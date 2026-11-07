@@ -1,6 +1,6 @@
 import { create } from "zustand"
 
-type Stage = "intro" | "avalanche" | "home" | "captcha" | "brad" | "endings" | "ad-boss" | "end-screen"
+type Stage = "intro" | "avalanche" | "home" | "captcha" | "brad" | "endings" | "ad-boss" | "end-screen" | "game-over" 
 
 type Ending = "brad-admits-bot" | "player-is-bot" | "cancel-plus"
 
@@ -13,6 +13,7 @@ interface GameState {
   currentStage: Stage
   monthlyTotal: number
   ending: Ending | null
+  trialEndsAt: number | null
   tierLevel: number
   desperation: number
   captchaLevel: number
@@ -23,10 +24,13 @@ interface GameState {
   messages: Message[]
 }
 
+const TRIAL_LENGTH_MS = 10 * 60 * 1000
+
 const initialState: GameState = {
   currentStage: "intro",
   monthlyTotal: 0,
   ending: null,
+  trialEndsAt: null,
   tierLevel: 0,
   desperation: 0,
   captchaLevel: 0,
@@ -42,6 +46,8 @@ interface GameActions {
   addToTotal: (amount: number) => void
   nextTier: () => void
   addDesperation: () => void
+  startTrial: () => void
+  resetGame: () => void
 }
 
 export const useGameStore = create<GameState & GameActions>()((set) => ({
@@ -51,4 +57,6 @@ export const useGameStore = create<GameState & GameActions>()((set) => ({
   addToTotal: (amount) => set((state) => ({ monthlyTotal: state.monthlyTotal + amount })),
   nextTier: () => set((state) => ({ tierLevel: state.tierLevel + 1})),
   addDesperation: () => set((state) => ({ desperation: state.desperation + 1 })),
+  startTrial: () => set({ trialEndsAt: Date.now() + TRIAL_LENGTH_MS }),
+  resetGame: () => set({ ...initialState }),
 }))
