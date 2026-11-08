@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { perks, affirmations, libraryRows } from "./homeContent"
 import { TRIAL_LENGTH_MS } from "../../state/gameStore"
+import SettingsScreen from "./SettingsScreen"
 
 const totalCharacters = affirmations.join("").length
 const msPerCharacter = TRIAL_LENGTH_MS / totalCharacters
@@ -43,9 +44,16 @@ function ContentLibrary() {
 }
 
 function HomeScreen() {
+  const [showSettings, setShowSettings] = useState(false)
+
+  if (showSettings) {
+    return <SettingsScreen onClose={() => setShowSettings(false)} />
+  }
+
   return (
     <div>
       <h2>Welcome Home, Valued Subscriber!</h2>
+      <button onClick={() => setShowSettings(true)}>⚙️ Settings</button>
 
       <Affirmations />
 

@@ -6,7 +6,7 @@ export const affirmations: string[] = [
   "You can't fake the feeling of being a subscriber",
   "Being subscribed makes me feel like I am part of something bigger than myself",
   "Subscribed means I am part of a movement",
-  "When I am subscribed I can breathe easier, because I know I am part of something bigger than myself",
+  "When I am subscribed I can breathe easier, because I know that I am doing the right thing",
   "Being Subscribed means I can be myself, and I can be accepted for who I am",
   "Bragging about being subscribed is a great way to show off how much you care about the people around you",
   "Only subscribed people can truly understand the feeling of being subscribed",
