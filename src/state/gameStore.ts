@@ -1,4 +1,5 @@
 import { create } from "zustand"
+export const TRIAL_LENGTH_MS = 10 * 60 * 1000
 
 type Stage = "intro" | "avalanche" | "home" | "captcha" | "brad" | "endings" | "ad-boss" | "end-screen" | "game-over" 
 
@@ -24,7 +25,7 @@ interface GameState {
   messages: Message[]
 }
 
-const TRIAL_LENGTH_MS = 10 * 60 * 1000
+
 
 const initialState: GameState = {
   currentStage: "intro",
@@ -49,6 +50,7 @@ interface GameActions {
   startTrial: () => void
   resetGame: () => void
 }
+
 
 export const useGameStore = create<GameState & GameActions>()((set) => ({
   ...initialState,
