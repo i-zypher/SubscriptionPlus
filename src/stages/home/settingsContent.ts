@@ -11,12 +11,13 @@ export type SettingOption =
 
 export type SettingsSection = {
   title: string
+  layout?: "grid"
   options: SettingOption[]
 }
 
 export const settingsSections: SettingsSection[] = [
   {
-    title: "Notifications",
+    title: "Notifications", 
     options: [
       { kind: "real-toggle", label: "Push Notifications", setting: "push" },
       { kind: "toggle", label: "Smoke Signals", startsOn: false, refuses: true, flipMessage: "Smoke signals cannot be enabled during wildfire season" },
@@ -33,6 +34,7 @@ export const settingsSections: SettingsSection[] = [
   },
   {
     title: "Buttons",
+    layout: "grid",
     options: [
       { kind: "locked", color: "#F0300A" },
       { kind: "locked", color: "#6A0AF0" },
