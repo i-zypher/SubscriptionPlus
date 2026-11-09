@@ -1,10 +1,12 @@
+import type { ToggleSettingKey, SliderSettingKey, ChoiceSettingKey } from "../../state/settingsStore"
+
 export type SettingOption =
-  | { kind: "toggle"; label: string; startsOn: boolean; flipMessage?: string }
-  | { kind: "real-toggle"; label: string; setting: string }
-  | { kind: "choice"; label: string; options: string[] }
+  | { kind: "toggle"; label: string; startsOn: boolean; flipMessage?: string; refuses?: boolean }
+  | { kind: "real-toggle"; label: string; setting: ToggleSettingKey }
+  | { kind: "choice"; label: string; setting: ChoiceSettingKey; options: string[] }
   | { kind: "locked"; color: string }
   | { kind: "exit"; color: string }
-  | { kind: "slider"; label: string; setting: string; min: number; max: number }
+  | { kind: "slider"; label: string; setting: SliderSettingKey; min: number; max: number }
   | { kind: "fake-slider"; label: string; snapsBackTo: number; flipMessage?: string }
 
 export type SettingsSection = {
@@ -17,7 +19,7 @@ export const settingsSections: SettingsSection[] = [
     title: "Notifications",
     options: [
       { kind: "real-toggle", label: "Push Notifications", setting: "push" },
-      { kind: "toggle", label: "Smoke Signals", startsOn: false, flipMessage: "Smoke signals cannot be enabled during wildfire season" },
+      { kind: "toggle", label: "Smoke Signals", startsOn: false, refuses: true, flipMessage: "Smoke signals cannot be enabled during wildfire season" },
       { kind: "toggle", label: "Moon Laser", startsOn: true, flipMessage: "Moon Laser is now set to Stun" },
       { kind: "toggle", label: "Carrier Pigeon", startsOn: true, flipMessage: "Carrier Pigeon is now set to Homing" },
     ],
@@ -25,8 +27,8 @@ export const settingsSections: SettingsSection[] = [
   {
     title: "Display",
     options: [
-      { kind: "choice", label: "Theme", options: ["Light", "Dark", "System"] },
-      { kind: "toggle", label: "Braille", startsOn: false, flipMessage: "Braille is available in 2036 with the advent of tactile displays" },
+      { kind: "choice", label: "Theme", setting: "theme", options: ["Light", "Dark", "System"] },
+      { kind: "toggle", label: "Braille", startsOn: false, refuses: true, flipMessage: "Braille is available in 2036 with the advent of tactile displays" },
     ],
   },
   {
@@ -50,7 +52,7 @@ export const settingsSections: SettingsSection[] = [
     title: "Accessibility",
     options: [
       { kind: "real-toggle", label: "Reduce Motion", setting: "reduceMotion" },
-      { kind: "choice", label: "Text Size", options: ["Small", "Medium", "Large"] },
+      { kind: "choice", label: "Text Size", setting: "textSize", options: ["Small", "Medium", "Large"] },
       { kind: "real-toggle", label: "High Contrast", setting: "highContrast" },
       { kind: "real-toggle", label: "Captions", setting: "captions" },
     ],
