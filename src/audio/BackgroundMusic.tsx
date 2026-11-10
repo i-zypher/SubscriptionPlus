@@ -25,6 +25,7 @@ function BackgroundMusic() {
   const stage = useGameStore((state) => state.currentStage)
   const masterVolume = useSettingsStore((state) => state.masterVolume)
   const music = useSettingsStore((state) => state.music)
+  const musicPaused = useGameStore((state) => state.musicPaused)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const track = trackFor(stage)
@@ -36,7 +37,9 @@ function BackgroundMusic() {
     const audio = new Audio(track)
     audio.loop = true
     audio.volume = musicVolume(masterVolume, music)
-    audio.play().catch(() => {})
+    if (!useGameStore.getState().musicPaused) {
+      audio.play().catch(() => {})
+    }
     audioRef.current = audio
 
     return () => {
@@ -50,6 +53,17 @@ function BackgroundMusic() {
       audioRef.current.volume = musicVolume(masterVolume, music)
     }
   }, [masterVolume, music])
+
+  // Pause/resume when something (like the audio CAPTCHA) needs quiet
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (musicPaused) {
+      audio.pause()
+    } else {
+      audio.play().catch(() => {})
+    }
+  }, [musicPaused])
 
   return null
 }

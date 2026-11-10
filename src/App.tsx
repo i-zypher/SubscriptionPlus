@@ -8,6 +8,8 @@ import TrialTimer from "./ui/TrialTimer"
 import  DesperationMeter from "./ui/DesperationMeter"
 import CaptchaScreen from "./stages/captcha/CaptchaScreen"
 import BackgroundMusic from "./audio/BackgroundMusic"
+import ChatBubble from "./ui/ChatBubble"
+
 
 function App() {
   const currentStage = useGameStore((state) => state.currentStage)
@@ -20,6 +22,7 @@ function App() {
       {currentStage !== "intro" && <Ticker />}
       {currentStage === "home" && <DesperationMeter />}
       {currentStage !== "intro" && currentStage !== "game-over" && <TrialTimer />}
+      {currentStage === "home" && <ChatBubble />}
 
       {currentStage === "intro" && <IntroScreen />}
       {currentStage === "avalanche" && <TierPopup />}

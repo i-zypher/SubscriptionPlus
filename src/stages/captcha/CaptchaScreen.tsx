@@ -8,13 +8,13 @@ import {
   playFailureTone,
   playMoneyAddedTone,
 } from "../../audio/sounds";
-import { spotScenes, spotImageSrc } from "./spotScenes"
+import { spotScenes, spotImageSrc } from "./spotScenes";
 
 const VERIFIED_HUMAN_PRICE = 4.99;
 const CHECKBOX_DODGES = 3;
 
-// TODO: set to whatever the CAPTCHA clip actually says
-const AUDIO_ANSWERS = ["subscription plus"];
+const AUDIO_QUESTION = "Subscription Plus! What's it do?";
+const AUDIO_ANSWERS = ["it renews"];
 
 type CaptchaProps = { onPass: () => void };
 
@@ -108,8 +108,31 @@ function CheckboxCaptcha({ onPass }: CaptchaProps) {
 function SpotDifferenceCaptcha({ onPass }: CaptchaProps) {
   const spotSceneId = useGameStore((state) => state.spotSceneId);
   const scene = spotScenes.find((s) => s.id === spotSceneId) ?? spotScenes[0];
-  const [oddIndex, setOddIndex] = useState(() => Math.floor(Math.random() * 4))
+  const [oddIndex, setOddIndex] = useState(() =>
+    Math.floor(Math.random() * 4),
+  );
   const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  // Load both images before showing any, so the odd one can't give itself
+  // away by popping in at a different moment
+  useEffect(() => {
+    const sources = [
+      spotImageSrc(scene.id, false),
+      spotImageSrc(scene.id, true),
+    ];
+    Promise.all(
+      sources.map(
+        (src) =>
+          new Promise<void>((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve();
+            img.onerror = () => resolve();
+            img.src = src;
+          }),
+      ),
+    ).then(() => setLoaded(true));
+  }, [scene.id]);
 
   function handlePick(index: number) {
     if (index === oddIndex) {
@@ -123,14 +146,18 @@ function SpotDifferenceCaptcha({ onPass }: CaptchaProps) {
 
   if (failed) {
     return (
-  <VerifiedHumanUpsell
-    onRetry={() => {
-      setOddIndex(Math.floor(Math.random() * 4))
-      setFailed(false)
-    }}
-    onPass={onPass}
-  />
-)
+      <VerifiedHumanUpsell
+        onRetry={() => {
+          setOddIndex(Math.floor(Math.random() * 4));
+          setFailed(false);
+        }}
+        onPass={onPass}
+      />
+    );
+  }
+
+  if (!loaded) {
+    return <p>Loading verification…</p>;
   }
 
   return (
@@ -140,8 +167,12 @@ function SpotDifferenceCaptcha({ onPass }: CaptchaProps) {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(2, 1fr)",
-          gap: "8px",
-          maxWidth: "480px",
+          gap: "12px",
+          width: "100%",
+          maxWidth: "960px",
+          margin: "0 auto",
+          padding: "0 12px",
+          boxSizing: "border-box",
         }}
       >
         {[0, 1, 2, 3].map((i) => (
@@ -185,14 +216,20 @@ function normalize(text: string) {
 
 function AudioCaptcha({ onPass }: CaptchaProps) {
   const jingleVersion = useGameStore((state) => state.jingleVersion);
+  const setMusicPaused = useGameStore((state) => state.setMusicPaused);
   const [guess, setGuess] = useState("");
   const [failed, setFailed] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Stop the clip if the player leaves this step
+  // Background music stays off for this whole step; stop the clip and
+  // bring the music back when the player leaves it
   useEffect(() => {
-    return () => audioRef.current?.pause();
-  }, []);
+    setMusicPaused(true);
+    return () => {
+      audioRef.current?.pause();
+      setMusicPaused(false);
+    };
+  }, [setMusicPaused]);
 
   function handlePlay() {
     if (!jingleVersion) return;
@@ -235,16 +272,19 @@ function AudioCaptcha({ onPass }: CaptchaProps) {
 
   return (
     <div>
-      <p>Press play and type what you hear.</p>
+      <p>Press play, then answer the question.</p>
       <button type="button" onClick={handlePlay}>
         🔊 Play audio
       </button>
+      <p>
+        <strong>{AUDIO_QUESTION}</strong>
+      </p>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
           value={guess}
           onChange={(e) => setGuess(e.target.value)}
-          aria-label="What you heard"
+          aria-label={AUDIO_QUESTION}
         />
         <button type="submit">Verify</button>
       </form>

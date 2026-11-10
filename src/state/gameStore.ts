@@ -37,6 +37,7 @@ interface GameState {
   messages: Message[];
   jingleVersion: string | null;
   spotSceneId: string | null;
+  musicPaused: boolean;
 }
 
 const initialState: GameState = {
@@ -54,6 +55,7 @@ const initialState: GameState = {
   messages: [],
   jingleVersion: null,
   spotSceneId: null,
+  musicPaused: false,
 };
 
 interface GameActions {
@@ -62,6 +64,7 @@ interface GameActions {
   nextTier: () => void;
   addDesperation: () => void;
   nextCaptcha: () => void;
+  setMusicPaused: (paused: boolean) => void;
   startTrial: () => void;
   resetGame: () => void;
 }
@@ -77,6 +80,7 @@ export const useGameStore = create<GameState & GameActions>()((set) => ({
     set((state) => ({ desperation: state.desperation + 1 })),
   nextCaptcha: () =>
     set((state) => ({ captchaLevel: state.captchaLevel + 1 })),
+  setMusicPaused: (paused) => set({ musicPaused: paused }),
   startTrial: () =>
     set((state) => ({
       trialEndsAt: Date.now() + TRIAL_LENGTH_MS,

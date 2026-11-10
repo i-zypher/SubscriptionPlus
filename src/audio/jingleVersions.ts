@@ -5,7 +5,6 @@ export type JingleVersion = {
 
 export const jingleVersions: JingleVersion[] = [
   { id: "original", edition: "Classic Edition (Now With Auto-Renew)" },
-  { id: "mariachi", edition: "Edición Muy Emocionada" },
   { id: "ballad", edition: "Emotional Support Edition" },
   { id: "polka", edition: "Oktober-Renew-Fest Edition" },
   { id: "bluegrass", edition: "The Moonshine Membership Edition" },
