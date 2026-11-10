@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { pickJingle } from "../audio/jingleVersions";
+import { pickSpotScene } from "../stages/captcha/spotScenes";
 
 export const TRIAL_LENGTH_MS = 10 * 60 * 1000;
 
@@ -35,6 +36,7 @@ interface GameState {
   muteWaiverSigned: boolean;
   messages: Message[];
   jingleVersion: string | null;
+  spotSceneId: string | null;
 }
 
 const initialState: GameState = {
@@ -51,6 +53,7 @@ const initialState: GameState = {
   muteWaiverSigned: false,
   messages: [],
   jingleVersion: null,
+  spotSceneId: null,
 };
 
 interface GameActions {
@@ -58,6 +61,7 @@ interface GameActions {
   addToTotal: (amount: number) => void;
   nextTier: () => void;
   addDesperation: () => void;
+  nextCaptcha: () => void;
   startTrial: () => void;
   resetGame: () => void;
 }
@@ -71,11 +75,18 @@ export const useGameStore = create<GameState & GameActions>()((set) => ({
   nextTier: () => set((state) => ({ tierLevel: state.tierLevel + 1 })),
   addDesperation: () =>
     set((state) => ({ desperation: state.desperation + 1 })),
+  nextCaptcha: () =>
+    set((state) => ({ captchaLevel: state.captchaLevel + 1 })),
   startTrial: () =>
     set((state) => ({
       trialEndsAt: Date.now() + TRIAL_LENGTH_MS,
       jingleVersion: pickJingle(state.jingleVersion),
+      spotSceneId: pickSpotScene(state.spotSceneId),
     })),
   resetGame: () =>
-    set((state) => ({ ...initialState, jingleVersion: state.jingleVersion })),
+    set((state) => ({
+      ...initialState,
+      jingleVersion: state.jingleVersion,
+      spotSceneId: state.spotSceneId,
+    })),
 }));
