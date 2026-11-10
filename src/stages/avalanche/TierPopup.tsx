@@ -1,5 +1,6 @@
 import { useGameStore } from "../../state/gameStore"
 import { tiers } from "./tiers"
+import {playMoneyAddedTone } from "../../audio/sounds"
 
 function TierPopup() {
   const tierLevel = useGameStore((state) => state.tierLevel)
@@ -11,6 +12,7 @@ function TierPopup() {
 
  function handleClick() {
   addToTotal(tier.price)
+  playMoneyAddedTone()
 
   if (tierLevel === tiers.length - 1) {
     goToStage("home")

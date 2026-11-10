@@ -1,4 +1,5 @@
 import { useGameStore } from "../../state/gameStore"
+import { playSuccessTone } from "../../audio/sounds"
 
 function IntroScreen() {
   const goToStage = useGameStore((state) => state.goToStage)
@@ -7,6 +8,7 @@ function IntroScreen() {
   function handleClick() {
     startTrial()
     goToStage("avalanche")
+    playSuccessTone()   
   }
 
   return (

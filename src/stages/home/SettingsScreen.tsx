@@ -8,6 +8,7 @@ import type {
   SliderSettingKey,
 } from "../../state/settingsStore";
 import { useGameStore } from "../../state/gameStore";
+import { playSuccessTone, playFailureTone } from "../../audio/sounds";
 
 function SliderControl({
   label,
@@ -32,6 +33,8 @@ function SliderControl({
         max={max}
         value={value}
         onChange={(e) => setSlider(setting, Number(e.target.value))}
+        onPointerUp={playSuccessTone}
+        onKeyUp={playSuccessTone}
       />
     </label>
   );
@@ -58,7 +61,10 @@ function ChoiceControl({
             type="radio"
             name={setting}
             checked={current === value}
-            onChange={() => setChoice(setting, value)}
+            onChange={() => {
+              setChoice(setting, value);
+              playSuccessTone();
+            }}
           />
           {value}
         </label>
@@ -82,7 +88,10 @@ function RealToggle({
       <input
         type="checkbox"
         checked={isOn}
-        onChange={() => toggleSetting(setting)}
+        onChange={() => {
+          toggleSetting(setting);
+          playSuccessTone();
+        }}
       />
       {label}
     </label>
@@ -111,6 +120,7 @@ function FakeToggle({
   }, [refused]);
 
   function handleChange() {
+    playFailureTone();
     if (refuses) {
       setRefused(true);
     } else {
@@ -150,6 +160,7 @@ function FakeSlider({
   function handleRelease() {
     setValue(snapsBackTo);
     setSnapped(true);
+    playFailureTone();
   }
 
   return (
@@ -172,7 +183,7 @@ function FakeSlider({
 }
 
 const swatchStyle = {
-  width: "100%",
+  width: "7dvw",
   aspectRatio: "1",
   border: "none",
   borderRadius: "12px",
@@ -192,6 +203,7 @@ function LockedSwatch({ color, index }: { color: string; index: number }) {
   function handleClick() {
     addDesperation();
     setShowLocked(true);
+    playSuccessTone();
   }
 
   return (
@@ -222,11 +234,16 @@ function ExitSwatch({ color, index }: { color: string; index: number }) {
   const goToStage = useGameStore((state) => state.goToStage);
 
   return (
-    <button
-      aria-label={`Color option ${index + 1}`}
-      style={{ ...swatchStyle, background: color }}
-      onClick={() => goToStage("captcha")}
-    />
+    <div style={{ position: "relative" }}>
+      <button
+        aria-label={`Color option ${index + 1}`}
+        style={{ ...swatchStyle, background: color }}
+        onClick={() => {
+          playFailureTone();
+          goToStage("captcha");
+        }}
+      />
+    </div>
   );
 }
 
@@ -276,9 +293,14 @@ function OptionView({ option, index }: { option: SettingOption; index: number })
 }
 
 function SettingsScreen({ onClose }: { onClose: () => void }) {
+  function handleBack() {
+    playFailureTone();
+    onClose();
+  }
+
   return (
     <div>
-      <button onClick={onClose}>← Back</button>
+      <button onClick={handleBack}>← Back</button>
       <h2>Settings</h2>
 
       {settingsSections.map((section) => (

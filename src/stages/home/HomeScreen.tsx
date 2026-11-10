@@ -3,6 +3,7 @@ import { perks, affirmations, libraryRows } from "./homeContent"
 import { TRIAL_LENGTH_MS } from "../../state/gameStore"
 import SettingsScreen from "./SettingsScreen"
 
+
 const totalCharacters = affirmations.join("").length
 const msPerCharacter = TRIAL_LENGTH_MS / totalCharacters
 
