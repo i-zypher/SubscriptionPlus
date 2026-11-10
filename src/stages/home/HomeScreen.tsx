@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
+import type { MouseEvent } from "react"
 import { perks, affirmations, libraryRows } from "./homeContent"
-import { TRIAL_LENGTH_MS } from "../../state/gameStore"
+import { TRIAL_LENGTH_MS, useGameStore } from "../../state/gameStore"
 import SettingsScreen from "./SettingsScreen"
-
 
 const totalCharacters = affirmations.join("").length
 const msPerCharacter = TRIAL_LENGTH_MS / totalCharacters
+
+const ERRANT_CLICKS_PER_DESPERATION = 5
 
 function Affirmations() {
   const [index, setIndex] = useState(0)
@@ -32,6 +34,7 @@ function ContentLibrary() {
   return (
     <div>
       <h3>Your Subscription Library</h3>
+      <p>Explore your subscription content below:</p>
       {libraryRows.map((row) => (
         <div key={row.title}>
           <h4>{row.title}</h4>
@@ -46,27 +49,42 @@ function ContentLibrary() {
 
 function HomeScreen() {
   const [showSettings, setShowSettings] = useState(false)
+  const addDesperation = useGameStore((state) => state.addDesperation)
+  const errantClicks = useRef(0)
 
-  if (showSettings) {
-    return <SettingsScreen onClose={() => setShowSettings(false)} />
+  function handleErrantClick(e: MouseEvent<HTMLDivElement>) {
+    const target = e.target as HTMLElement
+    // Clicks on real controls don't count as errant
+    if (target.closest("button, a, input, label, select, textarea")) return
+
+    errantClicks.current += 1
+    if (errantClicks.current % ERRANT_CLICKS_PER_DESPERATION === 0) {
+      addDesperation()
+    }
   }
 
   return (
-    <div>
-      <h2>Welcome Home, Valued Subscriber!</h2>
-      <button onClick={() => setShowSettings(true)}>⚙️ Settings</button>
+    <>
+      {/* Home stays mounted while Settings is open, just hidden,
+          so the affirmation rotation keeps its place */}
+      <div hidden={showSettings} onClick={handleErrantClick}>
+        <h2>Welcome Home, Valued Subscriber!</h2>
+        <button onClick={() => setShowSettings(true)}>⚙️ Settings</button>
 
-      <Affirmations />
+        <Affirmations />
 
-      <h3>Your Subscription Perks</h3>
-      <ul style={{ listStylePosition: "inside" }}>
-        {perks.map((perk) => (
-          <li key={perk}>{perk}</li>
-        ))}
-      </ul>
+        <h3>Your Subscription Perks</h3>
+        <ul style={{ listStylePosition: "inside" }}>
+          {perks.map((perk) => (
+            <li key={perk}>{perk}</li>
+          ))}
+        </ul>
 
-      <ContentLibrary />
-    </div>
+        <ContentLibrary />
+      </div>
+
+      {showSettings && <SettingsScreen onClose={() => setShowSettings(false)} />}
+    </>
   )
 }
 

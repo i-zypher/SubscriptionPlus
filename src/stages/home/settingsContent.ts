@@ -1,5 +1,6 @@
 import type { ToggleSettingKey, SliderSettingKey, ChoiceSettingKey } from "../../state/settingsStore"
 
+
 export type SettingOption =
   | { kind: "toggle"; label: string; startsOn: boolean; flipMessage?: string; refuses?: boolean }
   | { kind: "real-toggle"; label: string; setting: ToggleSettingKey }

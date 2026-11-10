@@ -5,6 +5,7 @@ import IntroScreen from "./stages/intro/IntroScreen"
 import GameOverScreen from "./stages/game-over/GameOverScreen"
 import Ticker from "./ui/Ticker"
 import TrialTimer from "./ui/TrialTimer"
+import  DesperationMeter from "./ui/DesperationMeter"
 import CaptchaScreen from "./stages/captcha/CaptchaScreen"
 import BackgroundMusic from "./audio/BackgroundMusic"
 
@@ -17,6 +18,7 @@ function App() {
       <h1>Subscription Plus</h1>
 
       {currentStage !== "intro" && <Ticker />}
+      {currentStage === "home" && <DesperationMeter />}
       {currentStage !== "intro" && currentStage !== "game-over" && <TrialTimer />}
 
       {currentStage === "intro" && <IntroScreen />}

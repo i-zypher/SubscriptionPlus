@@ -10,6 +10,8 @@ import type {
 import { useGameStore } from "../../state/gameStore";
 import { playSuccessTone, playFailureTone } from "../../audio/sounds";
 
+
+
 function SliderControl({
   label,
   setting,
@@ -109,6 +111,7 @@ function FakeToggle({
   flipMessage?: string;
   refuses?: boolean;
 }) {
+  const addDesperation = useGameStore((state) => state.addDesperation);
   const [on, setOn] = useState(startsOn);
   const [refused, setRefused] = useState(false);
   const flipped = on !== startsOn;
@@ -121,6 +124,7 @@ function FakeToggle({
 
   function handleChange() {
     playFailureTone();
+    addDesperation();
     if (refuses) {
       setRefused(true);
     } else {
@@ -139,6 +143,7 @@ function FakeToggle({
   );
 }
 
+
 function FakeSlider({
   label,
   snapsBackTo,
@@ -148,6 +153,7 @@ function FakeSlider({
   snapsBackTo: number;
   flipMessage?: string;
 }) {
+  const addDesperation = useGameStore((state) => state.addDesperation);
   const [value, setValue] = useState(snapsBackTo);
   const [snapped, setSnapped] = useState(false);
 
@@ -161,6 +167,7 @@ function FakeSlider({
     setValue(snapsBackTo);
     setSnapped(true);
     playFailureTone();
+    addDesperation();
   }
 
   return (
