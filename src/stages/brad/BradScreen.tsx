@@ -35,7 +35,7 @@ function BradScreen() {
   const [insults, setInsults] = useState(0);
 
   const timers = useRef<number[]>([]);
-  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const chatRef = useRef<HTMLDivElement | null>(null);
 
   const phaseIndex = Math.min(transferCount, LAST_PHASE);
   const phase = bradPhases[phaseIndex];
@@ -62,9 +62,11 @@ function BradScreen() {
       setMusicPaused(false);
     };
   }, [setMusicPaused]);
-  // Keep the newest message in view
+  // Keep the newest message in view. Scroll only the chat box: scrollIntoView
+  // also scrolls the whole page on iOS Safari, which jumps the layout.
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const chat = chatRef.current;
+    if (chat) chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" });
   }, [messages, typing, onHold]);
 
   function later(fn: () => void, ms: number) {
@@ -216,6 +218,7 @@ function BradScreen() {
       <h2>Live Support · {phase.name}</h2>
 
       <div
+        ref={chatRef}
         style={{
           height: "360px",
           overflowY: "auto",
@@ -254,7 +257,6 @@ function BradScreen() {
             🎵 On hold…
           </p>
         )}
-        <div ref={bottomRef} />
       </div>
 
       <form
@@ -265,10 +267,13 @@ function BradScreen() {
           type="text"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          disabled={busy}
+          // readOnly, not disabled: iOS Safari leaves a focused input that gets
+          // disabled unresponsive. handleSubmit already ignores sends while busy.
+          readOnly={busy}
           aria-label="Message Brad"
           placeholder={onHold ? "You're on hold…" : "Type a message…"}
-          style={{ flex: 1 }}
+          // 16px or larger stops iOS Safari from zooming in on focus
+          style={{ flex: 1, fontSize: "16px" }}
         />
         <button type="submit" disabled={busy}>
           Send
