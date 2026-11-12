@@ -3,6 +3,7 @@ import { pickJingle } from "../audio/jingleVersions";
 import { pickSpotScene } from "../stages/captcha/spotScenes";
 
 export const TRIAL_LENGTH_MS = 10 * 60 * 1000;
+export const CANCEL_PLUS_PRICE = 9.99;
 
 
 export type Stage =
@@ -77,7 +78,13 @@ export const useGameStore = create<GameState & GameActions>()((set) => ({
     set((state) => ({ messages: [...state.messages, message] })),
   nextTransfer: () =>
     set((state) => ({ transferCount: state.transferCount + 1 })),
-  setEnding: (ending) => set({ ending }),
+    // Winning stops the trial clock. Cancel Plus also replaces the whole bill.
+  setEnding: (ending) =>
+    set({
+      ending,
+      trialEndsAt: null,
+      ...(ending === "cancel-plus" ? { monthlyTotal: CANCEL_PLUS_PRICE } : {}),
+    }),
 
   goToStage: (stage) => set({ currentStage: stage }),
   addToTotal: (amount) =>

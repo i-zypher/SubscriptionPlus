@@ -13,13 +13,12 @@ export const jingleVersions: JingleVersion[] = [
 ]
 
 export function jingleSrc(id: string) {
-  return `/audio/jingle-${id}.mp3`
+  return `${import.meta.env.BASE_URL}audio/jingle-${id}.mp3`
 }
 
 export function captchaSrc(id: string) {
-  return `/audio/captcha-${id}.mp3`
+  return `${import.meta.env.BASE_URL}audio/captcha-${id}.mp3`
 }
-
 export function pickJingle(previous: string | null) {
   const options = jingleVersions.filter((version) => version.id !== previous)
   const index = Math.floor(Math.random() * options.length)

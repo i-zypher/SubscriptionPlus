@@ -1,71 +1,71 @@
-import { useEffect, useRef } from "react"
-import { useGameStore } from "../state/gameStore"
-import type { Stage } from "../state/gameStore"
-import { useSettingsStore } from "../state/settingsStore"
+import { useEffect, useRef } from "react";
+import { useGameStore } from "../state/gameStore";
+import type { Stage } from "../state/gameStore";
+import { useSettingsStore } from "../state/settingsStore";
 
 function trackFor(stage: Stage): string | null {
   switch (stage) {
     case "avalanche":
     case "home":
     case "captcha":
-      return "/audio/background.mp3"
+      return `${import.meta.env.BASE_URL}audio/background.mp3`;
     case "brad":
     case "endings":
-      return "/audio/glitchy.mp3"
+      return `${import.meta.env.BASE_URL}audio/glitchy.mp3`;
     default:
-      return null
+      return null;
   }
 }
 
 function musicVolume(master: number, music: number) {
-  return (master / 100) * (music / 100)
+  return (master / 100) * (music / 100);
 }
 
 function BackgroundMusic() {
-  const stage = useGameStore((state) => state.currentStage)
-  const masterVolume = useSettingsStore((state) => state.masterVolume)
-  const music = useSettingsStore((state) => state.music)
-  const musicPaused = useGameStore((state) => state.musicPaused)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const stage = useGameStore((state) => state.currentStage);
+  const masterVolume = useSettingsStore((state) => state.masterVolume);
+  const music = useSettingsStore((state) => state.music);
+  const musicPaused = useGameStore((state) => state.musicPaused);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const track = trackFor(stage)
+  const track = trackFor(stage);
 
   useEffect(() => {
-    if (!track) return
+    if (!track) return;
 
-    const { masterVolume, music } = useSettingsStore.getState()
-    const audio = new Audio(track)
-    audio.loop = true
-    audio.volume = musicVolume(masterVolume, music)
+    const { masterVolume, music } = useSettingsStore.getState();
+    const audio = new Audio(track);
+    audio.loop = true;
+    audio.volume = musicVolume(masterVolume, music);
     if (!useGameStore.getState().musicPaused) {
-      audio.play().catch(() => {})
+      audio.play().catch(() => {});
     }
-    audioRef.current = audio
+    audioRef.current = audio;
 
     return () => {
-      audio.pause()
-      audioRef.current = null
-    }
-  }, [track])
+      audio.pause();
+      audioRef.current = null;
+    };
+  }, [track]);
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = musicVolume(masterVolume, music)
+      audioRef.current.volume = musicVolume(masterVolume, music);
     }
-  }, [masterVolume, music])
+  }, [masterVolume, music]);
 
   // Pause/resume when something (like the audio CAPTCHA) needs quiet
   useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
+    const audio = audioRef.current;
+    if (!audio) return;
     if (musicPaused) {
-      audio.pause()
+      audio.pause();
     } else {
-      audio.play().catch(() => {})
+      audio.play().catch(() => {});
     }
-  }, [musicPaused])
+  }, [musicPaused]);
 
-  return null
+  return null;
 }
 
-export default BackgroundMusic
+export default BackgroundMusic;

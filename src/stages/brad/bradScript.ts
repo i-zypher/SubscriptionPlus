@@ -11,12 +11,36 @@ export const intentKeywords: Record<Exclude<Intent, "other">, string[]> = {
   cancel: ["cancel", "unsubscribe", "quit", "stop"],
   insult: ["stupid", "useless", "idiot", "dumb", "trash", "hate"],
   transfer: ["agent", "human", "manager", "supervisor", "person"],
-  askBot: ["are you a bot", "are you a robot", "are you ai", "you're a bot"],
-  iAmBot: ["i am a bot", "i'm a bot", "i am a robot", "simulation"],
+  askBot: [
+    "bot",
+    "robot",
+    "ai",
+    "chatbot",
+    "machine",
+    "computer",
+    "automated",
+    "are you human",
+    "are you real",
+    "real person",
+  ],
+  iAmBot: [
+    "i am a bot",
+    "i'm a bot",
+    "im a bot",
+    "i am a robot",
+    "i'm a robot",
+    "im a robot",
+    "i am an ai",
+    "i'm an ai",
+    "i am ai",
+    "i'm not human",
+    "i am not human",
+    "simulation",
+  ],
   yes: ["yes", "yeah", "sure", "ok", "fine"],
 };
 
-export const FEATURE_FEE = 4.99
+export const FEATURE_FEE = 4.99;
 
 export const chargedReplies: string[] = [
   "I'll be honest with you: I don't know. Honesty is a Plus+ feature, so that's {fee}.",
@@ -42,7 +66,7 @@ export const chargedReplies: string[] = [
   "I'll remember that for next time. Memory is {fee}/mo. …What were we talking about?",
   "Fun fact: fun facts are {fee}. That was the fun fact.",
   "I'm putting you on a brief hold. Holding is free. Unholding is {fee}.",
-]
+];
 
 export const bradReplies: Record<Intent, string[]> = {
   cancel: [
@@ -174,5 +198,5 @@ export const bradReplies: Record<Intent, string[]> = {
 
 export const BRAD_GREETING =
   "Hi, I'm Brad! 😊 I'm a real person. How can I help you today?";
-export const BRAD_CRACK = "???";
-
+export const BRAD_CRACK =
+  "Haha, you got me! 😊 I'm a bot! I don't have a mom. I don't even have a 'probably.'";

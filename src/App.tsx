@@ -11,6 +11,7 @@ import BackgroundMusic from "./audio/BackgroundMusic";
 import ChatBubble from "./ui/ChatBubble";
 import BradScreen from "./stages/brad/BradScreen";
 import EndingsScreen from "./stages/endings/EndingsScreen";
+import EndScreen from "./stages/end-screen/EndScreen";
 
 function App() {
   const currentStage = useGameStore((state) => state.currentStage);
@@ -34,6 +35,7 @@ function App() {
       {currentStage === "captcha" && <CaptchaScreen />}
       {currentStage === "brad" && <BradScreen />}
       {currentStage === "endings" && <EndingsScreen />}
+      {currentStage === "end-screen" && <EndScreen />}
     </div>
   );
 }
