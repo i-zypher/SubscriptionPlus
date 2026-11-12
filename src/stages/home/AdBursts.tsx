@@ -46,7 +46,8 @@ function pickAds(count: number) {
 
 const cardStyle: CSSProperties = {
   position: "fixed",
-  width: "min(320px, 90vw)",
+  boxSizing: "border-box",
+  width: "min(340px, calc(100vw - 16px))",
   background: "#fff",
   color: "#111",
   border: "3px solid #F00AD1",
@@ -117,8 +118,9 @@ function AdPopup({
   );
 
   const position: CSSProperties = {
-    left: `max(0px, calc(${open.x} * (100vw - 340px)))`,
-    top: `max(0px, calc(${open.y} * (100vh - 320px)))`,
+    // Always fully on screen, with an 8px margin, even on a narrow phone
+    left: `calc(8px + ${open.x} * max(0px, 100vw - 356px))`,
+    top: `calc(8px + ${open.y} * max(0px, 100dvh - 380px))`,
     zIndex: 2000 + layer,
   };
 

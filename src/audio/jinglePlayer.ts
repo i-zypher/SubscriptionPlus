@@ -44,7 +44,8 @@ export function playJingleOnce(version: string, onDone: () => void) {
   }
 
   showJingleNowPlaying(version)
-  player.play().catch(() => {})
+  // If the browser blocks playback, skip the intro instead of waiting forever
+  player.play().catch(handleEnded)
 }
 
 export function pauseJingle() {
