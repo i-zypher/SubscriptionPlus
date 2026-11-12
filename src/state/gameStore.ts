@@ -36,6 +36,7 @@ interface GameState {
   bradMode: "ai" | "lite";
   messages: Message[];
   jingleVersion: string | null;
+  jingleIntro: "pending" | "playing" | "done";
   spotSceneId: string | null;
   musicPaused: boolean;
 }
@@ -52,6 +53,7 @@ const initialState: GameState = {
   bradMode: "lite",
   messages: [],
   jingleVersion: null,
+  jingleIntro: "pending",
   spotSceneId: null,
   musicPaused: false,
 };
@@ -63,6 +65,7 @@ interface GameActions {
   addDesperation: () => void;
   nextCaptcha: () => void;
   setMusicPaused: (paused: boolean) => void;
+  setJingleIntro: (status: "pending" | "playing" | "done") => void;
   startTrial: () => void;
   resetGame: () => void;
   addMessage: (message: Message) => void;
@@ -95,6 +98,7 @@ export const useGameStore = create<GameState & GameActions>()((set) => ({
   nextCaptcha: () =>
     set((state) => ({ captchaLevel: state.captchaLevel + 1 })),
   setMusicPaused: (paused) => set({ musicPaused: paused }),
+  setJingleIntro: (status) => set({ jingleIntro: status }),
   startTrial: () =>
     set((state) => ({
       trialEndsAt: Date.now() + TRIAL_LENGTH_MS,

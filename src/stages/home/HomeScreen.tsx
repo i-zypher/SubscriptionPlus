@@ -4,6 +4,7 @@ import { perks, affirmations, libraryRows } from "./homeContent";
 import { TRIAL_LENGTH_MS, useGameStore } from "../../state/gameStore";
 import SettingsScreen from "./SettingsScreen";
 import AdBursts from "./AdBursts";
+import JingleIntro from "./JingleIntro";
 
 const totalCharacters = affirmations.join("").length;
 const msPerCharacter = TRIAL_LENGTH_MS / totalCharacters;
@@ -52,6 +53,7 @@ function HomeScreen() {
   const [showSettings, setShowSettings] = useState(false);
   const addDesperation = useGameStore((state) => state.addDesperation);
   const errantClicks = useRef(0);
+  const jingleIntro = useGameStore((state) => state.jingleIntro);
 
   function handleErrantClick(e: MouseEvent<HTMLDivElement>) {
     const target = e.target as HTMLElement;
@@ -109,7 +111,8 @@ function HomeScreen() {
         <ContentLibrary />
       </div>
 
-      <AdBursts paused={showSettings} />
+      <JingleIntro />
+      <AdBursts paused={showSettings || jingleIntro === "playing"} />
 
       {showSettings && (
         <SettingsScreen onClose={() => setShowSettings(false)} />

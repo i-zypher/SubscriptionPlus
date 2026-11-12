@@ -245,6 +245,11 @@ function AdBursts({ paused }: { paused: boolean }) {
     return () => events.forEach((e) => window.removeEventListener(e, mark));
   }, []);
 
+  // The idle clock starts fresh whenever the pause ends (settings closed, intro finished)
+  useEffect(() => {
+    if (!paused) lastActivity.current = Date.now();
+  }, [paused]);
+
   // Check once a second whether they've been idle long enough
   useEffect(() => {
     if (paused || adsShowing) return;
