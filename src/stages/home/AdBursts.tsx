@@ -3,8 +3,7 @@ import type { CSSProperties } from "react";
 import { ads, exitAds } from "./adPopups";
 import type { Ad, CloseTrick } from "./adPopups";
 import { useGameStore } from "../../state/gameStore";
-import { useSettingsStore } from "../../state/settingsStore";
-import { jingleSrc } from "../../audio/jingleVersions";
+import { playJingle, pauseJingle } from "../../audio/jinglePlayer";
 import { playFailureTone } from "../../audio/sounds";
 
 const IDLE_STEP_MS = 30 * 1000; // 30s, then 60s, then 90s...
@@ -260,17 +259,13 @@ function AdBursts({ paused }: { paused: boolean }) {
     return () => clearInterval(interval);
   }, [paused, adsShowing]);
 
-  // The jingle plays from the start while any ad is open
+    // The jingle plays while any ad is open, continuing the same song as Brad's holds
   useEffect(() => {
     if (!adsShowing || !jingleVersion) return;
     setMusicPaused(true);
-    const { masterVolume, music } = useSettingsStore.getState();
-    const audio = new Audio(jingleSrc(jingleVersion));
-    audio.loop = true;
-    audio.volume = (masterVolume / 100) * (music / 100);
-    audio.play().catch(() => {});
+    playJingle(jingleVersion);
     return () => {
-      audio.pause();
+      pauseJingle();
       setMusicPaused(false);
       lastActivity.current = Date.now(); // the next wait starts now
     };

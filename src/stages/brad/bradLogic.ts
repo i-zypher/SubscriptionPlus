@@ -1,5 +1,6 @@
-import { intentKeywords, bradReplies, chargedReplies, FEATURE_FEE } from "./bradScript"
+import { intentKeywords, chargedReplies, FEATURE_FEE } from "./bradScript"
 import type { Intent } from "./bradScript"
+import type { BradPhase } from "./bradPhases"
 
 // Checked in this order. "I'm a bot" must win over "are you a bot",
 // and "yes" comes last so "yes, cancel it" still counts as cancel.
@@ -31,13 +32,16 @@ export function detectIntent(message: string): Intent {
   return "other"
 }
 
-export function pickReply(intent: Intent) {
-  const lines = bradReplies[intent]
+export function pickLine(lines: string[]) {
   return lines[Math.floor(Math.random() * lines.length)]
 }
 
-export function pickOtherReply() {
-  const plain = bradReplies.other
+export function pickReply(phase: BradPhase, intent: Intent) {
+  return pickLine(phase.replies[intent])
+}
+
+export function pickOtherReply(phase: BradPhase) {
+  const plain = phase.replies.other
   const i = Math.floor(Math.random() * (plain.length + chargedReplies.length))
 
   if (i < plain.length) {

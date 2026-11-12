@@ -175,10 +175,4 @@ export const bradReplies: Record<Intent, string[]> = {
 export const BRAD_GREETING =
   "Hi, I'm Brad! 😊 I'm a real person. How can I help you today?";
 export const BRAD_CRACK = "???";
-export const BRAD_NAMES = [
-  "Brad",
-  "Brad (Specialist)",
-  "Brad, Senior Specialist 👔",
-  "BRAD",
-];
-export const INSULT_SURCHARGE = 15;
+

@@ -19,6 +19,7 @@ export type Ending = "brad-admits-bot" | "player-is-bot" | "cancel-plus";
 
 export type Message = {
   from: "brad" | "player" | "system";
+  name?: string;
   text: string;
 };
 

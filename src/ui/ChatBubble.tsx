@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useGameStore } from "../state/gameStore";
 
 const QUEUE_WAIT_MS = 3 * 60 * 1000;
-const QUEUE_TICK_MS = 3000;
+const QUEUE_TICK_MS = 35 * 1000;
 
 function randomQueuePosition() {
   return 1 + Math.floor(Math.random() * 100000);
