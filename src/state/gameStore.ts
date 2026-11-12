@@ -12,7 +12,6 @@ export type Stage =
   | "captcha"
   | "brad"
   | "endings"
-  | "ad-boss"
   | "end-screen"
   | "game-over";
 
@@ -32,9 +31,7 @@ interface GameState {
   desperation: number;
   captchaLevel: number;
   transferCount: number;
-  adPhase: number;
   bradMode: "ai" | "lite";
-  muteWaiverSigned: boolean;
   messages: Message[];
   jingleVersion: string | null;
   spotSceneId: string | null;

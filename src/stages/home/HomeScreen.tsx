@@ -3,6 +3,7 @@ import type { MouseEvent } from "react";
 import { perks, affirmations, libraryRows } from "./homeContent";
 import { TRIAL_LENGTH_MS, useGameStore } from "../../state/gameStore";
 import SettingsScreen from "./SettingsScreen";
+import AdBursts from "./AdBursts";
 
 const totalCharacters = affirmations.join("").length;
 const msPerCharacter = TRIAL_LENGTH_MS / totalCharacters;
@@ -107,6 +108,8 @@ function HomeScreen() {
 
         <ContentLibrary />
       </div>
+
+      <AdBursts paused={showSettings} />
 
       {showSettings && (
         <SettingsScreen onClose={() => setShowSettings(false)} />
