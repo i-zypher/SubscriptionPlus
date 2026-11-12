@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useGameStore } from "../state/gameStore";
 import type { Stage } from "../state/gameStore";
 import { useSettingsStore } from "../state/settingsStore";
+import { showMusicNowPlaying } from "./mediaSession";
 
 function trackFor(stage: Stage): string | null {
   switch (stage) {
@@ -38,6 +39,7 @@ function BackgroundMusic() {
     audio.loop = true;
     audio.volume = musicVolume(masterVolume, music);
     if (!useGameStore.getState().musicPaused) {
+      showMusicNowPlaying(track);
       audio.play().catch(() => {});
     }
     audioRef.current = audio;
@@ -61,6 +63,7 @@ function BackgroundMusic() {
     if (musicPaused) {
       audio.pause();
     } else {
+      showMusicNowPlaying(audio.src);
       audio.play().catch(() => {});
     }
   }, [musicPaused]);
