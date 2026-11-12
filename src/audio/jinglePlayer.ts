@@ -36,9 +36,12 @@ export function playJingleOnce(version: string, onDone: () => void) {
     stopWatchingEnd?.()
     onDone()
   }
-  player.addEventListener("ended", handleEnded)
+  // "pause" here means the phone stopped it (media controls, switching apps),
+  // since pauseJingle() stops watching before it pauses. Either way, move on.
+  const endEvents = ["ended", "pause", "error"]
+  endEvents.forEach((e) => player.addEventListener(e, handleEnded))
   stopWatchingEnd = () => {
-    player.removeEventListener("ended", handleEnded)
+    endEvents.forEach((e) => player.removeEventListener(e, handleEnded))
     player.loop = true
     stopWatchingEnd = null
   }
