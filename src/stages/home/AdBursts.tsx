@@ -223,6 +223,7 @@ function AdPopup({
 function AdBursts({ paused }: { paused: boolean }) {
   const jingleVersion = useGameStore((state) => state.jingleVersion);
   const setMusicPaused = useGameStore((state) => state.setMusicPaused);
+  const jingleIntro = useGameStore((state) => state.jingleIntro);
 
   const [openAds, setOpenAds] = useState<OpenAd[]>([]);
   const lastActivity = useRef(0);
@@ -266,17 +267,23 @@ function AdBursts({ paused }: { paused: boolean }) {
     return () => clearInterval(interval);
   }, [paused, adsShowing]);
 
-    // The jingle plays while any ad is open, continuing the same song as Brad's holds
+  // The jingle plays while any ad is open, continuing the same song as Brad's holds.
+  // If the home-screen intro is already playing it, the ads just ride along; if the
+  // intro ends while ads are still open, this takes over and keeps it looping.
   useEffect(() => {
-    if (!adsShowing || !jingleVersion) return;
+    if (!adsShowing || !jingleVersion || jingleIntro === "playing") return;
     setMusicPaused(true);
     playJingle(jingleVersion);
     return () => {
       pauseJingle();
       setMusicPaused(false);
-      lastActivity.current = Date.now(); // the next wait starts now
     };
-  }, [adsShowing, jingleVersion, setMusicPaused]);
+  }, [adsShowing, jingleVersion, jingleIntro, setMusicPaused]);
+
+  // The next idle wait starts when the last ad closes
+  useEffect(() => {
+    if (!adsShowing) lastActivity.current = Date.now();
+  }, [adsShowing]);
 
   function close(key: number, trick: CloseTrick) {
     setOpenAds((current) => {

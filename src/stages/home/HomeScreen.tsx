@@ -53,7 +53,6 @@ function HomeScreen() {
   const [showSettings, setShowSettings] = useState(false);
   const addDesperation = useGameStore((state) => state.addDesperation);
   const errantClicks = useRef(0);
-  const jingleIntro = useGameStore((state) => state.jingleIntro);
 
   function handleErrantClick(e: MouseEvent<HTMLDivElement>) {
     const target = e.target as HTMLElement;
@@ -112,7 +111,7 @@ function HomeScreen() {
       </div>
 
       <JingleIntro />
-      <AdBursts paused={showSettings || jingleIntro === "playing"} />
+      <AdBursts paused={showSettings} />
 
       {showSettings && (
         <SettingsScreen onClose={() => setShowSettings(false)} />
