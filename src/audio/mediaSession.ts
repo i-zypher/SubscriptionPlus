@@ -7,6 +7,7 @@ function showNowPlaying(title: string, artist: string) {
     title,
     artist,
     album: "Subscription Plus™",
+    artwork: [{ src: `${import.meta.env.BASE_URL}media-art.png`, sizes: "512x512", type: "image/png" }],
   })
 }
 
