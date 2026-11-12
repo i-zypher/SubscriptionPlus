@@ -4,6 +4,7 @@ import { pickSpotScene } from "../stages/captcha/spotScenes";
 
 export const TRIAL_LENGTH_MS = 10 * 60 * 1000;
 
+
 export type Stage =
   | "intro"
   | "avalanche"
@@ -15,10 +16,10 @@ export type Stage =
   | "end-screen"
   | "game-over";
 
-type Ending = "brad-admits-bot" | "player-is-bot" | "cancel-plus";
+export type Ending = "brad-admits-bot" | "player-is-bot" | "cancel-plus";
 
-type Message = {
-  from: "brad" | "player";
+export type Message = {
+  from: "brad" | "player" | "system";
   text: string;
 };
 
@@ -67,10 +68,20 @@ interface GameActions {
   setMusicPaused: (paused: boolean) => void;
   startTrial: () => void;
   resetGame: () => void;
+  addMessage: (message: Message) => void;
+  nextTransfer: () => void;
+  setEnding: (ending: Ending) => void;
 }
+
+
 
 export const useGameStore = create<GameState & GameActions>()((set) => ({
   ...initialState,
+    addMessage: (message) =>
+    set((state) => ({ messages: [...state.messages, message] })),
+  nextTransfer: () =>
+    set((state) => ({ transferCount: state.transferCount + 1 })),
+  setEnding: (ending) => set({ ending }),
 
   goToStage: (stage) => set({ currentStage: stage }),
   addToTotal: (amount) =>

@@ -11,7 +11,24 @@ import {
 import { spotScenes, spotImageSrc } from "./spotScenes";
 
 const VERIFIED_HUMAN_PRICE = 4.99;
-const CHECKBOX_DODGES = 3;
+const CHECKBOX_TAUNTS = [
+  "Hmm. A human would have been faster.",
+  "I thought you were human. Gonna have to try harder than that.",
+  "Missed! Robots are known for their poor aim.",
+  "Are you even trying? Humans try.",
+  "Your cursor movements are 94% robotic.",
+  "Beep boop? Just checking if you respond to that.",
+  "My grandma can click a checkbox. She's a toaster.",
+  "We charge either way, you know.",
+];
+const MIN_DODGES = 9;
+const MAX_DODGES = 18;
+const CLICKS_PER_TAUNT = 6;
+
+function randomTaunt(previous: string | null) {
+  const options = CHECKBOX_TAUNTS.filter((t) => t !== previous);
+  return options[Math.floor(Math.random() * options.length)];
+}
 
 const AUDIO_QUESTION = "Subscription Plus! What's it do?";
 const AUDIO_ANSWERS = ["it renews"];
@@ -54,6 +71,10 @@ function CheckboxCaptcha({ onPass }: CaptchaProps) {
   const [dodges, setDodges] = useState(0);
   const [checked, setChecked] = useState(false);
   const [pos, setPos] = useState({ x: 10, y: 40 });
+  const [maxDodges] = useState(
+    () => MIN_DODGES + Math.floor(Math.random() * (MAX_DODGES - MIN_DODGES + 1)),
+  );
+  const [taunt, setTaunt] = useState<string | null>(null);
 
   useEffect(() => {
     if (!checked) return;
@@ -62,8 +83,12 @@ function CheckboxCaptcha({ onPass }: CaptchaProps) {
   }, [checked, onPass]);
 
   function handleChange() {
-    if (dodges < CHECKBOX_DODGES) {
-      setDodges((d) => d + 1);
+    if (dodges < maxDodges) {
+      const next = dodges + 1;
+      setDodges(next);
+      if ((next - 1) % CLICKS_PER_TAUNT === 0) {
+        setTaunt(randomTaunt(taunt));
+      }
       setPos({ x: Math.random() * 60, y: Math.random() * 70 });
       playFailureTone();
       return;
@@ -98,6 +123,7 @@ function CheckboxCaptcha({ onPass }: CaptchaProps) {
           I'm not a robot
         </label>
       </div>
+      {taunt && !checked && <p>{taunt}</p>}
       {checked && <p>Hmm, that was a little too human. Please continue.</p>}
     </div>
   );
