@@ -11,6 +11,10 @@ const MIN_ADS = 3;
 const MAX_ADS = 7;
 const COUNTDOWN_SECONDS = 5;
 const DODGES = 3;
+// While ads sit open and untouched, a new burst lands on top this often
+const STACK_EVERY_MS = 30 * 1000;
+// Keeps a phone from grinding to a halt if someone walks away for an hour
+const MAX_ON_SCREEN = 40;
 
 const tricks: CloseTrick[] = [
   "bottom",
@@ -253,16 +257,20 @@ function AdBursts({ paused }: { paused: boolean }) {
     if (!paused) lastActivity.current = Date.now();
   }, [paused]);
 
-  // Check once a second whether they've been idle long enough
+  // Check once a second whether they've been idle long enough. With the
+  // screen clear, waits grow (30s, 60s, 90s…). With ads already open and
+  // nobody touching anything, a fresh burst stacks on top every 30s.
   useEffect(() => {
-    if (paused || adsShowing) return;
+    if (paused) return;
     const interval = setInterval(() => {
-      const needed = IDLE_STEP_MS * (burstCount.current + 1);
+      const needed = adsShowing ? STACK_EVERY_MS : IDLE_STEP_MS * (burstCount.current + 1);
       if (Date.now() - lastActivity.current < needed) return;
 
-      burstCount.current += 1;
+      if (!adsShowing) burstCount.current += 1;
+      lastActivity.current = Date.now(); // the next stack waits its own 30s
       const count = MIN_ADS + Math.floor(Math.random() * (MAX_ADS - MIN_ADS + 1));
-      setOpenAds(pickAds(count).map((ad) => makeOpenAd(ad, randomItem(tricks))));
+      const burst = pickAds(count).map((ad) => makeOpenAd(ad, randomItem(tricks)));
+      setOpenAds((current) => [...current, ...burst].slice(-MAX_ON_SCREEN));
     }, 1000);
     return () => clearInterval(interval);
   }, [paused, adsShowing]);
