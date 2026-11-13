@@ -10,6 +10,7 @@ import { FEATURE_FEE } from "./bradScript";
 import { aiBradAvailable, askBrad } from "./bradAI";
 import { liteReply, soundsLikeDistress, DISTRESS_REPLY } from "./bradLite";
 import type { AiIntent, Offer } from "./bradAI";
+import "./brad.css";
 
 const ASKS_TO_CRACK = 3;
 const INSULTS_TO_TRANSFER = 3;
@@ -17,6 +18,20 @@ const HOLD_MS = 15 * 1000;
 const ENDING_DELAY_MS = 3500;
 
 const LAST_PHASE = bradPhases.length - 1;
+
+// Total and time left, shown in every Brad's header
+function useMeters() {
+  const monthlyTotal = useGameStore((state) => state.monthlyTotal);
+  const trialEndsAt = useGameStore((state) => state.trialEndsAt);
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+  const remaining = Math.max(0, (trialEndsAt ?? now) - now);
+  const time = `${Math.floor(remaining / 60000)}:${String(Math.floor(remaining / 1000) % 60).padStart(2, "0")}`;
+  return { total: `$${monthlyTotal.toFixed(2)}`, time };
+}
 
 function BradScreen() {
   const messages = useGameStore((state) => state.messages);
@@ -78,6 +93,11 @@ function BradScreen() {
   useEffect(() => {
     const chat = chatRef.current;
     if (chat) chat.scrollTo({ top: chat.scrollHeight, behavior: "smooth" });
+    // BRAD's broken page has no chat box, so the whole page scrolls instead
+    const page = chat?.closest(".brad");
+    if (page && chat && chat.scrollHeight <= chat.clientHeight + 1) {
+      page.scrollTo({ top: page.scrollHeight, behavior: "smooth" });
+    }
   }, [messages, typing, onHold]);
 
   function later(fn: () => void, ms: number) {
@@ -304,72 +324,101 @@ function BradScreen() {
     void respond(text);
   }
 
-  return (
-    <div style={{ maxWidth: "520px", margin: "0 auto", textAlign: "left" }}>
-      <h2>Live Support · {phase.name}</h2>
+  const brokenPage = phaseIndex === LAST_PHASE;
+  const meters = useMeters();
 
-      <div
-        ref={chatRef}
-        style={{
-          height: "360px",
-          overflowY: "auto",
-          border: "1px solid #444",
-          borderRadius: "12px",
-          padding: "12px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "8px",
-        }}
-      >
-        {messages.map((m, i) => (
-          <p
-            key={i}
-            style={{
-              margin: 0,
-              alignSelf:
-                m.from === "player"
-                  ? "flex-end"
-                  : m.from === "brad"
-                    ? "flex-start"
-                    : "center",
-              fontStyle: m.from === "system" ? "italic" : "normal",
-              opacity: m.from === "system" ? 0.7 : 1,
-            }}
-          >
-            {m.from === "brad" && <strong>{m.name ?? "Brad"}: </strong>}
-            {m.text}
-          </p>
-        ))}
-        {typing && (
-          <p style={{ margin: 0, opacity: 0.7 }}>{phase.name} is typing…</p>
+  return (
+    <div className={`brad brad-p${phaseIndex}`}>
+      <div className="brad-window">
+        {/* Each Brad is a worse website than the last. BRAD is barely a website. */}
+        {brokenPage && (
+          <>
+            <p className="brad-err">
+              Uncaught TypeError: brad.isHuman is not a function
+              <br />
+              &nbsp;&nbsp;&nbsp;&nbsp;at SupportChat.render (chat.js:6767)
+            </p>
+            <div className="brad-applet" aria-hidden="true">
+              <span>☕</span>
+              <div>
+                <strong>Java(TM) Plug-in failed to load</strong>
+                <br />
+                ClassNotFoundException: BradApplet.class
+              </div>
+            </div>
+          </>
         )}
-        {onHold && (
-          <p style={{ margin: 0, opacity: 0.7, alignSelf: "center" }}>
-            🎵 On hold…
+
+        <header className="brad-head">
+          {!brokenPage && (
+            <div className="brad-avatar" aria-hidden="true">
+              {phaseIndex === 2 ? "👔" : "B"}
+            </div>
+          )}
+          <div className="brad-who">
+            <h2>
+              {brokenPage ? "Live Support - [object Object]" : `Live Support · ${phase.name}`}
+            </h2>
+            <small>
+              {brokenPage
+                ? "status: undefined"
+                : phaseIndex === 0
+                  ? "Online · usually replies instantly"
+                  : phaseIndex === 1
+                    ? "Specialist Desk · Ticket #A-0042"
+                    : "Senior Specialist · Office of Customer Success"}
+            </small>
+          </div>
+          <div className="brad-meters">
+            <span>{brokenPage ? `TOTAL=${meters.total}` : `${meters.total}/mo`}</span>
+            <span>{brokenPage ? `trial.remaining=${meters.time}` : `Trial ${meters.time}`}</span>
+          </div>
+        </header>
+
+        <div ref={chatRef} className="brad-log">
+          {messages.map((m, i) => (
+            <div key={i} className={`bmsg is-${m.from}`}>
+              {m.from === "brad" && <strong className="bmsg-name">{m.name ?? "Brad"}</strong>}
+              <span>{m.text}</span>
+            </div>
+          ))}
+          {typing && (
+            <div className="bmsg is-brad is-typing">
+              <strong className="bmsg-name">{phase.name}</strong>
+              <span>
+                {brokenPage ? "BRAD is typing... NaN%" : <><i /><i /><i /></>}
+              </span>
+            </div>
+          )}
+          {onHold && <div className="bmsg is-system is-hold">🎵 On hold…</div>}
+        </div>
+
+        <form onSubmit={handleSubmit} className="brad-form">
+          <input
+            type="text"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            // readOnly, not disabled: iOS Safari leaves a focused input that gets
+            // disabled unresponsive. handleSubmit already ignores sends while busy.
+            readOnly={busy}
+            aria-label="Message Brad"
+            placeholder={onHold ? "You're on hold…" : brokenPage ? "undefined" : "Type a message…"}
+          />
+          <button type="submit" disabled={busy}>
+            {brokenPage ? "Submit Query" : "Send"}
+          </button>
+        </form>
+
+        {brokenPage && (
+          <p className="brad-footer">
+            Best viewed in Netscape Navigator 4.0 at 800x600. © 1998 Subscription Plus.
+            <br />
+            <a href="#top" onClick={(e) => e.preventDefault()}>Return to homepage</a>
+            {" | "}
+            <a href="#top" onClick={(e) => e.preventDefault()}>Sign our guestbook</a>
           </p>
         )}
       </div>
-
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", gap: "8px", marginTop: "8px" }}
-      >
-        <input
-          type="text"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          // readOnly, not disabled: iOS Safari leaves a focused input that gets
-          // disabled unresponsive. handleSubmit already ignores sends while busy.
-          readOnly={busy}
-          aria-label="Message Brad"
-          placeholder={onHold ? "You're on hold…" : "Type a message…"}
-          // 16px or larger stops iOS Safari from zooming in on focus
-          style={{ flex: 1, fontSize: "16px" }}
-        />
-        <button type="submit" disabled={busy}>
-          Send
-        </button>
-      </form>
     </div>
   );
 }
