@@ -60,7 +60,7 @@ function CookieCaptcha({ onPass }: CaptchaProps) {
   }, [managing, relapses]);
 
   function handleAcceptAll() {
-    addToTotal(COOKIE_CLUB_PRICE);
+    addToTotal(COOKIE_CLUB_PRICE, "Cookie Club (accepted all cookies)");
     playMoneyAddedTone();
     onPass();
   }

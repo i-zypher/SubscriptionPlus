@@ -6,6 +6,9 @@ import { bradPhases } from "./bradPhases";
 import { detectIntent, pickLine, pickReply, pickOtherReply } from "./bradLogic";
 import { playJingle, pauseJingle } from "../../audio/jinglePlayer";
 import { playMoneyAddedTone } from "../../audio/sounds";
+import { FEATURE_FEE } from "./bradScript";
+import { aiBradAvailable, askBrad } from "./bradAI";
+import type { AiIntent } from "./bradAI";
 
 const ASKS_TO_CRACK = 3;
 const INSULTS_TO_TRANSFER = 3;
@@ -24,6 +27,7 @@ function BradScreen() {
   const setEnding = useGameStore((state) => state.setEnding);
   const setMusicPaused = useGameStore((state) => state.setMusicPaused);
   const goToStage = useGameStore((state) => state.goToStage);
+  const setBradMode = useGameStore((state) => state.setBradMode);
 
   const [draft, setDraft] = useState("");
   const [typing, setTyping] = useState(false);
@@ -35,6 +39,7 @@ function BradScreen() {
   const [insults, setInsults] = useState(0);
 
   const timers = useRef<number[]>([]);
+  const alive = useRef(true);
   const chatRef = useRef<HTMLDivElement | null>(null);
 
   const phaseIndex = Math.min(transferCount, LAST_PHASE);
@@ -44,6 +49,7 @@ function BradScreen() {
   // The first Brad says hi once per run
   useEffect(() => {
     if (useGameStore.getState().messages.length === 0) {
+      if (aiBradAvailable) setBradMode("ai");
       const first = bradPhases[0];
       addMessage({
         from: "brad",
@@ -51,12 +57,14 @@ function BradScreen() {
         text: pickLine(first.greetings),
       });
     }
-  }, [addMessage]);
+  }, [addMessage, setBradMode]);
 
   // Cancel pending replies and stop the hold music if the screen goes away
   useEffect(() => {
     const pending = timers.current;
+    alive.current = true;
     return () => {
+      alive.current = false;
       pending.forEach((id) => clearTimeout(id));
       pauseJingle();
       setMusicPaused(false);
@@ -77,13 +85,36 @@ function BradScreen() {
     addMessage({ from: "brad", name: phase.name, text });
   }
 
-  function bradSaysOther() {
-    const reply = pickOtherReply(phase);
-    bradSays(reply.text);
-    if (reply.charge > 0) {
-      addToTotal(reply.charge);
-      playMoneyAddedTone();
+  function charge(amount: number, label: string) {
+    addToTotal(amount, label);
+    playMoneyAddedTone();
+  }
+
+  // Scripted Brad Lite's general reply (sometimes a $4.99 "feature")
+  function liteOther(): { text: string; charge: number } {
+    return pickOtherReply(phase);
+  }
+
+  // Ask AI Brad, but never answer faster than this Brad types. Falls back to
+  // the scripted line (and Brad Lite for the rest of the run) if AI can't answer.
+  async function aiLine(phaseIndexForLine: number, intent: AiIntent, minMs: number) {
+    if (useGameStore.getState().bradMode !== "ai") {
+      await wait(minMs);
+      return null;
     }
+    const [answer] = await Promise.all([askBrad(phaseIndexForLine, intent), wait(minMs)]);
+    if (!answer && alive.current && useGameStore.getState().bradMode === "ai") {
+      setBradMode("lite");
+      addMessage({
+        from: "system",
+        text: "☕ Brad is on break. You're now chatting with Brad Lite.",
+      });
+    }
+    return answer;
+  }
+
+  function wait(ms: number) {
+    return new Promise<void>((resolve) => later(resolve, ms));
   }
 
   function finish(ending: Ending) {
@@ -113,9 +144,10 @@ function BradScreen() {
     });
     startHoldMusic();
 
-    later(() => {
+    later(async () => {
       stopHoldMusic();
-      const next = bradPhases[Math.min(phaseIndex + 1, LAST_PHASE)];
+      const nextIndex = Math.min(phaseIndex + 1, LAST_PHASE);
+      const next = bradPhases[nextIndex];
       nextTransfer();
       setBotAsks(0);
       setInsults(0);
@@ -124,16 +156,20 @@ function BradScreen() {
         from: "system",
         text: `🔄 You've been transferred to ${next.name}.`,
       });
+      setTyping(true);
+      const ai = await aiLine(nextIndex, "greeting", next.typingMs);
+      if (!alive.current) return;
+      setTyping(false);
       addMessage({
         from: "brad",
         name: next.name,
-        text: pickLine(next.greetings),
+        text: ai?.reply ?? pickLine(next.greetings),
       });
       setOnHold(false);
     }, HOLD_MS);
   }
 
-  function respond(message: string) {
+  async function respond(message: string) {
     const intent = detectIntent(message);
     const pitchWasOpen = pitchOpen;
     setPitchOpen(false);
@@ -141,67 +177,83 @@ function BradScreen() {
     // The surcharge hits instantly; Brad's reply takes its time
     let insultsNow = insults;
     if (intent === "insult") {
-      addToTotal(phase.surcharge);
-      playMoneyAddedTone();
+      charge(phase.surcharge, `Insult surcharge from ${phase.name}`);
       insultsNow = insults + 1;
       setInsults(insultsNow);
     }
 
     setTyping(true);
-    later(() => {
-      setTyping(false);
+    const asks = intent === "askBot" ? botAsks + 1 : botAsks;
+    if (intent === "askBot") setBotAsks(asks);
 
-      switch (intent) {
-        case "iAmBot":
-          bradSays(pickReply(phase, "iAmBot"));
-          finish("player-is-bot");
-          return;
+    // Endings and BRAD's refusal stay scripted: they're the punchlines,
+    // and the game (not the AI) decides when you win
+    const scripted =
+      intent === "iAmBot" ||
+      (intent === "askBot" && asks >= ASKS_TO_CRACK) ||
+      (intent === "yes" && pitchWasOpen) ||
+      (intent === "transfer" && phaseIndex === LAST_PHASE);
 
-        case "askBot": {
-          const asks = botAsks + 1;
-          setBotAsks(asks);
-          if (asks >= ASKS_TO_CRACK) {
-            bradSays(phase.crack);
-            finish("brad-admits-bot");
-          } else {
-            bradSays(pickReply(phase, "askBot"));
-          }
+    const aiIntent: AiIntent = intent === "yes" || intent === "iAmBot" ? "other" : intent;
+    const ai = scripted ? (await wait(phase.typingMs), null) : await aiLine(phaseIndex, aiIntent, phase.typingMs);
+    if (!alive.current) return;
+    setTyping(false);
+
+    switch (intent) {
+      case "iAmBot":
+        bradSays(pickReply(phase, "iAmBot"));
+        finish("player-is-bot");
+        return;
+
+      case "askBot":
+        if (asks >= ASKS_TO_CRACK) {
+          bradSays(phase.crack);
+          finish("brad-admits-bot");
+        } else {
+          bradSays(ai?.reply ?? pickReply(phase, "askBot"));
+        }
+        return;
+
+      case "yes":
+        if (pitchWasOpen) {
+          bradSays(pickReply(phase, "yes"));
+          finish("cancel-plus");
           return;
         }
+        break; // otherwise it's just chat
 
-        case "yes":
-          if (pitchWasOpen) {
-            bradSays(pickReply(phase, "yes"));
-            finish("cancel-plus");
-          } else {
-            bradSaysOther();
-          }
-          return;
+      case "cancel":
+        bradSays(ai?.reply ?? pickReply(phase, "cancel"));
+        setPitchOpen(true);
+        return;
 
-        case "cancel":
-          bradSays(pickReply(phase, "cancel"));
-          setPitchOpen(true);
-          return;
+      case "transfer":
+        bradSays(ai?.reply ?? pickReply(phase, "transfer"));
+        // Nobody is above BRAD
+        if (phaseIndex < LAST_PHASE) putOnHold();
+        return;
 
-        case "transfer":
-          bradSays(pickReply(phase, "transfer"));
-          // Nobody is above BRAD
-          if (phaseIndex < LAST_PHASE) putOnHold();
-          return;
+      case "insult":
+        bradSays(ai?.reply ?? pickReply(phase, "insult"));
+        // Three insults and this Brad hands you off
+        if (insultsNow >= INSULTS_TO_TRANSFER && phaseIndex < LAST_PHASE) {
+          putOnHold();
+        }
+        return;
 
-        case "insult":
-          bradSays(pickReply(phase, "insult"));
-          // Three insults and this Brad hands you off
-          if (insultsNow >= INSULTS_TO_TRANSFER && phaseIndex < LAST_PHASE) {
-            putOnHold();
-          }
-          return;
+      case "other":
+        break;
+    }
 
-        case "other":
-          bradSaysOther();
-          return;
-      }
-    }, phase.typingMs);
+    // General chat
+    if (ai) {
+      bradSays(ai.reply);
+      if (ai.charge) charge(FEATURE_FEE, `Plus+ feature fee from ${phase.name}`);
+    } else {
+      const lite = liteOther();
+      bradSays(lite.text);
+      if (lite.charge > 0) charge(lite.charge, `Plus+ feature fee from ${phase.name}`);
+    }
   }
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -210,7 +262,7 @@ function BradScreen() {
     if (!text || busy) return;
     addMessage({ from: "player", text });
     setDraft("");
-    respond(text);
+    void respond(text);
   }
 
   return (

@@ -17,7 +17,7 @@ export function VerifiedHumanUpsell({
   const addToTotal = useGameStore((state) => state.addToTotal);
 
   function handleSkip() {
-    addToTotal(VERIFIED_HUMAN_PRICE);
+    addToTotal(VERIFIED_HUMAN_PRICE, "Verified Human+ (failed a CAPTCHA and paid to skip it)");
     playMoneyAddedTone();
     onPass();
   }

@@ -11,7 +11,7 @@ function TierPopup() {
   const tier = tiers[tierLevel]
 
  function handleClick() {
-  addToTotal(tier.price)
+  addToTotal(tier.price, tier.name)
   playMoneyAddedTone()
 
   if (tierLevel === tiers.length - 1) {
