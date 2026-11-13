@@ -1,6 +1,11 @@
 import { useEffect } from "react";
 import { useGameStore } from "../../state/gameStore";
-import { jingleVersions, captchaSrc } from "../../audio/jingleVersions";
+import {
+  jingleVersions,
+  captchaSrc,
+  ALBUM_URL,
+  ALBUM_TRACKS,
+} from "../../audio/jingleVersions";
 import { useSettingsStore } from "../../state/settingsStore";
 import "./game-over.css";
 
@@ -8,7 +13,7 @@ function GameOverScreen() {
   const monthlyTotal = useGameStore((state) => state.monthlyTotal);
   const resetGame = useGameStore((state) => state.resetGame);
   const jingleVersion = useGameStore((state) => state.jingleVersion);
-  const edition = jingleVersions.find((v) => v.id === jingleVersion)?.edition;
+  const jingle = jingleVersions.find((v) => v.id === jingleVersion);
 
   useEffect(() => {
     if (!jingleVersion) return;
@@ -35,10 +40,18 @@ function GameOverScreen() {
           <span>Thank you for your loyalty. 💳</span>
         </div>
 
-        {edition && (
-          <p className="over-jingle">
-            <span aria-hidden="true">♪</span> Your jingle: {edition}
-          </p>
+        {jingle && (
+          <div className="over-jingle">
+            <p>
+              <span aria-hidden="true">♪</span> Your jingle: {jingle.edition}
+            </p>
+            <a href={ALBUM_URL} target="_blank" rel="noopener noreferrer">
+              Track {jingle.track} of {ALBUM_TRACKS} on{" "}
+              <em>Subscription Plus! The Album</em>
+              <br />
+              Download on iTunes, Amazon, or Google Play
+            </a>
+          </div>
         )}
 
         <button className="over-cta" onClick={resetGame}>

@@ -253,3 +253,8 @@
   opacity: 0.6;
   cursor: progress;
 }
+.rcpt-album {
+  display: block;
+  font-size: 10px;
+  color: #777;
+}

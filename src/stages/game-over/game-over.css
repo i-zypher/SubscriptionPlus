@@ -85,19 +85,28 @@
   color: #3d4752;
 }
 .over-jingle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
   margin: 0 0 20px;
-  padding: 8px 14px;
-  border-radius: 999px;
+  padding: 12px 14px;
+  border-radius: 18px;
   background: #f1f4f6;
-  font-size: 14px;
-  font-weight: 600;
   color: #3d4752;
 }
-.over-jingle span {
+.over-jingle p {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.over-jingle p span {
   color: #149aa8;
+}
+.over-jingle a {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.4;
+  font-weight: 600;
+  color: #149aa8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .over-cta {
   width: 100%;

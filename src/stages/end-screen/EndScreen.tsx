@@ -1,6 +1,6 @@
 import { useGameStore } from "../../state/gameStore";
 import type { Ending } from "../../state/gameStore";
-import { jingleVersions } from "../../audio/jingleVersions";
+import { jingleVersions, ALBUM_TRACKS } from "../../audio/jingleVersions";
 import { useState, useEffect, useRef } from "react";
 import { toBlob } from "html-to-image";
 import "./receipt.css";
@@ -47,7 +47,8 @@ function EndScreen() {
   const runId = useGameStore((state) => state.runId);
   const [printedAt] = useState(() => new Date());
 
-  const edition = jingleVersions.find((v) => v.id === jingleVersion)?.edition;
+  const jingle = jingleVersions.find((v) => v.id === jingleVersion);
+  const edition = jingle?.edition;
 
   const [copied, setCopied] = useState(false);
 
@@ -253,7 +254,13 @@ function EndScreen() {
               {edition && (
                 <>
                   <dt>Your jingle</dt>
-                  <dd>{edition}</dd>
+                  <dd>
+                    {edition}
+                    <small className="rcpt-album">
+                      Track {jingle?.track}/{ALBUM_TRACKS} · Now on iTunes,
+                      Amazon &amp; Google Play
+                    </small>
+                  </dd>
                 </>
               )}
               <dt>Charges</dt>
