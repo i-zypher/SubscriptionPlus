@@ -13,6 +13,8 @@ export type Ad = {
   body: string
   cta: string
   decline: string
+  // Ads that name a price really charge it when you hit the big button
+  purchase?: { name: string; price: number }
 }
 
 export const ads: Ad[] = [
@@ -44,6 +46,7 @@ export const ads: Ad[] = [
     headline: "Get 10% Off Your Subscription!",
     body: "Sign up for our newsletter and save 10% on the subscription you're already paying for. Newsletter is $2.99/mo.",
     cta: "SIGN ME UP",
+    purchase: { name: "Newsletter", price: 2.99 },
     decline: "No thanks, I hate saving money",
   },
   {
@@ -74,6 +77,7 @@ export const ads: Ad[] = [
     headline: "Brad Wants To Be Your Friend 👋",
     body: "Brad from Customer Support has sent you a friend request. Accepting is free. Being Brad's friend is $3.99/mo.",
     cta: "ACCEPT BRAD",
+    purchase: { name: "Being Brad's friend", price: 3.99 },
     decline: "Decline (Brad will be notified)",
   },
   {
@@ -140,6 +144,7 @@ export const ads: Ad[] = [
     headline: "Earn $5,000 A Month From Home!",
     body: "Just refer friends to Subscription Plus! Starter kit only $299. Results not typical. Results not possible.",
     cta: "BE MY OWN BOSS",
+    purchase: { name: "Referral starter kit", price: 299 },
     decline: "No thanks, I like having friends",
   },
   {
@@ -164,6 +169,7 @@ export const ads: Ad[] = [
     headline: "SPONSORED: Is Cancelling Bad For Your Health?",
     body: "Leading experts (us) say yes. Read the full article for just $1.99.",
     cta: "READ MORE",
+    purchase: { name: "Sponsored article", price: 1.99 },
     decline: "No thanks, I'll risk it",
   },
   {
@@ -194,6 +200,7 @@ export const ads: Ad[] = [
     headline: "Protect Your Subscription!",
     body: "Add SubscriptionCare+ and get coverage against accidental cancellation. Only $6.99/mo.",
     cta: "PROTECT IT",
+    purchase: { name: "SubscriptionCare+", price: 6.99 },
     decline: "No thanks, I live dangerously",
   },
 ]

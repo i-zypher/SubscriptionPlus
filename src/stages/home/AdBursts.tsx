@@ -4,7 +4,7 @@ import { ads, exitAds } from "./adPopups";
 import type { Ad, CloseTrick } from "./adPopups";
 import { useGameStore } from "../../state/gameStore";
 import { playJingleOnce, pauseJingle } from "../../audio/jinglePlayer";
-import { playFailureTone } from "../../audio/sounds";
+import { playFailureTone, playMoneyAddedTone } from "../../audio/sounds";
 
 const IDLE_STEP_MS = 30 * 1000; // 30s, then 60s, then 90s...
 const MIN_ADS = 3;
@@ -114,9 +114,22 @@ function AdPopup({
     onClose();
   }
 
-  // The big button never closes anything
+  const addToTotal = useGameStore((state) => state.addToTotal);
+
+  // The big button never closes anything… unless the ad is selling something,
+  // in which case you just bought it (and that's the easiest way out)
+  function handleCta() {
+    if (!ad.purchase) {
+      playFailureTone();
+      return;
+    }
+    addToTotal(ad.purchase.price, `${ad.purchase.name} (from a pop-up ad)`);
+    playMoneyAddedTone();
+    onClose();
+  }
+
   const cta = (
-    <button style={ctaStyle} onClick={playFailureTone}>
+    <button style={ctaStyle} onClick={handleCta}>
       {ad.cta}
     </button>
   );
