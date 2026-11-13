@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import confetti from "canvas-confetti"
 import { useGameStore } from "../../state/gameStore"
 import { tiers } from "./tiers"
@@ -50,6 +50,8 @@ function TierPopup() {
   const monthlyTotal = useGameStore((state) => state.monthlyTotal)
 
   const tier = tiers[tierLevel]
+  // Saying no: "Are you sure?" → "Did you mean yes?" (only button: Yes)
+  const [declineStep, setDeclineStep] = useState<"none" | "sure" | "meantYes">("none")
 
   useEffect(() => {
     celebrate(tierLevel)
@@ -61,6 +63,7 @@ function TierPopup() {
   }, [])
 
   function handleClick() {
+    setDeclineStep("none")
     addToTotal(tier.price, tier.name)
     playMoneyAddedTone()
 
@@ -133,7 +136,7 @@ function TierPopup() {
           <button className="aval-cta" onClick={handleClick}>
             {tier.buttonLabel}
           </button>
-          <button className="aval-decline" onClick={handleClick}>
+          <button className="aval-decline" onClick={() => setDeclineStep("sure")}>
             {tier.declineLabel}
           </button>
 
@@ -143,6 +146,35 @@ function TierPopup() {
           </p>
         </main>
       </div>
+
+      {declineStep !== "none" && (
+        <div className="aval-dialog-backdrop">
+          <div className="aval-dialog" role="alertdialog" aria-modal="true" key={declineStep}>
+            {declineStep === "sure" ? (
+              <>
+                <div className="aval-dialog-icon" aria-hidden="true">🥺</div>
+                <h3>Are you sure you want to say no?</h3>
+                <p>You'll lose access to savings you never had.</p>
+                <button className="aval-dialog-yes" onClick={() => setDeclineStep("meantYes")}>
+                  Yes, I'm sure
+                </button>
+                <button className="aval-dialog-back" onClick={() => setDeclineStep("none")}>
+                  Never mind
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="aval-dialog-icon" aria-hidden="true">🤔</div>
+                <h3>Did you mean yes?</h3>
+                <p>We think you meant yes.</p>
+                <button className="aval-cta" onClick={handleClick}>
+                  Yes
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
