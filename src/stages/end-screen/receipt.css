@@ -1,0 +1,217 @@
+/* End screen: a printed receipt of everything they were charged */
+
+.rcpt-page {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow-y: auto;
+  padding: 28px 16px 48px;
+  color-scheme: light;
+  font-family: "Outfit", system-ui, sans-serif;
+  background:
+    radial-gradient(60% 40% at 50% 0%, rgba(28, 209, 238, 0.25), transparent 70%),
+    #e9eef1;
+}
+.rcpt-wrap {
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.rcpt {
+  --zig: 10px;
+  position: relative;
+  padding: 26px 22px 30px;
+  background: #fffdf8;
+  color: #1f1f1f;
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  filter: drop-shadow(0 18px 24px rgba(11, 15, 20, 0.18));
+  /* Torn top and bottom edges */
+  -webkit-mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(2 * var(--zig)) 51% repeat-x,
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / calc(2 * var(--zig)) 51% repeat-x;
+  mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(2 * var(--zig)) 51% repeat-x,
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / calc(2 * var(--zig)) 51% repeat-x;
+  animation: rcpt-print 1.4s cubic-bezier(0.3, 0.9, 0.3, 1) both;
+}
+
+.rcpt-head {
+  text-align: center;
+}
+.rcpt-head img {
+  width: 44px;
+  height: 44px;
+  filter: grayscale(1) contrast(1.4);
+}
+.rcpt-head h2 {
+  margin: 6px 0 4px;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #111;
+}
+.rcpt-head p {
+  margin: 0;
+  font-size: 11.5px;
+  color: #555;
+}
+
+.rcpt-rule {
+  margin: 14px 0;
+  border-top: 2px dashed #bdb7aa;
+}
+
+.rcpt-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rcpt-items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+}
+.rcpt-items li span:first-child {
+  flex: 1;
+  text-align: left;
+}
+.rcpt-items li span:last-child {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+.rcpt-adjust {
+  font-weight: 700;
+}
+
+.rcpt-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 15px;
+  font-weight: 800;
+}
+.rcpt-total strong {
+  font-size: 26px;
+  letter-spacing: -0.02em;
+}
+.rcpt-renews {
+  margin: 4px 0 0;
+  text-align: right;
+  font-size: 11.5px;
+  color: #555;
+}
+
+.rcpt-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 12px;
+  margin: 0;
+}
+.rcpt-meta dt {
+  color: #777;
+}
+.rcpt-meta dd {
+  margin: 0;
+  text-align: right;
+}
+
+.rcpt-barcode {
+  height: 54px;
+  margin: 20px 10px 10px;
+  background: repeating-linear-gradient(
+    90deg,
+    #111 0 2px,
+    transparent 2px 4px,
+    #111 4px 5px,
+    transparent 5px 8px,
+    #111 8px 11px,
+    transparent 11px 12px,
+    #111 12px 13px,
+    transparent 13px 16px
+  );
+}
+.rcpt-thanks {
+  margin: 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+/* The true cancel: everything struck through, big red stamp */
+.rcpt.is-cancelled .rcpt-items li:not(.rcpt-adjust) span {
+  text-decoration: line-through;
+  color: #888;
+}
+.rcpt-stamp {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  padding: 6px 16px;
+  border: 4px solid #d93025;
+  border-radius: 8px;
+  color: #d93025;
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+  transform: translate(-50%, -50%) rotate(-14deg);
+  animation: rcpt-stamp 500ms cubic-bezier(0.2, 1.6, 0.4, 1) 1.3s both;
+}
+
+.rcpt-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 22px;
+}
+.rcpt-share {
+  padding: 18px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(120deg, #1cd1ee, #33d4a8);
+  color: #04221f;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 14px 28px -12px rgba(28, 209, 238, 0.9);
+}
+.rcpt-again {
+  padding: 15px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  color: #0b0f14;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px -10px rgba(11, 15, 20, 0.5);
+}
+
+@keyframes rcpt-print {
+  from {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(-24px);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+}
+@keyframes rcpt-stamp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(-14deg) scale(2.2);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rcpt,
+  .rcpt-stamp {
+    animation: none;
+  }
+}
