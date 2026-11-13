@@ -6,7 +6,9 @@ import type { CaptchaProps } from "./VerifiedHumanUpsell";
 // Three rounds of "select all squares with…". Getting round one right
 // just earns a "Please try again." Round three is hidden fees: every square.
 
-type Tile = { label: string; emoji: string; match: boolean };
+// "either" = a photo where you could argue it both ways (tiny bikes in the
+// background), so selecting it or not are both fine
+type Tile = { label: string; emoji?: string; image?: string; match: boolean | "either" };
 
 const STREET = [
   { label: "Car", emoji: "🚗" },
@@ -42,6 +44,39 @@ function streetGrid(target: { label: string; emoji: string }): Tile[] {
   return shuffle([...others, ...hits]);
 }
 
+// Real photos for the bicycles round (public/captcha-tiles/bicycles/)
+const BIKE_PHOTOS = [
+  { file: "mountain-bike", label: "Bicycle against a brick wall" },
+  { file: "old-bike", label: "Penny-farthing" },
+  { file: "recumbent-bike", label: "Recumbent bike" },
+  { file: "tightrope-bike", label: "Bicycle on a tightrope over a canyon" },
+  { file: "street-bike", label: "Cyclist in a bike lane" },
+  { file: "tandem-bike", label: "Tandem bicycle in a park" },
+];
+const OTHER_PHOTOS: { file: string; label: string; match: false | "either" }[] = [
+  { file: "city-bus", label: "City bus", match: false },
+  { file: "city-street-2", label: "City avenue", match: false },
+  { file: "crosswalk", label: "Crosswalk full of people", match: false },
+  { file: "yellow-cab", label: "Yellow taxi", match: false },
+  // Two bikes parked far in the background. Does that count? Either way.
+  { file: "city-street-1", label: "Street with parked cars", match: "either" },
+];
+
+function photo(file: string) {
+  return `${import.meta.env.BASE_URL}captcha-tiles/bicycles/${file}.jpg`;
+}
+
+function bicycleGrid(): Tile[] {
+  const bikeCount = 4 + Math.floor(Math.random() * 3); // 4 to 6
+  const bikes = shuffle(BIKE_PHOTOS)
+    .slice(0, bikeCount)
+    .map((p) => ({ label: p.label, image: photo(p.file), match: true }));
+  const others = shuffle(OTHER_PHOTOS)
+    .slice(0, 9 - bikeCount)
+    .map((p) => ({ label: p.label, image: photo(p.file), match: p.match }));
+  return shuffle([...bikes, ...others]);
+}
+
 const ROUNDS = [
   {
     prompt: "Select all squares with traffic lights",
@@ -49,7 +84,7 @@ const ROUNDS = [
   },
   {
     prompt: "Select all squares with bicycles",
-    build: () => streetGrid({ label: "Bicycle", emoji: "🚲" }),
+    build: bicycleGrid,
   },
   {
     prompt: "Select all squares with hidden fees",
@@ -82,7 +117,9 @@ function TrafficLightCaptcha({ onPass }: CaptchaProps) {
   }
 
   function handleVerify() {
-    const correct = tiles.every((tile, i) => tile.match === picked.has(i));
+    const correct = tiles.every(
+      (tile, i) => tile.match === "either" || tile.match === picked.has(i),
+    );
 
     if (correct && round === ROUNDS.length - 1) {
       playSuccessTone();
@@ -140,6 +177,7 @@ function TrafficLightCaptcha({ onPass }: CaptchaProps) {
             onClick={() => toggle(i)}
             style={{
               aspectRatio: "1",
+              overflow: "hidden",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -152,7 +190,16 @@ function TrafficLightCaptcha({ onPass }: CaptchaProps) {
               cursor: "pointer",
             }}
           >
-            <span style={{ fontSize: "32px" }}>{tile.emoji}</span>
+            {tile.image ? (
+              <img
+                src={tile.image}
+                alt=""
+                draggable={false}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+            ) : (
+              <span style={{ fontSize: "32px" }}>{tile.emoji}</span>
+            )}
             {round === ROUNDS.length - 1 && (
               <span style={{ fontSize: "11px", lineHeight: 1.2 }}>{tile.label}</span>
             )}
