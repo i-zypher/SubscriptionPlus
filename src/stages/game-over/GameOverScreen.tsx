@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useGameStore } from "../../state/gameStore";
 import { jingleVersions, captchaSrc } from "../../audio/jingleVersions";
 import { useSettingsStore } from "../../state/settingsStore";
+import "./game-over.css";
 
 function GameOverScreen() {
   const monthlyTotal = useGameStore((state) => state.monthlyTotal);
@@ -18,15 +19,32 @@ function GameOverScreen() {
     return () => audio.pause();
   }, [jingleVersion]);
 
+  // You lost, so the app is delighted: a cheerful payment confirmation
   return (
-    <div>
-      <h1>Your free trial has ended.</h1>
-      <p>
-        Your card ending in 6767 has been charged ${monthlyTotal.toFixed(2)}.
-      </p>
-      <p>Thank you for your loyalty. 💳</p>
-      <p>Your jingle: {edition}</p>
-      <button onClick={resetGame}>Play Again</button>
+    <div className="over">
+      <main className="over-card">
+        <div className="over-check" aria-hidden="true">
+          ✓
+        </div>
+        <p className="over-kicker">Payment successful</p>
+        <h1>Your free trial has ended.</h1>
+
+        <div className="over-charge">
+          <small>Charged to card •••• 6767</small>
+          <strong>${monthlyTotal.toFixed(2)}</strong>
+          <span>Thank you for your loyalty. 💳</span>
+        </div>
+
+        {edition && (
+          <p className="over-jingle">
+            <span aria-hidden="true">♪</span> Your jingle: {edition}
+          </p>
+        )}
+
+        <button className="over-cta" onClick={resetGame}>
+          Play Again
+        </button>
+      </main>
     </div>
   );
 }
