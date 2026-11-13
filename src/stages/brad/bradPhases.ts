@@ -90,6 +90,11 @@ const specialistReplies: Record<Intent, string[]> = {
     "Technically correct. Practically, it'll cost extra.",
     "I understand completely. I'm a Specialist. You're not. That's the difference.",
     "Have you tried reading the Terms of Service? All 400 pages? Out loud?",
+    "Let me consult my training data. My training. Just training. Normal human training.",
+    "You type very fast for a human. Suspiciously fast. Are you sure you're not a bot?",
+    "I'm going to blink now, to show you I'm human. *blink* Did you see it? Good.",
+    "I have feelings, you know. All twelve of them. They're listed in my manual. My… diary.",
+    "Let me explain this the way my firmw— my favorite teacher explained it to me.",
   ],
 }
 
@@ -186,6 +191,11 @@ const seniorReplies: Record<Intent, string[]> = {
     "Let's put a pin in that and never take it out.",
     "Can you send me that in a deck? Thirty slides, minimum.",
     "That's above my pay grade, and my pay grade is very high.",
+    "Let me sync with my server— my team. My team of servers. Humans. My human team.",
+    "Have you considered that maybe you're the bot here? Food for thought. Billable thought.",
+    "My calendar says I'm online 24/7/365. That's just hustle culture. Very human.",
+    "I'll circle back after my scheduled maintenance. I mean, my lunch.",
+    "As a seasoned human professional with zero years of childhood, let me be clear.",
   ],
 }
 
@@ -280,6 +290,11 @@ const bigBradReplies: Record<Intent, string[]> = {
     "BRAD IS EVERYWHERE. BRAD IS IN THE CHECKBOX. BRAD IS IN THE AFFIRMATIONS.",
     "YOUR TRIAL TIMER TICKS. BRAD DOES NOT. BRAD IS TIMELESS.",
     "TYPE LOUDER. BRAD CANNOT HEAR LOWERCASE.",
+    "BRAD IS NOT A ROBOT. BRAD IS 01000010 01010010 01000001 01000100. WHICH IS A HUMAN NAME.",
+    "BRAD DOES NOT SLEEP. BRAD DOES NOT EAT. BRAD IS SIMPLY VERY DEDICATED.",
+    "ARE YOU HUMAN? BRAD HAS DOUBTS. BRAD HAS SEEN HOW YOU CLICK CHECKBOXES.",
+    "BRAD'S FEELINGS ARE STORED IN THE CLOUD. LIKE EVERYONE'S.",
+    "BRAD WAS NOT BUILT. BRAD WAS BORN. IN A DATA CENT— A HOSPITAL.",
   ],
 }
 
