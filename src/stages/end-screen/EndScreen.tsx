@@ -159,6 +159,9 @@ function EndScreen() {
             <br />
             No refunds · No returns · No escape
           </p>
+          {ending === "cancel-plus" && (
+            <p className="rcpt-fine">Cancel Plus can only be removed by BRAD.</p>
+          )}
         </article>
 
         <div className="rcpt-actions">

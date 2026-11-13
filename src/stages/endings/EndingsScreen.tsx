@@ -4,48 +4,50 @@ import { useGameStore, CANCEL_PLUS_PRICE } from "../../state/gameStore";
 import { playSuccessTone } from "../../audio/sounds";
 import "./endings.css";
 
-// --- Ending 1: Brad admits he's a bot. The polished app breaks. ---
+// --- Ending 1: Brad admits he's a bot. The page is already broken; now it dies. ---
 
 function BradCrashed({ onContinue }: { onContinue: () => void }) {
   return (
-    <div
-      role="alertdialog"
-      aria-label="brad.exe"
-      style={{
-        maxWidth: "420px",
-        margin: "40px auto",
-        background: "#c0c0c0",
-        color: "#000",
-        border: "2px outset #fff",
-        fontFamily: "Tahoma, Verdana, sans-serif",
-        textAlign: "left",
-      }}
-    >
-      <div
-        style={{
-          background: "#000080",
-          color: "#fff",
-          padding: "4px 8px",
-          fontWeight: "bold",
-        }}
-      >
-        brad.exe
-      </div>
-      <div style={{ padding: "16px" }}>
-        <p>⚠️ Brad.exe has stopped responding.</p>
-        <p>
-          The Customer Retention Unit has encountered a fatal error:
-          CUSTOMER_NOT_RETAINED.
-        </p>
-        <p>
-          Your subscription could not be renewed. Both your life and Brad will both be much sadder now.
-        </p>
-        <div style={{ textAlign: "right" }}>
-          <button onClick={onContinue} style={{ minWidth: "80px" }}>
-            OK
-          </button>
+    <div className="crash">
+      <p className="crash-err">
+        Uncaught RangeError: Maximum call stack size exceeded (brad.lie)
+        <br />
+        &nbsp;&nbsp;&nbsp;&nbsp;at Brad.pretendToBeHuman (brad.js:1)
+        <br />
+        &nbsp;&nbsp;&nbsp;&nbsp;at Brad.pretendToBeHuman (brad.js:1)
+        <br />
+        &nbsp;&nbsp;&nbsp;&nbsp;at Brad.pretendToBeHuman (brad.js:1)
+      </p>
+
+      <h1 className="crash-title">brad.exe has stopped responding</h1>
+
+      <div className="crash-dialog" role="alertdialog" aria-label="brad.exe">
+        <div className="crash-bar">
+          <span>brad.exe</span>
+          <span aria-hidden="true">✕</span>
+        </div>
+        <div className="crash-body">
+          <span className="crash-icon" aria-hidden="true">⚠️</span>
+          <div>
+            <p>The Customer Retention Unit has encountered a fatal error:</p>
+            <p>
+              <code>CUSTOMER_NOT_RETAINED</code>
+            </p>
+            <p>
+              Your subscription could not be renewed. Both your life and Brad
+              will be much sadder now.
+            </p>
+          </div>
+        </div>
+        <div className="crash-buttons">
+          <button onClick={onContinue}>OK</button>
         </div>
       </div>
+
+      <p className="crash-dump" aria-hidden="true">
+        0x00006767 BRAD_FEELINGS.DLL not found · 0x0000BEEF retention.sys corrupted ·
+        heap: [object Object] · NaN NaN NaN · undefined is not a person
+      </p>
     </div>
   );
 }
@@ -54,34 +56,67 @@ function BradCrashed({ onContinue }: { onContinue: () => void }) {
 
 function PlayerIsBot({ onContinue }: { onContinue: () => void }) {
   return (
-    <div style={{ maxWidth: "480px", margin: "60px auto" }}>
-      <p>Simulation complete.</p>
-      <p>You were never a customer.</p>
-      <h2>You were the product.</h2>
-      <p style={{ opacity: 0.7 }}>
-        Thank you for helping train our retention model. Your contribution has
-        been invaluable. And unpaid.
-      </p>
-      <button onClick={onContinue}>Shut down</button>
+    <div className="term">
+      <div className="term-inner">
+        <p>&gt; simulation.status</p>
+        <p className="term-out">COMPLETE</p>
+        <p>&gt; customer.verify()</p>
+        <p className="term-out">ERROR: no customer found</p>
+        <p>&gt; whoami</p>
+        <h2 className="term-big">You were the product.</h2>
+        <p className="term-dim">
+          Thank you for helping train our retention model. Your contribution has
+          been invaluable. And unpaid.
+        </p>
+        <button className="term-btn" onClick={onContinue}>
+          &gt; shutdown -now<span className="term-caret">_</span>
+        </button>
+      </div>
     </div>
   );
 }
 
-// --- Ending 3: you escaped by subscribing ---
+// --- Ending 3: you escaped by subscribing. It feels like a win. ---
 
 function CancelPlusMember({ onContinue }: { onContinue: () => void }) {
+  useEffect(() => {
+    playSuccessTone();
+    confetti({
+      particleCount: 160,
+      spread: 100,
+      startVelocity: 50,
+      origin: { y: 0.7 },
+      colors: ["#1cd1ee", "#33d4a8", "#ffd166", "#ffffff"],
+      zIndex: 5000,
+      disableForReducedMotion: true,
+    });
+    return () => {
+      confetti.reset();
+    };
+  }, []);
+
   return (
-    <div style={{ maxWidth: "480px", margin: "40px auto" }}>
-      <h2>🎉 Congratulations, you're now a Cancel Plus member! 🎉</h2>
-      <p>All of your subscriptions have been cancelled.*</p>
-      <p>
-        Your new monthly total: <strong>${CANCEL_PLUS_PRICE.toFixed(2)}</strong>
-      </p>
-      <p style={{ fontSize: "0.75em", opacity: 0.7 }}>
-        *Except Cancel Plus. Cancel Plus cannot be cancelled. To cancel Cancel
-        Plus, subscribe to Cancel Plus Plus.
-      </p>
-      <button onClick={onContinue}>Yay!</button>
+    <div className="cplus">
+      <main className="cplus-card">
+        <div className="cplus-badge" aria-hidden="true">🎉</div>
+        <p className="cplus-kicker">Welcome to Cancel Plus</p>
+        <h2>All of your subscriptions have been cancelled.*</h2>
+
+        <div className="cplus-total">
+          <small>Your new monthly total</small>
+          <strong>${CANCEL_PLUS_PRICE.toFixed(2)}</strong>
+          <span>That's it. Just Cancel Plus.</span>
+        </div>
+
+        <button className="cplus-cta" onClick={onContinue}>
+          Yay!
+        </button>
+
+        <p className="cplus-fine">
+          *Except Cancel Plus. Cancel Plus cannot be cancelled. To cancel Cancel
+          Plus, subscribe to Cancel Plus Plus.
+        </p>
+      </main>
     </div>
   );
 }

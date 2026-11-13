@@ -215,3 +215,12 @@
     animation: none;
   }
 }
+
+/* The only hint that a better ending exists */
+.rcpt-fine {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: 8.5px;
+  line-height: 1.3;
+  color: #9a948a;
+}
