@@ -30,7 +30,8 @@ export async function askBrad(
   if (!BRAD_URL) return null;
   const state = useGameStore.getState();
   const edition =
-    jingleVersions.find((v) => v.id === state.jingleVersion)?.edition ?? "Classic Edition";
+    jingleVersions.find((v) => v.id === state.jingleVersion)?.edition ??
+    "Classic Edition";
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -71,5 +72,28 @@ export async function askBrad(
     return null;
   } finally {
     clearTimeout(timer);
+  }
+}
+
+// A player flagged one of Brad's replies. Sends only that reply, never the
+// player's own messages. Resolves true when it reached the server.
+export async function reportBradReply(
+  text: string,
+  name: string,
+): Promise<boolean> {
+  if (!BRAD_URL) return false;
+  try {
+    const response = await fetch(BRAD_URL.replace(/\/brad$/, "/report"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text: text.slice(0, 600),
+        name: name.slice(0, 40),
+        runId: useGameStore.getState().runId,
+      }),
+    });
+    return response.ok;
+  } catch {
+    return false;
   }
 }

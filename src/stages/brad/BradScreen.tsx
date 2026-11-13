@@ -7,7 +7,7 @@ import { detectIntent, mentionsIntent, pickLine, pickReply } from "./bradLogic";
 import { playJingle, pauseJingle } from "../../audio/jinglePlayer";
 import { playMoneyAddedTone } from "../../audio/sounds";
 import { FEATURE_FEE } from "./bradScript";
-import { aiBradAvailable, askBrad } from "./bradAI";
+import { aiBradAvailable, askBrad, reportBradReply } from "./bradAI";
 import { liteReply, soundsLikeDistress, DISTRESS_REPLY } from "./bradLite";
 import type { AiIntent, Offer } from "./bradAI";
 import "./brad.css";
@@ -110,6 +110,21 @@ function BradScreen() {
 
   function later(fn: () => void, ms: number) {
     timers.current.push(window.setTimeout(fn, ms));
+  }
+
+  // Reporting a reply (required for AI chat in the app stores)
+  const [reported, setReported] = useState<Record<number, "sending" | "sent">>(
+    {},
+  );
+  async function report(index: number, text: string, name: string) {
+    setReported((r) => ({ ...r, [index]: "sending" }));
+    const ok = await reportBradReply(text, name);
+    setReported((r) => {
+      const next = { ...r };
+      if (ok) next[index] = "sent";
+      else delete next[index]; // let them try again
+      return next;
+    });
   }
 
   function bradSays(text: string) {
@@ -438,6 +453,20 @@ function BradScreen() {
                 <strong className="bmsg-name">{m.name ?? "Brad"}</strong>
               )}
               <span>{m.text}</span>
+              {m.from === "brad" && (
+                <button
+                  type="button"
+                  className="bmsg-report"
+                  disabled={reported[i] !== undefined}
+                  onClick={() => report(i, m.text, m.name ?? "Brad")}
+                >
+                  {reported[i] === "sent"
+                    ? "Reported. Thanks."
+                    : reported[i] === "sending"
+                      ? "Reporting…"
+                      : "⚑ Report"}
+                </button>
+              )}
             </div>
           ))}
           {typing && (

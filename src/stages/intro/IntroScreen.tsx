@@ -49,7 +49,8 @@ function IntroScreen() {
           Heads up: this is a parody game, and no real money is charged.
           Brad, the support agent, is an AI. What you type to him is sent to
           our AI provider (Anthropic) to write his replies, and isn't stored.
-          Please don't share personal information.
+          If you report one of his replies, we keep that reply so we can
+          review it. Please don't share personal information.
         </p>
       </main>
     </div>

@@ -554,3 +554,25 @@
     animation: none;
   }
 }
+
+/* Report a reply: quiet, but always there (app stores require it for AI chat) */
+.bmsg-report {
+  display: block;
+  margin: 4px 0 0;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 11px;
+  opacity: 0.5;
+  cursor: pointer;
+  text-align: left;
+}
+.bmsg-report:hover:not(:disabled) {
+  opacity: 0.85;
+  text-decoration: underline;
+}
+.bmsg-report:disabled {
+  cursor: default;
+}

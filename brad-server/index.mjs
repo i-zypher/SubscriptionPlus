@@ -1,4 +1,5 @@
-// AI Brad for Subscription Plus. One endpoint: POST /brad
+// AI Brad for Subscription Plus. POST /brad for replies, POST /report when a
+// player flags one of Brad's replies.
 // The game falls back to scripted Brad Lite whenever this says no.
 import http from "node:http";
 import Anthropic from "@anthropic-ai/sdk";
@@ -17,7 +18,8 @@ const MAX_MESSAGE_CHARS = 300;
 const MAX_HISTORY = 24;
 const ALLOWED_ORIGINS = (
   process.env.ALLOWED_ORIGINS ||
-  "https://ceymer-studios.com,https://www.ceymer-studios.com,https://ceymer-studios-site.web.app,http://localhost:5173"
+  // The two "localhost" entries are the iOS and Android apps (Capacitor)
+  "https://ceymer-studios.com,https://www.ceymer-studios.com,https://ceymer-studios-site.web.app,http://localhost:5173,capacitor://localhost,https://localhost"
 ).split(",");
 const INTENTS = ["greeting", "cancel", "insult", "transfer", "askBot", "other", "accepted"];
 // Intents where Brad may pitch a made-up plan the player can say yes to
@@ -28,11 +30,14 @@ const MAX_PRICE = 49.99;
 const anthropic = process.env.MOCK_BRAD ? null : new Anthropic(); // reads ANTHROPIC_API_KEY
 
 // Counters live in memory. Deploy with --max-instances=1 so there's one copy.
-// Nothing the player types is stored or logged.
+// Nothing the player types is stored or logged. The only thing ever logged is
+// a Brad reply a player reports, so it can be reviewed.
 let day = today();
 let spentToday = 0;
 const callsPerRun = new Map();
 const callsPerIp = new Map();
+const reportsPerIp = new Map();
+const MAX_REPORTS_PER_IP_PER_HOUR = 20;
 
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -55,6 +60,17 @@ function overIpLimit(ip) {
   }
   entry.count += 1;
   return entry.count > MAX_CALLS_PER_IP_PER_HOUR;
+}
+
+function overReportLimit(ip) {
+  const hour = Math.floor(Date.now() / 3_600_000);
+  const entry = reportsPerIp.get(ip);
+  if (!entry || entry.hour !== hour) {
+    reportsPerIp.set(ip, { hour, count: 1 });
+    return false;
+  }
+  entry.count += 1;
+  return entry.count > MAX_REPORTS_PER_IP_PER_HOUR;
 }
 
 function send(res, status, body, origin) {
@@ -189,8 +205,36 @@ const server = http.createServer(async (req, res) => {
     return send(res, 200, { ok: true, spentToday: Number(spentToday.toFixed(4)), budget: DAILY_BUDGET_USD });
   }
 
-  if (req.method !== "POST" || req.url !== "/brad") return send(res, 404, { error: "not found" });
+  if (req.method !== "POST" || (req.url !== "/brad" && req.url !== "/report")) {
+    return send(res, 404, { error: "not found" });
+  }
   if (!origin || !ALLOWED_ORIGINS.includes(origin)) return send(res, 403, { error: "forbidden" });
+
+  // A player flagged one of Brad's replies. Log just that reply (Cloud Run
+  // logs, severity WARNING) so it can be reviewed. Never the player's own text.
+  if (req.url === "/report") {
+    const ip = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim();
+    if (overReportLimit(ip)) return send(res, 429, { error: "slow down" }, origin);
+    let report;
+    try {
+      report = JSON.parse(await readBody(req));
+    } catch {
+      report = null;
+    }
+    if (!report || !str(report.text, 600) || !str(report.name ?? "Brad", 40) || !str(report.runId ?? "", 64)) {
+      return send(res, 400, { error: "bad request" }, origin);
+    }
+    console.log(
+      JSON.stringify({
+        severity: "WARNING",
+        message: "Brad reply reported",
+        brad: report.name ?? "Brad",
+        reply: report.text,
+        runId: report.runId ?? "",
+      }),
+    );
+    return send(res, 200, { ok: true }, origin);
+  }
 
   rollOver();
   if (spentToday >= DAILY_BUDGET_USD) return send(res, 503, { fallback: "budget" }, origin);
