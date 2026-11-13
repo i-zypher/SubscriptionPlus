@@ -1,7 +1,11 @@
 # Every morning: read the past day's reported Brad replies from Cloud
 # Logging, have Claude review them, and open an issue with the digest.
-# No reports means no issue. Keep this repo private: the digest contains
-# Brad's replies, which can quote players.
+# No reports means no issue.
+#
+# This repo is public, so the digest never goes here: Brad's replies can
+# quote players. It goes to a PRIVATE repo (vars.REPORTS_REPO), using a
+# token that can only write issues there (secrets.REPORTS_TOKEN). Nothing
+# in this workflow prints report contents to the (public) logs.
 name: Review Brad reports
 
 on:
@@ -11,7 +15,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
   id-token: write
 
 jobs:
@@ -48,10 +51,15 @@ jobs:
           ANTHROPIC_API_KEY="$KEY" node scripts/review-brad-reports.mjs reports.json > digest.md
           echo "Reports found: $(node -e 'console.log(JSON.parse(require("fs").readFileSync("reports.json","utf8")||"[]").length)')"
 
-      - name: Open the digest issue
+      - name: Open the digest issue (in the private reports repo)
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.REPORTS_TOKEN }}
+          REPORTS_REPO: ${{ vars.REPORTS_REPO }}
         run: |
           if [ ! -s digest.md ]; then echo "No reports today."; exit 0; fi
-          gh label create brad-report --color F2596B --description "Daily review of reported Brad replies" --force
-          gh issue create --title "Brad reports: $(date -u +%Y-%m-%d)" --label brad-report --body-file digest.md
+          if [ -z "$REPORTS_REPO" ] || [ -z "$GH_TOKEN" ]; then
+            echo "::error::Set the REPORTS_REPO variable and REPORTS_TOKEN secret first. Not posting reports to this public repo."
+            exit 1
+          fi
+          gh label create brad-report --repo "$REPORTS_REPO" --color F2596B --description "Daily review of reported Brad replies" --force
+          gh issue create --repo "$REPORTS_REPO" --title "Brad reports: $(date -u +%Y-%m-%d)" --label brad-report --body-file digest.md
