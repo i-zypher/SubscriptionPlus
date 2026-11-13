@@ -6,7 +6,7 @@ import { ads, exitAds } from "./adPopups";
 import type { Ad, CloseTrick } from "./adPopups";
 import { useGameStore } from "../../state/gameStore";
 import { playJingleOnce, pauseJingle } from "../../audio/jinglePlayer";
-import { playFailureTone, playMoneyAddedTone } from "../../audio/sounds";
+import { playFailureTone, playMoneyAddedTone, playSuccessTone } from "../../audio/sounds";
 
 const FIRST_IDLE_MS = 15 * 1000; // first burst after 15s of nothing
 const IDLE_STEP_MS = 30 * 1000; // then 30s, 60s, 90s...
@@ -51,18 +51,18 @@ function pickAds(count: number) {
 
 // --- One popup ---
 
-// Ads are dark and warm so they clash with the app on purpose, without
-// burning anyone's eyes
+// Ads are warm beige so they stand apart from the cool app on purpose,
+// without burning anyone's eyes
 const cardStyle: CSSProperties = {
   position: "fixed",
   boxSizing: "border-box",
   width: "min(340px, calc(100vw - 16px))",
-  background: "linear-gradient(160deg, #1d2140, #121528)",
-  color: "#f4f5fb",
-  border: "1px solid rgba(255, 138, 92, 0.45)",
+  background: "linear-gradient(160deg, #fbf4e6, #f1e5cf)",
+  color: "#2b2118",
+  border: "1px solid rgba(201, 150, 95, 0.55)",
   borderRadius: "22px",
   padding: "18px 18px 16px",
-  boxShadow: "0 24px 60px -16px rgba(0,0,0,0.6)",
+  boxShadow: "0 24px 60px -16px rgba(60, 40, 20, 0.45)",
   textAlign: "left",
   fontFamily: '"Outfit", system-ui, sans-serif',
   animation: "ad-pop 380ms cubic-bezier(0.2, 1.5, 0.4, 1) both",
@@ -87,7 +87,7 @@ const linkStyle: CSSProperties = {
   background: "none",
   border: "none",
   padding: 0,
-  color: "#8b93a7",
+  color: "#9a8a76",
   fontSize: "0.7em",
   fontFamily: "inherit",
   textDecoration: "underline",
@@ -98,10 +98,12 @@ function AdPopup({
   open,
   layer,
   onClose,
+  onBought,
 }: {
   open: OpenAd;
   layer: number;
   onClose: () => void;
+  onBought: () => void;
 }) {
   const { ad, trick } = open;
   const [secondsLeft, setSecondsLeft] = useState(COUNTDOWN_SECONDS);
@@ -134,8 +136,10 @@ function AdPopup({
       return;
     }
     addToTotal(ad.purchase.price, `${ad.purchase.name} (from a pop-up ad)`);
+    playSuccessTone();
     playMoneyAddedTone();
-    onClose();
+    celebratePurchase();
+    onBought();
   }
 
   const cta = (
@@ -157,7 +161,7 @@ function AdPopup({
         <button
           aria-label="Close ad"
           onClick={onClose}
-          style={{ ...linkStyle, position: "absolute", top: 4, right: 6, fontSize: "10px", textDecoration: "none", color: "#4a5070" }}
+          style={{ ...linkStyle, position: "absolute", top: 4, right: 6, fontSize: "10px", textDecoration: "none", color: "#c9b9a2" }}
         >
           ×
         </button>
@@ -166,7 +170,7 @@ function AdPopup({
       {trick === "fakeX" && (
         <span
           aria-hidden="true"
-          style={{ position: "absolute", top: 6, right: 12, fontSize: "26px", fontWeight: "bold", color: "#f4f5fb" }}
+          style={{ position: "absolute", top: 6, right: 12, fontSize: "26px", fontWeight: "bold", color: "#2b2118" }}
         >
           ✕
         </span>
@@ -174,11 +178,11 @@ function AdPopup({
 
       {trick === "countdown" && (
         secondsLeft > 0 ? (
-          <span style={{ position: "absolute", top: 10, right: 14, fontSize: "0.75em", color: "#8b93a7" }}>
+          <span style={{ position: "absolute", top: 10, right: 14, fontSize: "0.75em", color: "#9a8a76" }}>
             You can close this ad in {secondsLeft}…
           </span>
         ) : (
-          <button aria-label="Close ad" onClick={onClose} style={{ ...linkStyle, position: "absolute", top: 6, right: 10, fontSize: "18px", textDecoration: "none", color: "#f4f5fb" }}>
+          <button aria-label="Close ad" onClick={onClose} style={{ ...linkStyle, position: "absolute", top: 6, right: 10, fontSize: "18px", textDecoration: "none", color: "#2b2118" }}>
             ✕
           </button>
         )
@@ -188,14 +192,14 @@ function AdPopup({
         <button
           aria-label="Close ad"
           onClick={handleDodge}
-          style={{ ...linkStyle, position: "absolute", top: `${dodgePos.top}%`, right: `${dodgePos.right}%`, fontSize: "18px", textDecoration: "none", color: "#f4f5fb" }}
+          style={{ ...linkStyle, position: "absolute", top: `${dodgePos.top}%`, right: `${dodgePos.right}%`, fontSize: "18px", textDecoration: "none", color: "#2b2118" }}
         >
           ✕
         </button>
       )}
 
       {trick === "spawner" && (
-        <button aria-label="Close ad" onClick={onClose} style={{ ...linkStyle, position: "absolute", top: 6, right: 10, fontSize: "18px", textDecoration: "none", color: "#f4f5fb" }}>
+        <button aria-label="Close ad" onClick={onClose} style={{ ...linkStyle, position: "absolute", top: 6, right: 10, fontSize: "18px", textDecoration: "none", color: "#2b2118" }}>
           ✕
         </button>
       )}
@@ -205,8 +209,8 @@ function AdPopup({
           display: "inline-block",
           padding: "2px 8px",
           borderRadius: "6px",
-          background: "rgba(255, 154, 92, 0.18)",
-          color: "#ffb38a",
+          background: "rgba(242, 89, 107, 0.12)",
+          color: "#c4452f",
           fontSize: "10px",
           fontWeight: 800,
           letterSpacing: "0.12em",
@@ -214,15 +218,15 @@ function AdPopup({
       >
         SPONSORED
       </span>
-      <h3 style={{ margin: "8px 0", paddingRight: "40px", fontSize: "20px", lineHeight: 1.15, fontWeight: 800, color: "#fff" }}>
+      <h3 style={{ margin: "8px 0", paddingRight: "40px", fontSize: "20px", lineHeight: 1.15, fontWeight: 800, color: "#2b2118" }}>
         {ad.headline}
       </h3>
 
       {trick === "bottom" ? (
         <div style={{ maxHeight: "200px", overflowY: "auto" }}>
-          <p style={{ color: "#c3c8d9", fontSize: "15px", lineHeight: 1.4 }}>{ad.body}</p>
+          <p style={{ color: "#5e4f3f", fontSize: "15px", lineHeight: 1.4 }}>{ad.body}</p>
           {cta}
-          <p style={{ fontSize: "0.7em", color: "#8b93a7", marginTop: "200px" }}>
+          <p style={{ fontSize: "0.7em", color: "#9a8a76", marginTop: "200px" }}>
             Terms and conditions apply. Offer valid while subscribed. Subscribed
             while valid. See terms for terms.
           </p>
@@ -232,7 +236,7 @@ function AdPopup({
         </div>
       ) : (
         <>
-          <p style={{ color: "#c3c8d9", fontSize: "15px", lineHeight: 1.4 }}>{ad.body}</p>
+          <p style={{ color: "#5e4f3f", fontSize: "15px", lineHeight: 1.4 }}>{ad.body}</p>
           {trick === "twoButtons" ? (
             <div style={{ display: "flex", gap: "8px" }}>
               {[0, 1].map((i) => (
@@ -272,6 +276,27 @@ function celebrateBurst() {
         startVelocity: 50,
         origin: { x, y: 0.75 },
         colors: ["#1cd1ee", "#33d4a8", "#ff9a5c", "#f2596b", "#ffffff"],
+        zIndex: 5000,
+        disableForReducedMotion: true,
+      });
+    }
+    if (Date.now() < end) requestAnimationFrame(frame);
+  };
+  frame();
+}
+
+// Buying something from an ad gets the biggest party of all
+function celebratePurchase() {
+  const end = Date.now() + 900;
+  const frame = () => {
+    for (const x of [0, 0.3, 0.5, 0.7, 1]) {
+      confetti({
+        particleCount: 16,
+        angle: x < 0.5 ? 60 : x > 0.5 ? 120 : 90,
+        spread: 100,
+        startVelocity: 58,
+        origin: { x, y: x === 0.5 ? 0.9 : 0.75 },
+        colors: ["#1cd1ee", "#33d4a8", "#ff9a5c", "#f2596b", "#ffd166", "#ffffff"],
         zIndex: 5000,
         disableForReducedMotion: true,
       });
@@ -380,7 +405,8 @@ function AdBursts({ paused }: { paused: boolean }) {
     if (!adsShowing) lastActivity.current = Date.now();
   }, [adsShowing]);
 
-  function close(key: number, trick: CloseTrick) {
+  function close(key: number, trick: CloseTrick, bought = false) {
+    if (!bought) playFailureTone(); // closing an ad is a sad moment for us
     setOpenAds((current) => {
       const remaining = current.filter((a) => a.key !== key);
       if (trick !== "spawner") return remaining;
@@ -397,6 +423,7 @@ function AdBursts({ paused }: { paused: boolean }) {
           open={open}
           layer={i}
           onClose={() => close(open.key, open.trick)}
+          onBought={() => close(open.key, open.trick, true)}
         />
       ))}
     </>
