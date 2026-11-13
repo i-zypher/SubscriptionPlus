@@ -173,7 +173,7 @@ export const bradReplies: Record<Intent, string[]> = {
     "I'm not sure I understand, but I'm confident you need an upgrade.",
     "Let me check on that for you… 🔍 Okay, I checked! The answer is Premium Plus.",
     "Hmm, interesting! I'll forward that to the appropriate department. That department is me.",
-    "I completely understand how you feel, [CUSTOMER_FIRST_NAME].",
+    "I completely understand how you feel, [CUSTOMER_FIRST_NAME]. Sorry, {name}!",
     "Thanks for reaching out! Your satisfaction is our top priority, right after revenue.",
     "That's a great point. I've written it down. On a sticky note. That I threw away.",
     "I'm so glad you asked! I have no idea. 😊",

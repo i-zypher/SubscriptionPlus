@@ -3,11 +3,12 @@ import type { FormEvent } from "react";
 import { useGameStore } from "../../state/gameStore";
 import type { Ending } from "../../state/gameStore";
 import { bradPhases } from "./bradPhases";
-import { detectIntent, pickLine, pickReply, pickOtherReply } from "./bradLogic";
+import { detectIntent, pickLine, pickReply } from "./bradLogic";
 import { playJingle, pauseJingle } from "../../audio/jinglePlayer";
 import { playMoneyAddedTone } from "../../audio/sounds";
 import { FEATURE_FEE } from "./bradScript";
 import { aiBradAvailable, askBrad } from "./bradAI";
+import { liteReply, soundsLikeDistress, DISTRESS_REPLY } from "./bradLite";
 import type { AiIntent, Offer } from "./bradAI";
 
 const ASKS_TO_CRACK = 3;
@@ -90,11 +91,6 @@ function BradScreen() {
   function charge(amount: number, label: string) {
     addToTotal(amount, label);
     playMoneyAddedTone();
-  }
-
-  // Scripted Brad Lite's general reply (sometimes a $4.99 "feature")
-  function liteOther(): { text: string; charge: number } {
-    return pickOtherReply(phase);
   }
 
   // Ask AI Brad, but never answer faster than this Brad types. Falls back to
@@ -182,6 +178,14 @@ function BradScreen() {
   }
 
   async function respond(message: string) {
+    // Real distress skips the bit entirely: no charges, no jokes
+    if (soundsLikeDistress(message)) {
+      setPitchOpen(false);
+      setOffer(null);
+      addMessage({ from: "system", text: DISTRESS_REPLY });
+      return;
+    }
+
     const intent = detectIntent(message);
     const pitchWasOpen = pitchOpen;
     const offerWasOpen = offer;
@@ -284,8 +288,9 @@ function BradScreen() {
       setOffer(ai.offer);
       if (ai.charge) charge(FEATURE_FEE, `Plus+ feature fee from ${phase.name}`);
     } else {
-      const lite = liteOther();
+      const lite = liteReply(phaseIndex, message);
       bradSays(lite.text);
+      setOffer(lite.offer);
       if (lite.charge > 0) charge(lite.charge, `Plus+ feature fee from ${phase.name}`);
     }
   }
