@@ -8,6 +8,7 @@ import {
 } from "../../audio/jingleVersions";
 import { useSettingsStore } from "../../state/settingsStore";
 import "./game-over.css";
+import { isApp } from "../../platform";
 
 function GameOverScreen() {
   const monthlyTotal = useGameStore((state) => state.monthlyTotal);
@@ -45,7 +46,12 @@ function GameOverScreen() {
             <p>
               <span aria-hidden="true">♪</span> Your jingle: {jingle.edition}
             </p>
-            <a href={ALBUM_URL} target="_blank" rel="noopener noreferrer">
+            <a
+              href={ALBUM_URL}
+              // In the apps, a plain link opens the phone's browser
+              target={isApp ? undefined : "_blank"}
+              rel="noopener noreferrer"
+            >
               Track {jingle.track} of {ALBUM_TRACKS} on{" "}
               <em>Subscription Plus! The Album</em>
               <br />

@@ -3,6 +3,9 @@ import type { Ending } from "../../state/gameStore";
 import { jingleVersions, ALBUM_TRACKS } from "../../audio/jingleVersions";
 import { useState, useEffect, useRef } from "react";
 import { toBlob } from "html-to-image";
+import { Share } from "@capacitor/share";
+import { Filesystem, Directory } from "@capacitor/filesystem";
+import { isApp } from "../../platform";
 import "./receipt.css";
 
 // Receipt lines are saved as "Name (details) ($4.99)"
@@ -21,13 +24,16 @@ function shortName(name: string) {
     return "Subscription Plus (base plan)";
   const trimmed = name.replace(
     /^Congratulations, (You're now a |You have now joined |You now have |You're now )/i,
-    "",
+    ""
   );
   return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
 }
 
 const money = (n: number) =>
-  `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  `$${n.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 
 const endingLabels: Record<Ending, string> = {
   "brad-admits-bot": "Broke Brad 🤖",
@@ -54,7 +60,9 @@ function EndScreen() {
 
   const shareText = [
     "I escaped Subscription Plus 💳",
-    `Final monthly total: $${monthlyTotal.toFixed(2)} (${receipts.length} charges)`,
+    `Final monthly total: $${monthlyTotal.toFixed(2)} (${
+      receipts.length
+    } charges)`,
     ending ? `Ending: ${endingLabels[ending]}` : "",
     edition ? `Jingle: ${edition}` : "",
     "",
@@ -69,7 +77,7 @@ function EndScreen() {
   const shotRef = useRef<HTMLDivElement | null>(null);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [picture, setPicture] = useState<"making" | "ready" | "failed">(
-    "making",
+    "making"
   );
 
   useEffect(() => {
@@ -99,7 +107,7 @@ function EndScreen() {
     // 10 seconds so a slow phone still gets a working (text) Share button.
     const start = setTimeout(() => {
       const giveUp = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("too slow")), 10000),
+        setTimeout(() => reject(new Error("too slow")), 10000)
       );
       Promise.race([makePicture(), giveUp])
         .then((file) => {
@@ -119,7 +127,33 @@ function EndScreen() {
     };
   }, []);
 
+  // In the apps: save the picture to the app's cache and open the phone's
+  // own share sheet with it (the in-app browser can't share files itself)
+  async function shareInApp() {
+    try {
+      if (receiptFile) {
+        const data = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result).split(",")[1]);
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(receiptFile);
+        });
+        const { uri } = await Filesystem.writeFile({
+          path: receiptFile.name,
+          data,
+          directory: Directory.Cache,
+        });
+        await Share.share({ text: shareText, files: [uri] });
+      } else {
+        await Share.share({ text: shareText });
+      }
+    } catch {
+      // They closed the share sheet
+    }
+  }
+
   async function handleShare() {
+    if (isApp) return shareInApp();
     const files = receiptFile ? [receiptFile] : [];
 
     // Phones: the share sheet, with the picture when the phone supports it
@@ -127,7 +161,7 @@ function EndScreen() {
       const withPicture = files.length > 0 && navigator.canShare?.({ files });
       try {
         await navigator.share(
-          withPicture ? { files, text: shareText } : { text: shareText },
+          withPicture ? { files, text: shareText } : { text: shareText }
         );
       } catch (err) {
         // Closing the share sheet is fine. Anything else: try text only.
@@ -216,8 +250,8 @@ function EndScreen() {
                     {ending === "cancel-plus"
                       ? "Cancel Plus (replaces everything above, forever)"
                       : cancelled
-                        ? "Cancelled by BRAD (he needs to lie down)"
-                        : "Adjustments we don't have to explain"}
+                      ? "Cancelled by BRAD (he needs to lie down)"
+                      : "Adjustments we don't have to explain"}
                   </span>
                   <span>
                     {adjustment < 0
@@ -293,10 +327,10 @@ function EndScreen() {
             {picture === "making"
               ? "Printing your copy…"
               : copied
-                ? receiptFile
-                  ? "Saved + text copied ✅"
-                  : "Copied! ✅"
-                : "Share my receipt"}
+              ? receiptFile
+                ? "Saved + text copied ✅"
+                : "Copied! ✅"
+              : "Share my receipt"}
           </button>
           <button className="rcpt-again" onClick={resetGame}>
             Start a New Free Trial

@@ -151,7 +151,8 @@ function AdPopup({
   const position: CSSProperties = {
     // Always fully on screen, with an 8px margin, even on a narrow phone
     left: `calc(8px + ${open.x} * max(0px, 100vw - 356px))`,
-    top: `calc(8px + ${open.y} * max(0px, 100dvh - 380px))`,
+    // Stays clear of the notch and home bar in the apps (unset on the web)
+    top: `calc(8px + var(--sa-top, 0px) + ${open.y} * max(0px, 100dvh - 380px - var(--sa-top, 0px) - var(--sa-bottom, 0px)))`,
     zIndex: 2000 + layer,
   };
 

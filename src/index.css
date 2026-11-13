@@ -127,3 +127,33 @@ code {
   --bg: #fff;
   --border: #e5e4e7;
 }
+
+/* iOS/Android apps: every screen is a full-screen layer, so pull each one in
+   from the status bar, notch and home bar. The page background shows behind.
+   Android gets the sizes from Capacitor (--safe-area-inset-*), iOS from env(). */
+.is-app {
+  --sa-top: var(--safe-area-inset-top, env(safe-area-inset-top));
+  --sa-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom));
+}
+.is-app body {
+  background: #f5f9fa;
+}
+.is-app .intro,
+.is-app .aval,
+.is-app .home,
+.is-app .set,
+.is-app .cap,
+.is-app .brad,
+.is-app .rcpt-page,
+.is-app .over,
+.is-app .cplus,
+.is-app .crash,
+.is-app .term,
+.is-app .win {
+  top: var(--sa-top);
+  bottom: var(--sa-bottom);
+}
+.is-app .chatw,
+.is-app .desp {
+  bottom: calc(16px + var(--sa-bottom));
+}
