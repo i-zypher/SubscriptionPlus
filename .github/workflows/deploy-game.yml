@@ -1,0 +1,52 @@
+# Builds the game and deploys it to its own Firebase Hosting site
+# (subscriptionplusgame.com) on every push to main. It only ever touches the
+# game's site, never ceymer-studios.com.
+name: Deploy game
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "brad-server/**"
+      - "android/**"
+      - "ios/**"
+      - "assets/**"
+      - "**.md"
+      - ".github/workflows/deploy-brad.yml"
+      - ".github/workflows/review-brad-reports.yml"
+      - "scripts/review-brad-reports.mjs"
+  workflow_dispatch:
+
+# A newer push replaces a deploy that hasn't finished yet
+concurrency:
+  group: deploy-game
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write # keyless sign-in to Google Cloud
+
+jobs:
+  deploy:
+    # Skips quietly until the one-time Google Cloud setup is done
+    if: ${{ vars.GCP_WIF_PROVIDER != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npx eslint src
+      - run: npm run build:site
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - name: Deploy to Firebase Hosting (game site only)
+        run: npx --yes firebase-tools@15.34.2 deploy --only hosting:game --project ceymer-studios-site --non-interactive

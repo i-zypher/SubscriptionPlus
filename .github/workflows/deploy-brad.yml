@@ -1,0 +1,44 @@
+# Deploys the Brad server to Cloud Run, only when brad-server/ changes.
+name: Deploy Brad server
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "brad-server/**"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-brad
+  cancel-in-progress: false # never cut a server deploy off halfway
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    # Skips quietly until the one-time Google Cloud setup is done
+    if: ${{ vars.GCP_WIF_PROVIDER != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the server starts to parse
+        run: node --check brad-server/index.mjs && node --check brad-server/prompt.mjs
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run
+        run: >-
+          gcloud run deploy brad --source brad-server
+          --project ceymer-studios-site --region us-east1
+          --allow-unauthenticated --max-instances 1 --memory 256Mi
+          --set-secrets ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest
+          --set-env-vars DAILY_BUDGET_USD=0.5
+          --quiet

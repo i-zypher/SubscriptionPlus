@@ -19,7 +19,7 @@ const MAX_HISTORY = 24;
 const ALLOWED_ORIGINS = (
   process.env.ALLOWED_ORIGINS ||
   // The two "localhost" entries are the iOS and Android apps (Capacitor)
-  "https://ceymer-studios.com,https://www.ceymer-studios.com,https://ceymer-studios-site.web.app,http://localhost:5173,capacitor://localhost,https://localhost"
+  "https://ceymer-studios.com,https://www.ceymer-studios.com,https://ceymer-studios-site.web.app,https://subscriptionplusgame.com,https://www.subscriptionplusgame.com,https://subscriptionplus-game.web.app,https://subscriptionplus-game.firebaseapp.com,http://localhost:5173,capacitor://localhost,https://localhost"
 ).split(",");
 const INTENTS = ["greeting", "cancel", "insult", "transfer", "askBot", "other", "accepted"];
 // Intents where Brad may pitch a made-up plan the player can say yes to

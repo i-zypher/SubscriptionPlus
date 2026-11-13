@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "ceymer-studios-site"
+  },
+  "targets": {
+    "ceymer-studios-site": {
+      "hosting": {
+        "game": [
+          "subscriptionplus-game"
+        ]
+      }
+    }
+  }
+}
