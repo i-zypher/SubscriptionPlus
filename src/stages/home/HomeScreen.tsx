@@ -54,6 +54,7 @@ function ContentLibrary() {
     <section className="home-card">
       <p className="home-label">Your Subscription Library</p>
       <h3>Explore your subscription content</h3>
+      <div className="home-carousel">
       <div className="home-pages" ref={pagesRef} onScroll={handleScroll}>
         {libraryRows.map((row) => (
           <div key={row.title} className="home-page">
@@ -70,6 +71,25 @@ function ContentLibrary() {
             </div>
           </div>
         ))}
+      </div>
+      {page > 0 && (
+        <button
+          className="home-arrow is-left"
+          aria-label="Previous page"
+          onClick={() => goTo(page - 1)}
+        >
+          ‹
+        </button>
+      )}
+      {page < libraryRows.length - 1 && (
+        <button
+          className="home-arrow is-right"
+          aria-label="Next page"
+          onClick={() => goTo(page + 1)}
+        >
+          ›
+        </button>
+      )}
       </div>
       <div className="home-dots">
         {libraryRows.map((row, i) => (
