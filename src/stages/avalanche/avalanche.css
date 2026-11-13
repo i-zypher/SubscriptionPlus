@@ -88,12 +88,12 @@
 .aval-level-4 {
   border: 3px solid transparent;
   background:
-    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(var(--sp-card), var(--sp-card)) padding-box,
     var(--brand) border-box;
 }
 .aval-level-4 {
   background:
-    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(var(--sp-card), var(--sp-card)) padding-box,
     linear-gradient(90deg, var(--cyan), var(--green), #ffd166, var(--cyan)) border-box;
   background-size: 100% 100%, 300% 100%;
   animation:
@@ -409,4 +409,9 @@
   .aval-dialog-backdrop {
     animation: none;
   }
+}
+
+/* Dark theme: the "You save" pill */
+:root[data-theme="dark"] .aval-price em {
+  background: rgba(51, 212, 168, 0.16);
 }

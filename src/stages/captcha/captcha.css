@@ -370,3 +370,17 @@
   font-weight: 700;
   cursor: pointer;
 }
+
+/* Dark theme: taunts and the failed-check icon */
+:root[data-theme="dark"] .cap-taunt {
+  background: rgba(255, 209, 102, 0.12);
+  color: #ffd98a;
+}
+:root[data-theme="dark"] .cap-taunt.is-good {
+  background: rgba(51, 212, 168, 0.14);
+  color: #7ff0c8;
+}
+:root[data-theme="dark"] .cap-upsell-icon {
+  background: rgba(229, 72, 77, 0.18);
+  color: #ff8a8f;
+}

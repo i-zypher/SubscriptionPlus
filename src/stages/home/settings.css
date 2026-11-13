@@ -306,3 +306,9 @@
   color: var(--sp-faint);
   font-size: calc(22px * var(--ts, 1));
 }
+
+/* Dark theme: the toggles' joke notes */
+:root[data-theme="dark"] .set-note {
+  background: rgba(255, 178, 36, 0.14);
+  color: #ffd27f;
+}

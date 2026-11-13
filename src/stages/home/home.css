@@ -398,7 +398,7 @@
   height: 30px;
   border: 0;
   border-radius: 50%;
-  background: #f0f3f5;
+  background: var(--sp-soft);
   color: var(--muted);
   font-size: calc(14px * var(--ts, 1));
   cursor: pointer;
