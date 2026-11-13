@@ -300,3 +300,34 @@ code {
   outline: 3px solid #1cd1ee !important;
   outline-offset: 2px !important;
 }
+
+/* ---------- Pop-up ads ----------
+   Warm and beige so they stand apart from the app, in both themes */
+:root {
+  --ad-bg-a: #fbf4e6;
+  --ad-bg-b: #f1e5cf;
+  --ad-ink: #2b2118;
+  --ad-muted: #5e4f3f;
+  --ad-faint: #9a8a76;
+  --ad-faintest: #c9b9a2;
+  --ad-line: rgba(201, 150, 95, 0.55);
+  --ad-tag: #c4452f;
+}
+:root[data-theme="dark"] {
+  --ad-bg-a: #2d241b;
+  --ad-bg-b: #221a13;
+  --ad-ink: #f6ead9;
+  --ad-muted: #d8c5ad;
+  --ad-faint: #a8957d;
+  --ad-faintest: #7d6c58;
+  --ad-line: rgba(201, 150, 95, 0.4);
+  --ad-tag: #ff9384;
+}
+:root.high-contrast {
+  --ad-muted: #3d3024;
+  --ad-faint: #5e4f3f;
+}
+:root.high-contrast[data-theme="dark"] {
+  --ad-muted: #f0e2cf;
+  --ad-faint: #d8c5ad;
+}

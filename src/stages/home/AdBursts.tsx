@@ -61,9 +61,9 @@ const cardStyle: CSSProperties = {
   position: "fixed",
   boxSizing: "border-box",
   width: "min(340px, calc(100vw - 16px))",
-  background: "linear-gradient(160deg, #fbf4e6, #f1e5cf)",
-  color: "#2b2118",
-  border: "1px solid rgba(201, 150, 95, 0.55)",
+  background: "linear-gradient(160deg, var(--ad-bg-a), var(--ad-bg-b))",
+  color: "var(--ad-ink)",
+  border: "1px solid var(--ad-line)",
   borderRadius: "22px",
   padding: "18px 18px 16px",
   boxShadow: "0 24px 60px -16px rgba(60, 40, 20, 0.45)",
@@ -91,7 +91,7 @@ const linkStyle: CSSProperties = {
   background: "none",
   border: "none",
   padding: 0,
-  color: "#9a8a76",
+  color: "var(--ad-faint)",
   fontSize: "0.7em",
   fontFamily: "inherit",
   textDecoration: "underline",
@@ -177,7 +177,7 @@ function AdPopup({
             right: 6,
             fontSize: "calc(10px * var(--ts, 1))",
             textDecoration: "none",
-            color: "#c9b9a2",
+            color: "var(--ad-faintest)",
           }}
         >
           ×
@@ -193,7 +193,7 @@ function AdPopup({
             right: 12,
             fontSize: "calc(26px * var(--ts, 1))",
             fontWeight: "bold",
-            color: "#2b2118",
+            color: "var(--ad-ink)",
           }}
         >
           ✕
@@ -208,7 +208,7 @@ function AdPopup({
               top: 10,
               right: 14,
               fontSize: "0.75em",
-              color: "#9a8a76",
+              color: "var(--ad-faint)",
             }}
           >
             You can close this ad in {secondsLeft}…
@@ -224,7 +224,7 @@ function AdPopup({
               right: 10,
               fontSize: "calc(18px * var(--ts, 1))",
               textDecoration: "none",
-              color: "#2b2118",
+              color: "var(--ad-ink)",
             }}
           >
             ✕
@@ -242,7 +242,7 @@ function AdPopup({
             right: `${dodgePos.right}%`,
             fontSize: "calc(18px * var(--ts, 1))",
             textDecoration: "none",
-            color: "#2b2118",
+            color: "var(--ad-ink)",
           }}
         >
           ✕
@@ -260,7 +260,7 @@ function AdPopup({
             right: 10,
             fontSize: "calc(18px * var(--ts, 1))",
             textDecoration: "none",
-            color: "#2b2118",
+            color: "var(--ad-ink)",
           }}
         >
           ✕
@@ -273,7 +273,7 @@ function AdPopup({
           padding: "2px 8px",
           borderRadius: "6px",
           background: "rgba(242, 89, 107, 0.12)",
-          color: "#c4452f",
+          color: "var(--ad-tag)",
           fontSize: "calc(10px * var(--ts, 1))",
           fontWeight: 800,
           letterSpacing: "0.12em",
@@ -288,7 +288,7 @@ function AdPopup({
           fontSize: "calc(20px * var(--ts, 1))",
           lineHeight: 1.15,
           fontWeight: 800,
-          color: "#2b2118",
+          color: "var(--ad-ink)",
         }}
       >
         {ad.headline}
@@ -298,7 +298,7 @@ function AdPopup({
         <div style={{ maxHeight: "200px", overflowY: "auto" }}>
           <p
             style={{
-              color: "#5e4f3f",
+              color: "var(--ad-muted)",
               fontSize: "calc(15px * var(--ts, 1))",
               lineHeight: 1.4,
             }}
@@ -307,7 +307,7 @@ function AdPopup({
           </p>
           {cta}
           <p
-            style={{ fontSize: "0.7em", color: "#9a8a76", marginTop: "200px" }}
+            style={{ fontSize: "0.7em", color: "var(--ad-faint)", marginTop: "200px" }}
           >
             Terms and conditions apply. Offer valid while subscribed. Subscribed
             while valid. See terms for terms.
@@ -320,7 +320,7 @@ function AdPopup({
         <>
           <p
             style={{
-              color: "#5e4f3f",
+              color: "var(--ad-muted)",
               fontSize: "calc(15px * var(--ts, 1))",
               lineHeight: 1.4,
             }}
