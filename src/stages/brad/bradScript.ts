@@ -1,15 +1,51 @@
 export type Intent =
-  | "cancel"
-  | "insult"
-  | "transfer"
-  | "askBot"
-  | "iAmBot"
-  | "yes"
-  | "other";
+  "cancel" | "insult" | "transfer" | "askBot" | "iAmBot" | "yes" | "other";
 
 export const intentKeywords: Record<Exclude<Intent, "other">, string[]> = {
   cancel: ["cancel", "unsubscribe", "quit", "stop"],
-  insult: ["stupid", "useless", "idiot", "dumb", "trash", "hate"],
+  insult: [
+    "stupid",
+    "useless",
+    "idiot",
+    "dumb",
+    "trash",
+    "hate",
+    // Swearing counts too (whole words, so "class" doesn't match "ass")
+    "fuck",
+    "fucking",
+    "fuckin",
+    "fucker",
+    "fucked",
+    "fk",
+    "fu",
+    "stfu",
+    "wtf",
+    "shit",
+    "shitty",
+    "bullshit",
+    "damn",
+    "dammit",
+    "goddamn",
+    "crap",
+    "crappy",
+    "ass",
+    "asshole",
+    "dumbass",
+    "jackass",
+    "bitch",
+    "bastard",
+    "dick",
+    "piss",
+    "pissed",
+    "suck",
+    "sucks",
+    "shut up",
+    "moron",
+    "loser",
+    "garbage",
+    "jerk",
+    "clown",
+  ],
   transfer: ["agent", "human", "manager", "supervisor", "person"],
   askBot: [
     "bot",
