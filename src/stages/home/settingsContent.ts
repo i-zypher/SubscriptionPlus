@@ -1,3 +1,4 @@
+import { PRIVACY_URL } from "../../links"
 import type { ToggleSettingKey, SliderSettingKey, ChoiceSettingKey } from "../../state/settingsStore"
 
 
@@ -9,6 +10,7 @@ export type SettingOption =
   | { kind: "exit"; color: string }
   | { kind: "slider"; label: string; setting: SliderSettingKey; min: number; max: number }
   | { kind: "fake-slider"; label: string; snapsBackTo: number; flipMessage?: string }
+  | { kind: "link"; label: string; href: string }
 
 export type SettingsSection = {
   title: string
@@ -74,6 +76,7 @@ export const settingsSections: SettingsSection[] = [
     options: [
       { kind: "toggle", label: "Spy Satellites", startsOn: true, flipMessage: "Spy Satellites are now set to Passive" },
       { kind: "toggle", label: "Surveillance Van", startsOn: false, flipMessage: "Surveillance Van is now set to Active" },
+      { kind: "link", label: "Privacy Policy (the real one)", href: PRIVACY_URL },
     ],
   },
 ]

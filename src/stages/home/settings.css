@@ -296,3 +296,13 @@
     animation: none;
   }
 }
+
+/* A real link row (Privacy Policy) */
+.set-link {
+  color: var(--sp-ink);
+  text-decoration: none;
+}
+.set-link span:last-child {
+  color: var(--sp-faint);
+  font-size: calc(22px * var(--ts, 1));
+}

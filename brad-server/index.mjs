@@ -51,7 +51,20 @@ function rollOver() {
   }
 }
 
+// IP addresses are only ever counted for the current hour; every new hour
+// starts with empty maps, so no address is kept longer than that
+let countingHour = Math.floor(Date.now() / 3_600_000);
+function forgetOldHours() {
+  const hour = Math.floor(Date.now() / 3_600_000);
+  if (hour !== countingHour) {
+    countingHour = hour;
+    callsPerIp.clear();
+    reportsPerIp.clear();
+  }
+}
+
 function overIpLimit(ip) {
+  forgetOldHours();
   const hour = Math.floor(Date.now() / 3_600_000);
   const entry = callsPerIp.get(ip);
   if (!entry || entry.hour !== hour) {
@@ -63,6 +76,7 @@ function overIpLimit(ip) {
 }
 
 function overReportLimit(ip) {
+  forgetOldHours();
   const hour = Math.floor(Date.now() / 3_600_000);
   const entry = reportsPerIp.get(ip);
   if (!entry || entry.hour !== hour) {

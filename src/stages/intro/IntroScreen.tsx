@@ -1,6 +1,8 @@
 import { useGameStore } from "../../state/gameStore"
 import { playSuccessTone } from "../../audio/sounds"
 import "./intro.css"
+import { isApp } from "../../platform"
+import { PRIVACY_URL } from "../../links"
 
 function IntroScreen() {
   const goToStage = useGameStore((state) => state.goToStage)
@@ -50,7 +52,10 @@ function IntroScreen() {
           Brad, the support agent, is an AI. What you type to him is sent to
           our AI provider (Anthropic) to write his replies, and isn't stored.
           If you report one of his replies, we keep that reply so we can
-          review it. Please don't share personal information.
+          review it. Please don't share personal information.{" "}
+          <a href={PRIVACY_URL} target={isApp ? undefined : "_blank"} rel="noopener noreferrer">
+            Privacy Policy
+          </a>
         </p>
       </main>
     </div>

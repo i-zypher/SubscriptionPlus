@@ -250,3 +250,7 @@
     animation: none;
   }
 }
+.intro-disclosure a {
+  color: var(--sp-teal-ink);
+  font-weight: 700;
+}

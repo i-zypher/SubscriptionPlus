@@ -338,6 +338,18 @@ function OptionView({
       return <LockedSwatch color={option.color} index={index} />;
     case "exit":
       return <ExitSwatch color={option.color} index={index} />;
+    case "link":
+      return (
+        <a
+          className="set-row set-link"
+          href={option.href}
+          target={isApp ? undefined : "_blank"}
+          rel="noopener noreferrer"
+        >
+          <span>{option.label}</span>
+          <span aria-hidden="true">›</span>
+        </a>
+      );
   }
 }
 
