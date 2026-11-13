@@ -5,6 +5,7 @@ import { TRIAL_LENGTH_MS, useGameStore } from "../../state/gameStore";
 import SettingsScreen from "./SettingsScreen";
 import AdBursts from "./AdBursts";
 import JingleIntro from "./JingleIntro";
+import "./home.css";
 
 const totalCharacters = affirmations.join("").length;
 const msPerCharacter = TRIAL_LENGTH_MS / totalCharacters;
@@ -25,26 +26,66 @@ function Affirmations() {
   }, [index]);
 
   return (
-    <div>
-      <h3>Affirmation of the Day</h3>
-      <p>{affirmations[index]}</p>
-    </div>
+    <section className="home-card">
+      <p className="home-label">Affirmation of the Day</p>
+      <p key={index} className="home-affirm">
+        {affirmations[index]}
+      </p>
+    </section>
   );
 }
 
 function ContentLibrary() {
   return (
-    <div>
-      <h3>Your Subscription Library</h3>
-      <p>Explore your subscription content below:</p>
+    <section className="home-card">
+      <p className="home-label">Your Subscription Library</p>
+      <h3>Explore your subscription content</h3>
       {libraryRows.map((row) => (
-        <div key={row.title}>
+        <div key={row.title} className="home-row">
           <h4>{row.title}</h4>
-          {row.tiles.map((tile, i) => (
-            <span key={i}>{tile}</span>
-          ))}
+          <div className="home-tiles">
+            {row.tiles.map((tile, i) => (
+              <div
+                key={i}
+                className={`home-tile${tile.includes("Loading") ? " is-loading" : ""}`}
+              >
+                {tile}
+              </div>
+            ))}
+          </div>
         </div>
       ))}
+    </section>
+  );
+}
+
+// The two chips at the top: what you owe, and how long until it counts
+function StatusChips() {
+  const monthlyTotal = useGameStore((state) => state.monthlyTotal);
+  const trialEndsAt = useGameStore((state) => state.trialEndsAt);
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const remaining = Math.max(0, (trialEndsAt ?? now) - now);
+  const minutes = Math.floor(remaining / 60000);
+  const seconds = String(Math.floor(remaining / 1000) % 60).padStart(2, "0");
+
+  return (
+    <div className="home-status">
+      <div className="home-chip">
+        <small>Monthly total</small>
+        <strong>${monthlyTotal.toFixed(2)}</strong>
+      </div>
+      <div className={`home-chip is-trial${remaining < 60000 ? " is-urgent" : ""}`}>
+        <small>Free trial ends in</small>
+        <strong>
+          {minutes}:{seconds}
+        </strong>
+      </div>
     </div>
   );
 }
@@ -69,45 +110,47 @@ function HomeScreen() {
     <>
       {/* Home stays mounted while Settings is open, just hidden,
           so the affirmation rotation keeps its place */}
-      <div hidden={showSettings} onClick={handleErrantClick}>
-        <h2>Welcome Home, Valued Subscriber!</h2>
-        <button
-          onClick={() => setShowSettings(true)}
-          aria-label="Menu"
-          style={{
-            background: "none",
-            border: "none",
-            padding: "8px",
-            cursor: "pointer",
-            display: "flex",
-            flexDirection: "column",
-            gap: "5px",
-          }}
-        >
-          {[0, 1, 2].map((i) => (
-            <span
-              key={i}
-              style={{
-                display: "block",
-                width: "26px",
-                height: "3px",
-                borderRadius: "2px",
-                background: "currentColor",
-              }}
-            />
-          ))}
-        </button>
+      <div className="home" hidden={showSettings} onClick={handleErrantClick}>
+        <div className="home-inner">
+          <header className="home-top">
+            <div className="home-logo">
+              <img src={`${import.meta.env.BASE_URL}brand/logo-mark.png`} alt="" />
+              <div>
+                Subscription <span>Plus</span>
+              </div>
+            </div>
+            <button
+              className="home-menu"
+              onClick={() => setShowSettings(true)}
+              aria-label="Menu"
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          </header>
 
-        <Affirmations />
+          <StatusChips />
 
-        <h3>Your Subscription Perks</h3>
-        <ul style={{ listStylePosition: "inside" }}>
-          {perks.map((perk) => (
-            <li key={perk}>{perk}</li>
-          ))}
-        </ul>
+          <section className="home-hero">
+            <span className="home-member">Founding Lifetime Member</span>
+            <h2>Welcome Home, Valued Subscriber!</h2>
+            <p>Member since just now. Member until forever.</p>
+          </section>
 
-        <ContentLibrary />
+          <Affirmations />
+
+          <section className="home-card">
+            <p className="home-label">Your Subscription Perks</p>
+            <ul className="home-perks">
+              {perks.map((perk) => (
+                <li key={perk}>{perk}</li>
+              ))}
+            </ul>
+          </section>
+
+          <ContentLibrary />
+        </div>
       </div>
 
       <JingleIntro />

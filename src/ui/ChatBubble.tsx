@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useGameStore } from "../state/gameStore";
+import "../stages/home/home.css";
 
 const QUEUE_WAIT_MS = 3 * 60 * 1000;
 const QUEUE_TICK_MS = 35 * 1000;
@@ -33,50 +34,24 @@ function ChatBubble() {
   }, [open, goToStage]);
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        right: "20px",
-        bottom: "20px",
-        zIndex: 1000,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-end",
-        gap: "10px",
-        textAlign: "left",
-      }}
-    >
+    <div className="chatw">
       {open && (
-        <div
-          role="dialog"
-          aria-label="Live support"
-          style={{
-            width: "280px",
-            maxWidth: "calc(100vw - 40px)",
-            background: "var(--bg)",
-            border: "1px solid var(--border)",
-            borderRadius: "14px",
-            boxShadow: "var(--shadow)",
-            padding: "16px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <strong>Live Support · Brad</strong>
-            <button aria-label="Close" onClick={() => setOpen(false)}>
+        <div role="dialog" aria-label="Live support" className="chatw-panel">
+          <div className="chatw-head">
+            <div className="chatw-avatar" aria-hidden="true">B</div>
+            <div>
+              <strong>Live Support · Brad</strong>
+              <small>Brad is online and excited to help!</small>
+            </div>
+            <button className="chatw-close" aria-label="Close" onClick={() => setOpen(false)}>
               ✕
             </button>
           </div>
-          <p>🟢 Brad is online and excited to help!</p>
-          <p>
-            You are <strong>#{queuePosition.toLocaleString()}</strong> in line.
-          </p>
-          <p style={{ fontSize: "0.85em" }}>
+          <div className="chatw-queue">
+            <small>Your place in line</small>
+            <strong>#{queuePosition.toLocaleString()}</strong>
+          </div>
+          <p className="chatw-note">
             To protect your account, please verify you're human before
             connecting.
           </p>
@@ -84,21 +59,14 @@ function ChatBubble() {
       )}
 
       <button
+        className="chatw-button"
         aria-label="Open live support chat"
         onClick={() => setOpen((prev) => !prev)}
-        style={{
-          width: "60px",
-          height: "60px",
-          borderRadius: "50%",
-          border: "none",
-          background: "var(--accent)",
-          color: "#fff",
-          fontSize: "28px",
-          cursor: "pointer",
-          boxShadow: "var(--shadow)",
-        }}
       >
-        💬
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.9A8 8 0 1 1 21 12Z" />
+          <path d="M8.5 12h.01M12 12h.01M15.5 12h.01" />
+        </svg>
       </button>
     </div>
   );

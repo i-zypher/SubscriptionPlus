@@ -1,5 +1,6 @@
 import { useGameStore } from "../state/gameStore"
 import { desperationHints, DESPERATION_MAX } from "../stages/home/desperationHints"
+import "../stages/home/home.css"
 
 function DesperationMeter() {
   const desperation = useGameStore((state) => state.desperation)
@@ -11,28 +12,10 @@ function DesperationMeter() {
   const latestHint = unlocked.at(-1)
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: "16px",
-        left: "16px",
-        width: "260px",
-        padding: "12px",
-        background: "#222",
-        borderRadius: "12px",
-        textAlign: "left",
-      }}
-    >
-      <p>Desperation</p>
-      <div style={{ height: "8px", background: "#444", borderRadius: "4px" }}>
-        <div
-          style={{
-            width: `${percent}%`,
-            height: "100%",
-            background: "#F0300A",
-            borderRadius: "4px",
-          }}
-        />
+    <div className="desp">
+      <small>Desperation</small>
+      <div className="desp-bar">
+        <div style={{ width: `${percent}%` }} />
       </div>
       {latestHint && <p>{latestHint.text}</p>}
     </div>
