@@ -105,6 +105,7 @@ function CookieCaptcha({ onPass }: CaptchaProps) {
         <p style={{ textAlign: "center", margin: "8px 0 0" }}>
           <button
             type="button"
+            className="cap-link"
             onClick={() => setManaging(true)}
             style={{
               background: "none",

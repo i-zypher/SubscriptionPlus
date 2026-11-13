@@ -23,14 +23,20 @@ export function VerifiedHumanUpsell({
   }
 
   return (
-    <div>
-      <p>Verification failed. That's okay, nobody's perfect!</p>
-      <p>
-        Skip verification forever with <strong>Verified Human+</strong>, just $
-        {VERIFIED_HUMAN_PRICE}/mo.
-      </p>
-      <button onClick={handleSkip}>Yes! Verify me with money</button>
-      <button onClick={onRetry}>No thanks, I'll prove myself</button>
+    <div className="cap-upsell">
+      <div className="cap-upsell-icon" aria-hidden="true">✕</div>
+      <p className="cap-upsell-title">Verification failed.</p>
+      <p>That's okay, nobody's perfect!</p>
+      <div className="cap-upsell-offer">
+        Skip verification forever with <strong>Verified Human+</strong>
+        <span>${VERIFIED_HUMAN_PRICE}/mo</span>
+      </div>
+      <button className="cap-upsell-buy" onClick={handleSkip}>
+        Yes! Verify me with money
+      </button>
+      <button className="cap-upsell-retry" onClick={onRetry}>
+        No thanks, I'll prove myself
+      </button>
     </div>
   );
 }

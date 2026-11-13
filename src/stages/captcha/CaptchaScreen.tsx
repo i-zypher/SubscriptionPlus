@@ -12,6 +12,7 @@ import { VerifiedHumanUpsell } from "./VerifiedHumanUpsell";
 import type { CaptchaProps } from "./VerifiedHumanUpsell";
 import type { CaptchaId } from "./captchaPool";
 import TrafficLightCaptcha from "./TrafficLightCaptcha";
+import "./captcha.css";
 import WobblyTextCaptcha from "./WobblyTextCaptcha";
 import CookieCaptcha from "./CookieCaptcha";
 import SpotTheBotCaptcha from "./SpotTheBotCaptcha";
@@ -73,20 +74,10 @@ function CheckboxCaptcha({ onPass }: CaptchaProps) {
 
   return (
     <div>
-      <div
-        style={{
-          position: "relative",
-          height: "160px",
-          border: "1px solid #ccc",
-        }}
-      >
+      <div className="cap-arena">
         <label
-          style={{
-            position: "absolute",
-            left: `${pos.x}%`,
-            top: `${pos.y}%`,
-            whiteSpace: "nowrap",
-          }}
+          className={`cap-check${checked ? " is-checked" : ""}`}
+          style={{ left: `${pos.x * 0.7}%`, top: `${pos.y * 0.8}%` }}
         >
           <input
             type="checkbox"
@@ -94,11 +85,11 @@ function CheckboxCaptcha({ onPass }: CaptchaProps) {
             onChange={handleChange}
             disabled={checked}
           />
-          I'm not a robot
+          <span>I'm not a robot</span>
         </label>
       </div>
-      {taunt && !checked && <p>{taunt}</p>}
-      {checked && <p>Hmm, that was a little too human. Please continue.</p>}
+      {taunt && !checked && <p className="cap-taunt">{taunt}</p>}
+      {checked && <p className="cap-taunt is-good">Hmm, that was a little too human. Please continue.</p>}
     </div>
   );
 }
@@ -157,7 +148,7 @@ function SpotDifferenceCaptcha({ onPass }: CaptchaProps) {
   }
 
   if (!loaded) {
-    return <p>Loading verification…</p>;
+    return <p className="cap-loading">Loading verification…</p>;
   }
 
   return (
@@ -273,8 +264,8 @@ function AudioCaptcha({ onPass }: CaptchaProps) {
   return (
     <div>
       <p>Press play, then answer the question.</p>
-      <button type="button" onClick={handlePlay}>
-        🔊 Play audio
+      <button type="button" className="cap-play" onClick={handlePlay}>
+        <span aria-hidden="true">▶</span> Play audio
       </button>
       <p>
         <strong>{AUDIO_QUESTION}</strong>
@@ -326,23 +317,53 @@ function CaptchaScreen() {
   }
 
   return (
-    <div>
-      <h2>Please verify you are human to continue cancelling.</h2>
-      <p>
-        Verification {step + 1} of {order.length}
-      </p>
+    <div className="cap">
+      <div className="cap-inner">
+        <header className="cap-top">
+          <img src={`${import.meta.env.BASE_URL}brand/logo-mark.png`} alt="" />
+          <span>Security Check</span>
+        </header>
+        <h2>Please verify you are human to continue cancelling.</h2>
+        <div className="cap-progress" aria-label={`Verification ${step + 1} of ${order.length}`}>
+          {order.map((id, i) => (
+            <span key={id} className={i < step ? "is-done" : i === step ? "is-now" : ""} />
+          ))}
+          <small>
+            Verification {step + 1} of {order.length}
+          </small>
+        </div>
 
-      {/* key resets each step's local state when moving on */}
-      <Step key={step} onPass={handlePass} />
+        <div className="cap-widget">
+          <div className="cap-body">
+            {/* key resets each step's local state when moving on */}
+            <Step key={step} onPass={handlePass} />
+          </div>
+          <footer className="cap-foot">
+            <span className="cap-icons" aria-hidden="true">
+              <span>↻</span>
+              <span>🎧</span>
+              <span>ⓘ</span>
+            </span>
+            <span className="cap-brand">
+              <img src={`${import.meta.env.BASE_URL}brand/logo-mark.png`} alt="" />
+              <span>
+                <strong>SubCAPTCHA</strong>
+                <small>Privacy · Terms · Fees</small>
+              </span>
+            </span>
+          </footer>
+        </div>
 
-      <button
-        onClick={() => {
-          goToStage("home");
-          playSuccessTone();
-        }}
-      >
-        Never mind, I'll stay 😊
-      </button>
+        <button
+          className="cap-stay"
+          onClick={() => {
+            goToStage("home");
+            playSuccessTone();
+          }}
+        >
+          Never mind, I'll stay 😊
+        </button>
+      </div>
     </div>
   );
 }

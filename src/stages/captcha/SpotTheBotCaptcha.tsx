@@ -241,10 +241,10 @@ function SpotTheBotCaptcha({ onPass }: CaptchaProps) {
         </div>
       </div>
       <p style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
-        <button type="button" onClick={() => zoomCenter(1.5)} aria-label="Zoom in">
+        <button type="button" className="cap-zoom" onClick={() => zoomCenter(1.5)} aria-label="Zoom in">
           ＋
         </button>
-        <button type="button" onClick={() => zoomCenter(1 / 1.5)} aria-label="Zoom out">
+        <button type="button" className="cap-zoom" onClick={() => zoomCenter(1 / 1.5)} aria-label="Zoom out">
           －
         </button>
         <button type="button" onClick={() => setView({ scale: 1, x: 0, y: 0 })}>
