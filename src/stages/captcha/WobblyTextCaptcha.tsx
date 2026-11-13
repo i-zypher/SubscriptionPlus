@@ -4,14 +4,29 @@ import { playSuccessTone, playFailureTone } from "../../audio/sounds";
 import { VerifiedHumanUpsell } from "./VerifiedHumanUpsell";
 import type { CaptchaProps } from "./VerifiedHumanUpsell";
 
-// Type the squiggly word. The words are the fine print. The last one can't
-// be read at all, and the only accepted answer is "I agree".
+// Type the squiggly word. One per run, picked from the fine print.
+// The unreadable one only accepts "I agree".
 
-const ROUNDS = [
-  { shown: "AUTORENEW", answer: "autorenew", wobble: 1 },
-  { shown: "NONREFUNDABLE", answer: "nonrefundable", wobble: 1.4 },
+const CHALLENGES = [
+  { shown: "AUTORENEW", answer: "autorenew", wobble: 1.2 },
+  { shown: "NONREFUNDABLE", answer: "nonrefundable", wobble: 1.2 },
+  { shown: "FINE PRINT", answer: "fineprint", wobble: 1.3 },
+  { shown: "TERMS APPLY", answer: "termsapply", wobble: 1.3 },
+  { shown: "NO REFUNDS", answer: "norefunds", wobble: 1.4 },
+  { shown: "BILLED ANNUALLY", answer: "billedannually", wobble: 1.2 },
+  { shown: "RECURRING", answer: "recurring", wobble: 1.4 },
   { shown: "ẞ¥Ꮻ₩ǂ§ЖΩ∆ҨɄ", answer: "iagree", wobble: 3 },
 ];
+const UNREADABLE_ANSWER = "iagree";
+
+// Never the same one twice in a row
+let lastChallenge: string | null = null;
+function pickChallenge() {
+  const options = CHALLENGES.filter((c) => c.shown !== lastChallenge);
+  const challenge = options[Math.floor(Math.random() * options.length)];
+  lastChallenge = challenge.shown;
+  return challenge;
+}
 
 function normalize(text: string) {
   return text.toLowerCase().replace(/[^a-z]/g, "");
@@ -28,34 +43,23 @@ function letterStyles(text: string, wobble: number) {
 }
 
 function WobblyTextCaptcha({ onPass }: CaptchaProps) {
-  const [round, setRound] = useState(0);
-  const [styles, setStyles] = useState(() =>
-    letterStyles(ROUNDS[0].shown, ROUNDS[0].wobble),
-  );
+  const [current] = useState(pickChallenge);
+  const [styles] = useState(() => letterStyles(current.shown, current.wobble));
   const [guess, setGuess] = useState("");
   const [hint, setHint] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
 
-  const current = ROUNDS[round];
-  const isLast = round === ROUNDS.length - 1;
-
-  function goTo(next: number) {
-    setRound(next);
-    setStyles(letterStyles(ROUNDS[next].shown, ROUNDS[next].wobble));
-    setGuess("");
-    setHint(null);
-  }
+  const isUnreadable = current.answer === UNREADABLE_ANSWER;
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (normalize(guess) === current.answer) {
       playSuccessTone();
-      if (isLast) onPass();
-      else goTo(round + 1);
+      onPass();
       return;
     }
     playFailureTone();
-    if (isLast) {
+    if (isUnreadable) {
       // No upsell here, just a nudge toward the only answer we accept
       setGuess("");
       setHint("Incorrect. Hint: the answer is always “I agree.”");
@@ -69,7 +73,7 @@ function WobblyTextCaptcha({ onPass }: CaptchaProps) {
       <VerifiedHumanUpsell
         onRetry={() => {
           setFailed(false);
-          goTo(0);
+          setGuess("");
         }}
         onPass={onPass}
       />
@@ -100,7 +104,7 @@ function WobblyTextCaptcha({ onPass }: CaptchaProps) {
       >
         {[...current.shown].map((char, i) => (
           <span
-            key={`${round}-${i}`}
+            key={i}
             style={{
               display: "inline-block",
               fontSize: `${styles[i].size}px`,
