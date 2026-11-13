@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.tsx'
 import { isApp } from './platform'
 import { startSettings } from './settings/applySettings'
+import { startNotifications } from './notifications'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -16,6 +17,9 @@ if (isApp) document.documentElement.classList.add('is-app')
 
 // Theme, text size, reduce motion, high contrast (and the app's bar colours)
 startSettings()
+
+// Win-back reminders in the apps (Settings → Push Notifications)
+startNotifications()
 
 // Lets the website install as an app. Production only, so local dev never
 // gets a stale worker, and never inside the real apps (they don't need it).

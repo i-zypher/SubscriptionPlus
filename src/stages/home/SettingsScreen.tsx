@@ -4,6 +4,8 @@ import "./settings.css";
 import { settingsSections } from "./settingsContent";
 import type { SettingOption } from "./settingsContent";
 import { useSettingsStore } from "../../state/settingsStore";
+import { useNotificationNote } from "../../notifications";
+import { isApp } from "../../platform";
 import type {
   ToggleSettingKey,
   ChoiceSettingKey,
@@ -11,8 +13,6 @@ import type {
 } from "../../state/settingsStore";
 import { useGameStore } from "../../state/gameStore";
 import { playSuccessTone, playFailureTone } from "../../audio/sounds";
-
-
 
 function SliderControl({
   label,
@@ -39,7 +39,11 @@ function SliderControl({
         min={min}
         max={max}
         value={value}
-        style={{ "--fill": `${((value - min) / (max - min)) * 100}%` } as CSSProperties}
+        style={
+          {
+            "--fill": `${((value - min) / (max - min)) * 100}%`,
+          } as CSSProperties
+        }
         onChange={(e) => setSlider(setting, Number(e.target.value))}
         onPointerUp={playSuccessTone}
         onKeyUp={playSuccessTone}
@@ -92,21 +96,35 @@ function RealToggle({
 }) {
   const isOn = useSettingsStore((state) => state[setting]);
   const toggleSetting = useSettingsStore((state) => state.toggleSetting);
+  const notificationNote = useNotificationNote((state) => state.note);
+
+  // Push Notifications only does something in the apps; say so honestly
+  const note =
+    setting !== "push"
+      ? null
+      : !isApp
+      ? isOn
+        ? "Reminders come with the iOS and Android apps."
+        : null
+      : notificationNote;
 
   return (
-    <label className="set-row">
-      <span>{label}</span>
-      <input
-        type="checkbox"
-        role="switch"
-        className="set-switch"
-        checked={isOn}
-        onChange={() => {
-          toggleSetting(setting);
-          playSuccessTone();
-        }}
-      />
-    </label>
+    <div className="set-item">
+      <label className="set-row">
+        <span>{label}</span>
+        <input
+          type="checkbox"
+          role="switch"
+          className="set-switch"
+          checked={isOn}
+          onChange={() => {
+            toggleSetting(setting);
+            playSuccessTone();
+          }}
+        />
+      </label>
+      {note && <p className="set-note">{note}</p>}
+    </div>
   );
 }
 
@@ -154,11 +172,12 @@ function FakeToggle({
           onChange={handleChange}
         />
       </label>
-      {(flipped || refused) && flipMessage && <p className="set-note">{flipMessage}</p>}
+      {(flipped || refused) && flipMessage && (
+        <p className="set-note">{flipMessage}</p>
+      )}
     </div>
   );
 }
-
 
 function FakeSlider({
   label,
@@ -271,7 +290,13 @@ function ExitSwatch({ color, index }: { color: string; index: number }) {
   );
 }
 
-function OptionView({ option, index }: { option: SettingOption; index: number }) {
+function OptionView({
+  option,
+  index,
+}: {
+  option: SettingOption;
+  index: number;
+}) {
   switch (option.kind) {
     case "toggle":
       return (
@@ -335,7 +360,9 @@ function SettingsScreen({ onClose }: { onClose: () => void }) {
         {settingsSections.map((section) => (
           <section key={section.title} className="set-section">
             <h3>{section.title}</h3>
-            <div className={section.layout === "grid" ? "set-grid" : "set-group"}>
+            <div
+              className={section.layout === "grid" ? "set-grid" : "set-group"}
+            >
               {section.options.map((option, i) => (
                 <OptionView key={i} option={option} index={i} />
               ))}

@@ -13,6 +13,7 @@ import BradScreen from "./stages/brad/BradScreen";
 import EndingsScreen from "./stages/endings/EndingsScreen";
 import EndScreen from "./stages/end-screen/EndScreen";
 import Captions from "./ui/Captions";
+import NotifyPrompt from "./ui/NotifyPrompt";
 
 function App() {
   const currentStage = useGameStore((state) => state.currentStage);
@@ -32,6 +33,7 @@ function App() {
       {currentStage === "intro" && <IntroScreen />}
       {currentStage === "avalanche" && <TierPopup />}
       {currentStage === "home" && <HomeScreen />}
+      {currentStage === "home" && <NotifyPrompt />}
       {currentStage === "game-over" && <GameOverScreen />}
       {currentStage === "captcha" && <CaptchaScreen />}
       {currentStage === "brad" && <BradScreen />}

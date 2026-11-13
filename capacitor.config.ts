@@ -7,6 +7,13 @@ const config: CapacitorConfig = {
   appName: "Subscription Plus",
   webDir: "dist",
   backgroundColor: "#f5f9fa",
+  plugins: {
+    LocalNotifications: {
+      // White silhouette of the logo for Android's status bar
+      smallIcon: "ic_stat_sp",
+      iconColor: "#1cd1ee",
+    },
+  },
 };
 
 export default config;
