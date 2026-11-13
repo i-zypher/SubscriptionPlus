@@ -249,3 +249,7 @@
   color: #0b0f14;
   font-weight: 800;
 }
+.rcpt-share:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}

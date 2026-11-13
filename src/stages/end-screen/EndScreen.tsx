@@ -64,15 +64,19 @@ function EndScreen() {
 
   // The receipt as a picture, made ahead of time so the share sheet opens
   // straight from the tap (iPhones refuse to share after a slow await).
+  // The Share button waits until it's ready, so nobody gets text only.
   const shotRef = useRef<HTMLDivElement | null>(null);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [picture, setPicture] = useState<"making" | "ready" | "failed">(
+    "making",
+  );
 
   useEffect(() => {
     let alive = true;
-    // Wait for the print and stamp animations to finish
-    const timer = setTimeout(async () => {
+
+    async function makePicture() {
       const node = shotRef.current;
-      if (!node) return;
+      if (!node) throw new Error("receipt not on screen");
       node.classList.add("is-capturing");
       try {
         await document.fonts.ready;
@@ -81,22 +85,36 @@ function EndScreen() {
           cacheBust: true,
           style: { margin: "0" },
         });
-        if (blob && alive) {
-          setReceiptFile(
-            new File([blob], "subscription-plus-receipt.png", {
-              type: "image/png",
-            }),
-          );
-        }
-      } catch {
-        // No picture; sharing falls back to text
+        if (!blob) throw new Error("no picture");
+        return new File([blob], "subscription-plus-receipt.png", {
+          type: "image/png",
+        });
       } finally {
         node.classList.remove("is-capturing");
       }
+    }
+
+    // Wait for the print and stamp animations, then make it. Give up after
+    // 10 seconds so a slow phone still gets a working (text) Share button.
+    const start = setTimeout(() => {
+      const giveUp = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("too slow")), 10000),
+      );
+      Promise.race([makePicture(), giveUp])
+        .then((file) => {
+          if (!alive) return;
+          setReceiptFile(file);
+          setPicture("ready");
+        })
+        .catch((err) => {
+          console.error("Receipt picture failed:", err);
+          if (alive) setPicture("failed");
+        });
     }, 2200);
+
     return () => {
       alive = false;
-      clearTimeout(timer);
+      clearTimeout(start);
     };
   }, []);
 
@@ -110,8 +128,15 @@ function EndScreen() {
         await navigator.share(
           withPicture ? { files, text: shareText } : { text: shareText },
         );
-      } catch {
-        // They closed the share sheet; nothing to do
+      } catch (err) {
+        // Closing the share sheet is fine. Anything else: try text only.
+        if (withPicture && (err as Error).name !== "AbortError") {
+          try {
+            await navigator.share({ text: shareText });
+          } catch {
+            // Closed it again
+          }
+        }
       }
       return;
     }
@@ -253,12 +278,18 @@ function EndScreen() {
         </div>
 
         <div className="rcpt-actions">
-          <button className="rcpt-share" onClick={handleShare}>
-            {copied
-              ? receiptFile
-                ? "Saved + text copied ✅"
-                : "Copied! ✅"
-              : "Share my receipt"}
+          <button
+            className="rcpt-share"
+            onClick={handleShare}
+            disabled={picture === "making"}
+          >
+            {picture === "making"
+              ? "Printing your copy…"
+              : copied
+                ? receiptFile
+                  ? "Saved + text copied ✅"
+                  : "Copied! ✅"
+                : "Share my receipt"}
           </button>
           <button className="rcpt-again" onClick={resetGame}>
             Start a New Free Trial
