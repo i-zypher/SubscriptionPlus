@@ -7,6 +7,7 @@ const endingLabels: Record<Ending, string> = {
   "brad-admits-bot": "Broke Brad 🤖",
   "player-is-bot": "Accepted I'm a Bot 🤖",
   "cancel-plus": "Subscribed to Cancel Plus 💳",
+  "true-cancel": "Actually Cancelled 🏆",
 };
 // Replace with the real link once the game is hosted
 const GAME_URL = "https://subscriptionplusgame.com";

@@ -1,4 +1,8 @@
+import { useEffect } from "react";
+import confetti from "canvas-confetti";
 import { useGameStore, CANCEL_PLUS_PRICE } from "../../state/gameStore";
+import { playSuccessTone } from "../../audio/sounds";
+import "./endings.css";
 
 // --- Ending 1: Brad admits he's a bot. The polished app breaks. ---
 
@@ -82,6 +86,73 @@ function CancelPlusMember({ onContinue }: { onContinue: () => void }) {
   );
 }
 
+// --- Ending 4: the true cancel. You actually did it. ---
+
+function TrueCancel({ onContinue }: { onContinue: () => void }) {
+  const receipts = useGameStore((state) => state.receipts);
+
+  // The biggest party in the game: three seconds of confetti from everywhere
+  useEffect(() => {
+    playSuccessTone();
+    const end = Date.now() + 3000;
+    let frameId = 0;
+    const frame = () => {
+      for (const x of [0, 0.2, 0.4, 0.6, 0.8, 1]) {
+        confetti({
+          particleCount: 10,
+          angle: x < 0.5 ? 60 : 120,
+          spread: 110,
+          startVelocity: 60,
+          origin: { x, y: 0.9 },
+          colors: ["#1cd1ee", "#33d4a8", "#ffd166", "#ffffff", "#0b0f14"],
+          zIndex: 5000,
+          disableForReducedMotion: true,
+        });
+      }
+      if (Date.now() < end) frameId = requestAnimationFrame(frame);
+    };
+    frame();
+    return () => {
+      cancelAnimationFrame(frameId);
+      confetti.reset();
+    };
+  }, []);
+
+  return (
+    <div className="win">
+      <main className="win-card">
+        <div className="win-trophy" aria-hidden="true">🏆</div>
+        <p className="win-kicker">Ultimate ending unlocked</p>
+        <h2>Subscription Cancelled.</h2>
+        <p className="win-sub">For real. For free. Forever.</p>
+
+        <div className="win-total">
+          <small>Your new monthly total</small>
+          <strong>$0.00</strong>
+          {receipts.length > 0 && (
+            <span>{receipts.length} charges waived</span>
+          )}
+        </div>
+
+        <ul className="win-list">
+          <li>No fees</li>
+          <li>No Cancel Plus</li>
+          <li>No Brad</li>
+        </ul>
+
+        <p className="win-note">
+          You are the first person in history to cancel Subscription Plus.
+          Brad is lying down.
+        </p>
+
+        <button className="win-cta" onClick={onContinue}>
+          Claim my freedom
+        </button>
+      </main>
+    </div>
+  );
+}
+
 function EndingsScreen() {
   const ending = useGameStore((state) => state.ending);
   const goToStage = useGameStore((state) => state.goToStage);
@@ -95,6 +166,8 @@ function EndingsScreen() {
       return <PlayerIsBot onContinue={toEndScreen} />;
     case "cancel-plus":
       return <CancelPlusMember onContinue={toEndScreen} />;
+    case "true-cancel":
+      return <TrueCancel onContinue={toEndScreen} />;
     default:
       return null;
   }

@@ -25,7 +25,7 @@ export type Stage =
   | "end-screen"
   | "game-over";
 
-export type Ending = "brad-admits-bot" | "player-is-bot" | "cancel-plus";
+export type Ending = "brad-admits-bot" | "player-is-bot" | "cancel-plus" | "true-cancel";
 
 export type Message = {
   from: "brad" | "player" | "system";
@@ -98,12 +98,14 @@ export const useGameStore = create<GameState & GameActions>()((set) => ({
     set((state) => ({ messages: [...state.messages, message] })),
   nextTransfer: () =>
     set((state) => ({ transferCount: state.transferCount + 1 })),
-    // Winning stops the trial clock. Cancel Plus also replaces the whole bill.
+    // Winning stops the trial clock. Cancel Plus replaces the whole bill;
+    // the true cancel wipes it out.
   setEnding: (ending) =>
     set({
       ending,
       trialEndsAt: null,
       ...(ending === "cancel-plus" ? { monthlyTotal: CANCEL_PLUS_PRICE } : {}),
+      ...(ending === "true-cancel" ? { monthlyTotal: 0 } : {}),
     }),
 
   goToStage: (stage) => set({ currentStage: stage }),

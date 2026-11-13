@@ -1,0 +1,145 @@
+/* The true cancel: the one screen where the app is genuinely happy for you */
+
+.win {
+  --cyan: #1cd1ee;
+  --green: #33d4a8;
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px 48px;
+  color-scheme: light;
+  font-family: "Outfit", system-ui, sans-serif;
+  color: #0b0f14;
+  background:
+    radial-gradient(70% 50% at 50% 0%, rgba(255, 209, 102, 0.45), transparent 70%),
+    linear-gradient(160deg, var(--cyan), var(--green));
+}
+.win-card {
+  width: 100%;
+  max-width: 420px;
+  margin: auto 0;
+  padding: 30px 24px 24px;
+  border-radius: 32px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 30px 80px -24px rgba(4, 34, 31, 0.55);
+  animation: win-pop 700ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+.win-trophy {
+  font-size: 72px;
+  line-height: 1;
+  animation: win-bounce 1.6s ease-in-out 700ms infinite;
+}
+.win-kicker {
+  margin: 12px 0 4px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #b07d00;
+}
+.win h2 {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0b0f14;
+}
+.win-sub {
+  margin: 6px 0 20px;
+  font-size: 17px;
+  color: #5d6874;
+}
+.win-total {
+  padding: 18px;
+  margin-bottom: 16px;
+  border-radius: 22px;
+  background: linear-gradient(140deg, rgba(28, 209, 238, 0.14), rgba(51, 212, 168, 0.14));
+}
+.win-total small {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #149aa8;
+}
+.win-total strong {
+  display: block;
+  margin: 4px 0;
+  font-size: 60px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+.win-total span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #138561;
+}
+.win-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.win-list li {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #0b0f14;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+.win-list li::before {
+  content: "✓ ";
+  color: var(--green);
+}
+.win-note {
+  margin: 0 0 20px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: #5d6874;
+}
+.win-cta {
+  width: 100%;
+  padding: 18px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(120deg, var(--cyan), var(--green));
+  color: #04221f;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 14px 28px -10px rgba(28, 209, 238, 0.8);
+}
+
+@keyframes win-pop {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+}
+@keyframes win-bounce {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(4deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .win-card,
+  .win-trophy {
+    animation: none;
+  }
+}

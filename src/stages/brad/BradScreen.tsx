@@ -13,6 +13,11 @@ import type { AiIntent, Offer } from "./bradAI";
 import "./brad.css";
 
 const ASKS_TO_CRACK = 3;
+const CANCELS_TO_WIN = 3;
+const BRAD_WAVERS =
+  "BRAD… BRAD HEARD THAT. NO ONE HAS EVER SAID IT TWICE. DO NOT SAY IT AGAIN.";
+const BRAD_GIVES_UP =
+  "…FINE. FINE! NO ONE HAS EVER SAID IT THREE TIMES. YOUR SUBSCRIPTION IS CANCELLED. FOR FREE. NO FEES. NO CANCEL PLUS. BRAD NEEDS TO LIE DOWN.";
 const INSULTS_TO_TRANSFER = 3;
 // Hold time before each new Brad picks up: Specialist, Senior Specialist, BRAD
 const HOLD_MS = [15 * 1000, 30 * 1000, 45 * 1000];
@@ -56,6 +61,8 @@ function BradScreen() {
   // These reset for each new Brad
   const [botAsks, setBotAsks] = useState(0);
   const [insults, setInsults] = useState(0);
+  // Say cancel to BRAD three times and he finally breaks
+  const [cancels, setCancels] = useState(0);
 
   const timers = useRef<number[]>([]);
   const alive = useRef(true);
@@ -178,6 +185,7 @@ function BradScreen() {
       nextTransfer();
       setBotAsks(0);
       setInsults(0);
+      setCancels(0);
       setPitchOpen(false);
       setOffer(null);
       addMessage({
@@ -241,6 +249,9 @@ function BradScreen() {
     setTyping(true);
     const asks = intent === "askBot" ? botAsks + 1 : botAsks;
     if (intent === "askBot") setBotAsks(asks);
+    const atBrad = phaseIndex === LAST_PHASE;
+    const cancelCount = atBrad && intent === "cancel" ? cancels + 1 : cancels;
+    if (atBrad && intent === "cancel") setCancels(cancelCount);
 
     // Endings and BRAD's refusal stay scripted: they're the punchlines,
     // and the game (not the AI) decides when you win
@@ -248,7 +259,8 @@ function BradScreen() {
       intent === "iAmBot" ||
       (intent === "askBot" && asks >= ASKS_TO_CRACK) ||
       (intent === "yes" && pitchWasOpen) ||
-      (intent === "transfer" && phaseIndex === LAST_PHASE);
+      (intent === "transfer" && phaseIndex === LAST_PHASE) ||
+      (intent === "cancel" && atBrad && cancelCount >= CANCELS_TO_WIN - 1);
 
     const aiIntent: AiIntent = intent === "yes" || intent === "iAmBot" ? "other" : intent;
     const ai = scripted ? (await wait(phase.typingMs), null) : await aiLine(phaseIndex, aiIntent, phase.typingMs);
@@ -280,6 +292,15 @@ function BradScreen() {
         break; // otherwise it's just chat
 
       case "cancel":
+        if (atBrad && cancelCount >= CANCELS_TO_WIN) {
+          bradSays(BRAD_GIVES_UP);
+          finish("true-cancel");
+          return;
+        }
+        if (atBrad && cancelCount === CANCELS_TO_WIN - 1) {
+          bradSays(BRAD_WAVERS);
+          return;
+        }
         bradSays(ai?.reply ?? pickReply(phase, "cancel"));
         // The first Brad has nothing to sell you. Only the Brads above him
         // can offer Cancel Plus.
