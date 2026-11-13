@@ -2,7 +2,7 @@ import { useGameStore } from "../../state/gameStore"
 import { playSuccessTone } from "../../audio/sounds"
 import "./intro.css"
 import { isApp } from "../../platform"
-import { PRIVACY_URL } from "../../links"
+import { PRIVACY_URL, TERMS_URL } from "../../links"
 
 function IntroScreen() {
   const goToStage = useGameStore((state) => state.goToStage)
@@ -55,6 +55,10 @@ function IntroScreen() {
           review it. Please don't share personal information.{" "}
           <a href={PRIVACY_URL} target={isApp ? undefined : "_blank"} rel="noopener noreferrer">
             Privacy Policy
+          </a>{" "}
+          ·{" "}
+          <a href={TERMS_URL} target={isApp ? undefined : "_blank"} rel="noopener noreferrer">
+            Terms
           </a>
         </p>
       </main>
