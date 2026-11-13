@@ -237,3 +237,15 @@
 .rcpt-shot.is-capturing * {
   animation: none !important;
 }
+
+/* Under the paper, so a reposted picture still says where the game is */
+.rcpt-url {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: #5d6874;
+}
+.rcpt-url strong {
+  color: #0b0f14;
+  font-weight: 800;
+}

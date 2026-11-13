@@ -247,6 +247,9 @@ function EndScreen() {
               </p>
             )}
           </article>
+          <p className="rcpt-url">
+            Can you cancel? <strong>subscriptionplusgame.com</strong>
+          </p>
         </div>
 
         <div className="rcpt-actions">
