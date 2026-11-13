@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Subscription Plus</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        box-sizing: border-box;
+        font-family: system-ui, sans-serif;
+        color: #0b0f14;
+        background: #f5f9fa;
+        text-align: center;
+      }
+      main {
+        max-width: 360px;
+        padding: 32px 24px;
+        border-radius: 28px;
+        background: #fff;
+        box-shadow: 0 20px 50px -20px rgba(11, 15, 20, 0.3);
+      }
+      img { width: 72px; height: 72px; }
+      h1 { margin: 12px 0 8px; font-size: 24px; }
+      p { margin: 0 0 20px; color: #5d6874; line-height: 1.45; }
+      button {
+        width: 100%;
+        padding: 16px;
+        border: 0;
+        border-radius: 999px;
+        background: linear-gradient(120deg, #1cd1ee, #33d4a8);
+        color: #04221f;
+        font: inherit;
+        font-weight: 800;
+        font-size: 17px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="app/icon-192.png" alt="" />
+      <h1>You're offline.</h1>
+      <p>Subscription Plus needs an internet connection. Don't worry: your subscription is still active.</p>
+      <button onclick="location.reload()">Try again</button>
+    </main>
+  </body>
+</html>
