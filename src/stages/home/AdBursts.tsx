@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 import { ads, exitAds } from "./adPopups";
 import type { Ad, CloseTrick } from "./adPopups";
 import { useGameStore } from "../../state/gameStore";
-import { playJingle, pauseJingle } from "../../audio/jinglePlayer";
+import { playJingleOnce, pauseJingle } from "../../audio/jinglePlayer";
 import { playFailureTone } from "../../audio/sounds";
 
 const IDLE_STEP_MS = 30 * 1000; // 30s, then 60s, then 90s...
@@ -227,12 +227,14 @@ function AdPopup({
 function AdBursts({ paused }: { paused: boolean }) {
   const jingleVersion = useGameStore((state) => state.jingleVersion);
   const setMusicPaused = useGameStore((state) => state.setMusicPaused);
-  const jingleIntro = useGameStore((state) => state.jingleIntro);
 
   const [openAds, setOpenAds] = useState<OpenAd[]>([]);
   const lastActivity = useRef(0);
   const burstCount = useRef(0);
   const nextKey = useRef(0);
+  // Goes up with every burst (including stacks) so each one restarts the jingle
+  const [burstId, setBurstId] = useState(0);
+  const adJinglePlaying = useRef(false);
   const adsShowing = openAds.length > 0;
 
   function makeOpenAd(ad: Ad, trick: CloseTrick): OpenAd {
@@ -271,22 +273,43 @@ function AdBursts({ paused }: { paused: boolean }) {
       const count = MIN_ADS + Math.floor(Math.random() * (MAX_ADS - MIN_ADS + 1));
       const burst = pickAds(count).map((ad) => makeOpenAd(ad, randomItem(tricks)));
       setOpenAds((current) => [...current, ...burst].slice(-MAX_ON_SCREEN));
+      setBurstId((n) => n + 1);
     }, 1000);
     return () => clearInterval(interval);
   }, [paused, adsShowing]);
 
-  // The jingle plays while any ad is open, continuing the same song as Brad's holds.
-  // If the home-screen intro is already playing it, the ads just ride along; if the
-  // intro ends while ads are still open, this takes over and keeps it looping.
+  // Each burst plays the jingle through once, then the background music comes
+  // back even if ads are still open. If the home-screen intro is already
+  // playing the jingle, the ads just ride along with it.
   useEffect(() => {
-    if (!adsShowing || !jingleVersion || jingleIntro === "playing") return;
+    if (burstId === 0 || !jingleVersion) return;
+    if (useGameStore.getState().jingleIntro === "playing") return;
+    adJinglePlaying.current = true;
     setMusicPaused(true);
-    playJingle(jingleVersion);
-    return () => {
+    playJingleOnce(jingleVersion, () => {
+      adJinglePlaying.current = false;
+      setMusicPaused(false);
+    });
+  }, [burstId, jingleVersion, setMusicPaused]);
+
+  // Closing every ad stops the jingle early
+  useEffect(() => {
+    if (adsShowing || !adJinglePlaying.current) return;
+    adJinglePlaying.current = false;
+    pauseJingle();
+    setMusicPaused(false);
+  }, [adsShowing, setMusicPaused]);
+
+  // Leaving the home screen mid-jingle
+  useEffect(
+    () => () => {
+      if (!adJinglePlaying.current) return;
+      adJinglePlaying.current = false;
       pauseJingle();
       setMusicPaused(false);
-    };
-  }, [adsShowing, jingleVersion, jingleIntro, setMusicPaused]);
+    },
+    [setMusicPaused],
+  );
 
   // The next idle wait starts when the last ad closes
   useEffect(() => {

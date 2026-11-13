@@ -29,6 +29,7 @@ export function playJingle(version: string) {
 
 // Plays through to the end of the song once, then calls onDone (home-screen intro)
 export function playJingleOnce(version: string, onDone: () => void) {
+  stopWatchingEnd?.() // a newer request replaces any older one
   const player = getAudio(version)
   player.loop = false
 
