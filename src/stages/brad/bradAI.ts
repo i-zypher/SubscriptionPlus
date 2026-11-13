@@ -9,11 +9,24 @@ const HISTORY_LENGTH = 24;
 
 export const aiBradAvailable = Boolean(BRAD_URL);
 
-export type AiIntent = "greeting" | "cancel" | "insult" | "transfer" | "askBot" | "other";
-export type AiReply = { reply: string; charge: boolean };
+export type AiIntent =
+  | "greeting"
+  | "cancel"
+  | "insult"
+  | "transfer"
+  | "askBot"
+  | "other"
+  | "accepted";
+// A made-up plan Brad pitched; saying yes really adds it to the bill
+export type Offer = { name: string; price: number };
+export type AiReply = { reply: string; charge: boolean; offer: Offer | null };
 
 // Returns null whenever AI Brad can't answer, so the caller falls back to Lite
-export async function askBrad(phase: number, intent: AiIntent): Promise<AiReply | null> {
+export async function askBrad(
+  phase: number,
+  intent: AiIntent,
+  accepted?: Offer,
+): Promise<AiReply | null> {
   if (!BRAD_URL) return null;
   const state = useGameStore.getState();
   const edition =
@@ -30,6 +43,7 @@ export async function askBrad(phase: number, intent: AiIntent): Promise<AiReply 
         runId: state.runId,
         phase,
         intent,
+        ...(accepted ? { accepted } : {}),
         history: state.messages.slice(-HISTORY_LENGTH).map((m) => ({
           from: m.from,
           ...(m.name ? { name: m.name } : {}),
@@ -45,7 +59,14 @@ export async function askBrad(phase: number, intent: AiIntent): Promise<AiReply 
     if (!response.ok) return null;
     const data = (await response.json()) as Partial<AiReply>;
     if (typeof data.reply !== "string" || !data.reply.trim()) return null;
-    return { reply: data.reply, charge: data.charge === true };
+    const offer =
+      data.offer &&
+      typeof data.offer.name === "string" &&
+      typeof data.offer.price === "number" &&
+      data.offer.price > 0
+        ? { name: data.offer.name, price: data.offer.price }
+        : null;
+    return { reply: data.reply, charge: data.charge === true, offer };
   } catch {
     return null;
   } finally {

@@ -8,7 +8,7 @@ import { playJingle, pauseJingle } from "../../audio/jinglePlayer";
 import { playMoneyAddedTone } from "../../audio/sounds";
 import { FEATURE_FEE } from "./bradScript";
 import { aiBradAvailable, askBrad } from "./bradAI";
-import type { AiIntent } from "./bradAI";
+import type { AiIntent, Offer } from "./bradAI";
 
 const ASKS_TO_CRACK = 3;
 const INSULTS_TO_TRANSFER = 3;
@@ -34,6 +34,8 @@ function BradScreen() {
   const [onHold, setOnHold] = useState(false);
   const [ended, setEnded] = useState(false);
   const [pitchOpen, setPitchOpen] = useState(false);
+  // The last made-up plan AI Brad pitched, waiting for a yes
+  const [offer, setOffer] = useState<Offer | null>(null);
   // These reset for each new Brad
   const [botAsks, setBotAsks] = useState(0);
   const [insults, setInsults] = useState(0);
@@ -97,12 +99,20 @@ function BradScreen() {
 
   // Ask AI Brad, but never answer faster than this Brad types. Falls back to
   // the scripted line (and Brad Lite for the rest of the run) if AI can't answer.
-  async function aiLine(phaseIndexForLine: number, intent: AiIntent, minMs: number) {
+  async function aiLine(
+    phaseIndexForLine: number,
+    intent: AiIntent,
+    minMs: number,
+    accepted?: Offer,
+  ) {
     if (useGameStore.getState().bradMode !== "ai") {
       await wait(minMs);
       return null;
     }
-    const [answer] = await Promise.all([askBrad(phaseIndexForLine, intent), wait(minMs)]);
+    const [answer] = await Promise.all([
+      askBrad(phaseIndexForLine, intent, accepted),
+      wait(minMs),
+    ]);
     if (!answer && alive.current && useGameStore.getState().bradMode === "ai") {
       setBradMode("lite");
       addMessage({
@@ -152,6 +162,7 @@ function BradScreen() {
       setBotAsks(0);
       setInsults(0);
       setPitchOpen(false);
+      setOffer(null);
       addMessage({
         from: "system",
         text: `🔄 You've been transferred to ${next.name}.`,
@@ -165,6 +176,7 @@ function BradScreen() {
         name: next.name,
         text: ai?.reply ?? pickLine(next.greetings),
       });
+      setOffer(ai?.offer ?? null);
       setOnHold(false);
     }, HOLD_MS);
   }
@@ -172,7 +184,26 @@ function BradScreen() {
   async function respond(message: string) {
     const intent = detectIntent(message);
     const pitchWasOpen = pitchOpen;
+    const offerWasOpen = offer;
     setPitchOpen(false);
+    setOffer(null);
+
+    // Saying yes to one of Brad's made-up plans really buys it
+    if (intent === "yes" && !pitchWasOpen && offerWasOpen) {
+      charge(offerWasOpen.price, `${offerWasOpen.name} (upsold by ${phase.name})`);
+      setTyping(true);
+      const ai = await aiLine(phaseIndex, "accepted", phase.typingMs, offerWasOpen);
+      if (!alive.current) return;
+      setTyping(false);
+      const price = `$${offerWasOpen.price.toFixed(2)}/mo`;
+      bradSays(
+        ai?.reply ??
+          (phaseIndex === LAST_PHASE
+            ? `${offerWasOpen.name.toUpperCase()} IS YOURS. ${price}. BRAD IS PLEASED.`
+            : `Done! ${offerWasOpen.name} is now on your account for ${price}. 😊`),
+      );
+      return;
+    }
 
     // The surcharge hits instantly; Brad's reply takes its time
     let insultsNow = insults;
@@ -211,6 +242,7 @@ function BradScreen() {
           finish("brad-admits-bot");
         } else {
           bradSays(ai?.reply ?? pickReply(phase, "askBot"));
+          setOffer(ai?.offer ?? null);
         }
         return;
 
@@ -235,6 +267,7 @@ function BradScreen() {
 
       case "insult":
         bradSays(ai?.reply ?? pickReply(phase, "insult"));
+        setOffer(ai?.offer ?? null);
         // Three insults and this Brad hands you off
         if (insultsNow >= INSULTS_TO_TRANSFER && phaseIndex < LAST_PHASE) {
           putOnHold();
@@ -248,6 +281,7 @@ function BradScreen() {
     // General chat
     if (ai) {
       bradSays(ai.reply);
+      setOffer(ai.offer);
       if (ai.charge) charge(FEATURE_FEE, `Plus+ feature fee from ${phase.name}`);
     } else {
       const lite = liteOther();

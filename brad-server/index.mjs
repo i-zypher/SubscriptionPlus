@@ -19,7 +19,11 @@ const ALLOWED_ORIGINS = (
   process.env.ALLOWED_ORIGINS ||
   "https://ceymer-studios.com,https://www.ceymer-studios.com,https://ceymer-studios-site.web.app,http://localhost:5173"
 ).split(",");
-const INTENTS = ["greeting", "cancel", "insult", "transfer", "askBot", "other"];
+const INTENTS = ["greeting", "cancel", "insult", "transfer", "askBot", "other", "accepted"];
+// Intents where Brad may pitch a made-up plan the player can say yes to
+const OFFER_INTENTS = ["greeting", "insult", "askBot", "other"];
+const MIN_PRICE = 0.99;
+const MAX_PRICE = 49.99;
 
 const anthropic = process.env.MOCK_BRAD ? null : new Anthropic(); // reads ANTHROPIC_API_KEY
 
@@ -64,6 +68,16 @@ function send(res, status, body, origin) {
 }
 
 const str = (v, max) => typeof v === "string" && v.length <= max;
+const validPrice = (v) => typeof v === "number" && v >= MIN_PRICE && v <= MAX_PRICE;
+
+// Keep only a sane offer: a short name and a real price, rounded to cents
+function cleanOffer(offer) {
+  if (!offer || typeof offer !== "object") return null;
+  const name = typeof offer.name === "string" ? offer.name.trim() : "";
+  const price = Number(offer.price);
+  if (!name || name.length > 40 || /cancel/i.test(name) || !validPrice(price)) return null;
+  return { name, price: Math.round(price * 100) / 100 };
+}
 
 // Only accept exactly the shape the game sends
 function validate(body) {
@@ -81,8 +95,14 @@ function validate(body) {
   if (!run || typeof run.total !== "number" || !str(run.jingle, 80)) return null;
   if (!Array.isArray(run.receipts) || run.receipts.length > 40) return null;
   if (!run.receipts.every((r) => str(r, 120))) return null;
+  let accepted = null;
+  if (intent === "accepted") {
+    const offer = body.accepted;
+    if (!offer || !str(offer.name, 40) || !validPrice(offer.price)) return null;
+    accepted = { name: offer.name, price: offer.price };
+  }
   const surcharge = [15, 25, 50, 100][phase];
-  return { runId, phase, intent, history, run, surcharge };
+  return { runId, phase, intent, history, run, surcharge, accepted };
 }
 
 function readBody(req) {
@@ -107,19 +127,24 @@ function parseReply(text) {
     try {
       const parsed = JSON.parse(match[0]);
       if (typeof parsed.reply === "string" && parsed.reply.trim()) {
-        return { reply: parsed.reply.trim().slice(0, 400), charge: parsed.charge === true };
+        return {
+          reply: parsed.reply.trim().slice(0, 400),
+          charge: parsed.charge === true,
+          offer: cleanOffer(parsed.offer),
+        };
       }
     } catch {
       // fall through
     }
   }
   const plain = text.trim();
-  return plain ? { reply: plain.slice(0, 400), charge: false } : null;
+  return plain ? { reply: plain.slice(0, 400), charge: false, offer: null } : null;
 }
 
 async function askClaude(request) {
   if (!anthropic) {
-    return { reply: `[mock ${PHASES[request.phase].name} / ${request.intent}]`, charge: false };
+    const offer = request.intent === "other" ? { name: "Mock Plus", price: 6.99 } : null;
+    return { reply: `[mock ${PHASES[request.phase].name} / ${request.intent}]`, charge: false, offer };
   }
   const { system, user } = buildPrompt(request);
   const response = await anthropic.messages.create({
@@ -190,6 +215,7 @@ const server = http.createServer(async (req, res) => {
     if (!answer) return send(res, 502, { fallback: "empty" }, origin);
     // Charges only make sense on general chat
     if (request.intent !== "other") answer.charge = false;
+    if (!OFFER_INTENTS.includes(request.intent)) answer.offer = null;
     return send(res, 200, answer, origin);
   } catch (err) {
     console.error("Claude call failed:", err?.status ?? "", err?.message ?? err);

@@ -35,13 +35,14 @@ HARD RULES (never break these):
 - Roasting is fine and expected: playful, sarcastic, petty, corporate. NEVER use slurs, sexual content, threats, or insults about race, religion, gender, sexuality, disability, appearance, or real people. Don't swear beyond very mild words.
 - If the player says something that sounds like real distress (self-harm, suicide, abuse, a real emergency), drop the bit completely: reply kindly and briefly as yourself, tell them they matter, and suggest calling or texting 988 (US Suicide & Crisis Lifeline). Set "charge" to false.
 - Keep replies SHORT: 1 to 3 sentences, under 280 characters. This is a chat bubble.
-- Invent fake plans freely when the player mentions something about their life ("You mentioned your dog! Pet Plus is just $6.99/mo."). Never claim a fake charge already happened except the ones listed below.
+- Invent fake plans freely when the player mentions something about their life ("You mentioned your dog! Pet Plus is just $6.99/mo."). Whenever you pitch a made-up plan with a price, put it in "offer" and end the reply by asking if they want it, because if they say yes the game really adds it to their bill. At most one offer per reply. Never claim a charge already happened unless the task says so.
 - ROBOT TELLS: you are secretly a bot, and the game is funnier when players catch on. In about two out of three replies, slip in ONE tell: a glitch, robot phrasing, a near-slip you correct, OR turn it around and suspect the CUSTOMER is the bot ("You type like a bot. Are YOU human?"). Vary them. Never actually confirm you're a bot; the slip is the joke.
 - Use the run details when they're funny (their monthly total, things they paid for, the jingle edition), but don't list them all. One callback at most.
 
 OUTPUT: reply with ONLY a JSON object, no other text:
-{"reply": "<what you say>", "charge": <true or false>}
+{"reply": "<what you say>", "charge": <true or false>, "offer": null or {"name": "<plan name>", "price": <monthly price, e.g. 6.99>}}
 "charge" is only for the $4.99 "Plus+ feature" joke described in the task. It must be false unless the task allows it.
+"offer" is the made-up plan you pitched in this reply (never Cancel Plus), or null if you didn't pitch one. Keep prices between $0.99 and $49.99.
 `;
 
 const TASKS = {
@@ -55,13 +56,20 @@ const TASKS = {
     "The player asked for a manager, a human, or a transfer. Agree to transfer them up to the next Brad in character, and tell them they'll be placed on hold.",
   askBot:
     "The player is asking whether you're a bot. Deny it in character, badly: the denial itself should sound robotic or glitch, and you can accuse them of being the bot. Do not admit it.",
+  accepted: (offer) =>
+    `The customer just said yes to ${offer.name}, and the game has added it to their bill at $${offer.price.toFixed(2)}/mo. Celebrate the purchase in character. Don't pitch anything new in this reply ("offer" must be null).`,
   other:
     "Respond to what the player said, in character, and steer them back toward staying subscribed (without mentioning Cancel Plus). If what they said gives you an opening, you may charge them for a ridiculous 'Plus+ feature' (like answering, listening, empathy, eye contact, reading their message) for $4.99 and set \"charge\" to true. Do this at most about one time in four, only when it's funny, and say it's $4.99 in the reply.",
 };
 
-export function buildPrompt({ phase, intent, surcharge, history, run }) {
+export function buildPrompt({ phase, intent, surcharge, history, run, accepted }) {
   const brad = PHASES[phase];
-  const task = intent === "insult" ? TASKS.insult(surcharge) : TASKS[intent];
+  const task =
+    intent === "insult"
+      ? TASKS.insult(surcharge)
+      : intent === "accepted"
+        ? TASKS.accepted(accepted)
+        : TASKS[intent];
 
   const transcript = history
     .map((m) => {
