@@ -8,6 +8,16 @@ let audio: HTMLAudioElement | null = null
 let loadedVersion: string | null = null
 let stopWatchingEnd: (() => void) | null = null
 
+function jingleVolume() {
+  const { masterVolume, music } = useSettingsStore.getState()
+  return (masterVolume / 100) * (music / 100)
+}
+
+// Volume sliders apply right away, even mid-song
+useSettingsStore.subscribe(() => {
+  if (audio) audio.volume = jingleVolume()
+})
+
 // A new trial means a new version, which starts the song from the top
 function getAudio(version: string) {
   if (!audio || loadedVersion !== version) {
@@ -16,8 +26,7 @@ function getAudio(version: string) {
     audio.loop = true
     loadedVersion = version
   }
-  const { masterVolume, music } = useSettingsStore.getState()
-  audio.volume = (masterVolume / 100) * (music / 100)
+  audio.volume = jingleVolume()
   return audio
 }
 
