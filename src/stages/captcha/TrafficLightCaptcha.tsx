@@ -17,8 +17,18 @@ type PhotoSet = {
   misses: (Photo & { either?: boolean })[];
 };
 
-// Files live in public/captcha-tiles/<folder>/<name>.jpg. Sets borrow each
-// other's photos as wrong answers until their own filler photos exist.
+// Wrong answers every set can use (public/captcha-tiles/filler/)
+const FILLER: Photo[] = [
+  { file: "filler/emergency-room", label: "Emergency room" },
+  { file: "filler/impossible-stairs", label: "Impossible staircase" },
+  { file: "filler/vulture", label: "Vulture on a fence post" },
+  { file: "filler/marble-bust", label: "Marble bust" },
+  { file: "filler/leaf-pile", label: "Jumping into a leaf pile" },
+  { file: "filler/purple-bird", label: "Purple bird" },
+];
+
+// Files live in public/captcha-tiles/<folder>/<name>.jpg. Each set mixes the
+// shared filler with photos borrowed from the other sets.
 const PHOTO_SETS: PhotoSet[] = [
   {
     prompt: "Select all squares with bicycles",
@@ -38,6 +48,9 @@ const PHOTO_SETS: PhotoSet[] = [
       { file: "parks/parking-lot", label: "Parking lot" },
       { file: "parks/water-park", label: "Water park" },
       { file: "traffic-lights/old-west", label: "Old West street" },
+      ...FILLER,
+      { file: "filler/old-map", label: "Old city map" },
+      { file: "filler/city-skyline", label: "City skyline" },
       // Two bikes parked far in the background. Does that count? Either way.
       { file: "bicycles/city-street-1", label: "Street with parked cars", either: true },
     ],
@@ -62,6 +75,10 @@ const PHOTO_SETS: PhotoSet[] = [
       { file: "traffic-lights/too-many-lights", label: "Street full of traffic lights" },
       { file: "traffic-lights/stop-sign", label: "Stop sign" },
       { file: "traffic-lights/old-west", label: "Old West street" },
+      ...FILLER,
+      // Parks drawn on a map, and a little green park in the skyline: either way
+      { file: "filler/old-map", label: "Old city map", either: true },
+      { file: "filler/city-skyline", label: "City skyline", either: true },
     ],
   },
   {
@@ -82,6 +99,10 @@ const PHOTO_SETS: PhotoSet[] = [
       { file: "parks/city-park", label: "City park" },
       { file: "bicycles/old-bike", label: "Penny-farthing" },
       { file: "bicycles/tandem-bike", label: "Tandem bicycle in a park" },
+      ...FILLER,
+      { file: "filler/old-map", label: "Old city map" },
+      // Too far away to tell if there are traffic lights down there
+      { file: "filler/city-skyline", label: "City skyline", either: true },
       // Traffic lights far down the street behind the stop sign
       { file: "traffic-lights/stop-sign", label: "Stop sign", either: true },
     ],
