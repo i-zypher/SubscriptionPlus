@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import type { CSSProperties } from "react";
+import "./settings.css";
 import { settingsSections } from "./settingsContent";
 import type { SettingOption } from "./settingsContent";
 import { useSettingsStore } from "../../state/settingsStore";
@@ -27,13 +29,17 @@ function SliderControl({
   const setSlider = useSettingsStore((state) => state.setSlider);
 
   return (
-    <label>
-      {label}: {value}
+    <label className="set-row set-slider">
+      <span className="set-row-top">
+        <span>{label}</span>
+        <span className="set-value">{value}</span>
+      </span>
       <input
         type="range"
         min={min}
         max={max}
         value={value}
+        style={{ "--fill": `${((value - min) / (max - min)) * 100}%` } as CSSProperties}
         onChange={(e) => setSlider(setting, Number(e.target.value))}
         onPointerUp={playSuccessTone}
         onKeyUp={playSuccessTone}
@@ -55,22 +61,24 @@ function ChoiceControl({
   const setChoice = useSettingsStore((state) => state.setChoice);
 
   return (
-    <div>
-      <p>{label}</p>
-      {options.map((value) => (
-        <label key={value}>
-          <input
-            type="radio"
-            name={setting}
-            checked={current === value}
-            onChange={() => {
+    <div className="set-row set-choice">
+      <span>{label}</span>
+      <div className="set-segments" role="radiogroup" aria-label={label}>
+        {options.map((value) => (
+          <button
+            key={value}
+            role="radio"
+            aria-checked={current === value}
+            className={current === value ? "is-on" : ""}
+            onClick={() => {
               setChoice(setting, value);
               playSuccessTone();
             }}
-          />
-          {value}
-        </label>
-      ))}
+          >
+            {value}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -86,16 +94,18 @@ function RealToggle({
   const toggleSetting = useSettingsStore((state) => state.toggleSetting);
 
   return (
-    <label>
+    <label className="set-row">
+      <span>{label}</span>
       <input
         type="checkbox"
+        role="switch"
+        className="set-switch"
         checked={isOn}
         onChange={() => {
           toggleSetting(setting);
           playSuccessTone();
         }}
       />
-      {label}
     </label>
   );
 }
@@ -133,12 +143,18 @@ function FakeToggle({
   }
 
   return (
-    <div>
-      <label>
-        <input type="checkbox" checked={on} onChange={handleChange} />
-        {label}
+    <div className="set-item">
+      <label className="set-row">
+        <span>{label}</span>
+        <input
+          type="checkbox"
+          role="switch"
+          className={`set-switch${refused ? " is-refused" : ""}`}
+          checked={on}
+          onChange={handleChange}
+        />
       </label>
-      {(flipped || refused) && flipMessage && <p>{flipMessage}</p>}
+      {(flipped || refused) && flipMessage && <p className="set-note">{flipMessage}</p>}
     </div>
   );
 }
@@ -171,31 +187,42 @@ function FakeSlider({
   }
 
   return (
-    <div>
-      <label>
-        {label}: {value}
+    <div className="set-item">
+      <label className="set-row set-slider">
+        <span className="set-row-top">
+          <span>{label}</span>
+          <span className="set-value">{value}</span>
+        </span>
         <input
           type="range"
           min={0}
           max={100}
           value={value}
+          style={{ "--fill": `${value}%` } as CSSProperties}
           onChange={(e) => setValue(Number(e.target.value))}
           onPointerUp={handleRelease}
           onKeyUp={handleRelease}
         />
       </label>
-      {snapped && flipMessage && <p>{flipMessage}</p>}
+      {snapped && flipMessage && <p className="set-note">{flipMessage}</p>}
     </div>
   );
 }
 
-const swatchStyle = {
-  width: "7dvw",
-  aspectRatio: "1",
-  border: "none",
-  borderRadius: "12px",
-  cursor: "pointer",
-};
+// Real 3D buttons: a darker "side" underneath that disappears when pressed
+function darken(hex: string, amount: number) {
+  const n = parseInt(hex.slice(1), 16);
+  const channel = (shift: number) =>
+    Math.max(0, Math.round(((n >> shift) & 255) * (1 - amount)));
+  return `rgb(${channel(16)}, ${channel(8)}, ${channel(0)})`;
+}
+
+function swatchVars(color: string) {
+  return {
+    "--face": color,
+    "--side": darken(color, 0.38),
+  } as CSSProperties;
+}
 
 function LockedSwatch({ color, index }: { color: string; index: number }) {
   const addDesperation = useGameStore((state) => state.addDesperation);
@@ -214,25 +241,14 @@ function LockedSwatch({ color, index }: { color: string; index: number }) {
   }
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className="set-swatch-wrap">
       <button
         aria-label={`Color option ${index + 1}`}
-        style={{ ...swatchStyle, background: color }}
+        className="set-swatch"
+        style={swatchVars(color)}
         onClick={handleClick}
       />
-      {showLocked && (
-        <span
-          style={{
-            position: "absolute",
-            top: "-28px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Plus+ members only
-        </span>
-      )}
+      {showLocked && <span className="set-locked">🔒 Plus+ members only</span>}
     </div>
   );
 }
@@ -241,10 +257,11 @@ function ExitSwatch({ color, index }: { color: string; index: number }) {
   const goToStage = useGameStore((state) => state.goToStage);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div className="set-swatch-wrap">
       <button
         aria-label={`Color option ${index + 1}`}
-        style={{ ...swatchStyle, background: color }}
+        className="set-swatch"
+        style={swatchVars(color)}
         onClick={() => {
           playFailureTone();
           goToStage("captcha");
@@ -306,31 +323,26 @@ function SettingsScreen({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div>
-      <button onClick={handleBack}>← Back</button>
-      <h2>Settings</h2>
+    <div className="set">
+      <div className="set-inner">
+        <header className="set-top">
+          <button className="set-back" onClick={handleBack}>
+            ‹ Back
+          </button>
+        </header>
+        <h2>Settings</h2>
 
-      {settingsSections.map((section) => (
-        <div key={section.title}>
-          <h3>{section.title}</h3>
-          <div
-            style={
-              section.layout === "grid"
-                ? {
-                    display: "grid",
-                    gridTemplateColumns: "repeat(4, 1fr)",
-                    gap: "12px",
-                    paddingTop: "32px",
-                  }
-                : undefined
-            }
-          >
-            {section.options.map((option, i) => (
-              <OptionView key={i} option={option} index={i} />
-            ))}
-          </div>
-        </div>
-      ))}
+        {settingsSections.map((section) => (
+          <section key={section.title} className="set-section">
+            <h3>{section.title}</h3>
+            <div className={section.layout === "grid" ? "set-grid" : "set-group"}>
+              {section.options.map((option, i) => (
+                <OptionView key={i} option={option} index={i} />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
     </div>
   );
 }
