@@ -124,12 +124,16 @@ async function askClaude(request) {
   const { system, user } = buildPrompt(request);
   const response = await anthropic.messages.create({
     model: MODEL,
-    max_tokens: 200,
+    // Haiku can think before answering, and thinking counts toward max_tokens.
+    // Low effort keeps it quick; the headroom stops replies getting cut off.
+    max_tokens: 1024,
+    output_config: { effort: "low" },
     system,
     messages: [{ role: "user", content: user }],
   });
   const { input_tokens, output_tokens } = response.usage;
   spentToday += (input_tokens * INPUT_PRICE + output_tokens * OUTPUT_PRICE) / 1_000_000;
+  if (response.stop_reason === "max_tokens") console.error("Brad ran out of tokens");
   const text = response.content
     .filter((block) => block.type === "text")
     .map((block) => block.text)
