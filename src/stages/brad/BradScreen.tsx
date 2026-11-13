@@ -281,7 +281,9 @@ function BradScreen() {
 
       case "cancel":
         bradSays(ai?.reply ?? pickReply(phase, "cancel"));
-        setPitchOpen(true);
+        // The first Brad has nothing to sell you. Only the Brads above him
+        // can offer Cancel Plus.
+        if (phaseIndex > 0) setPitchOpen(true);
         return;
 
       case "transfer":

@@ -49,6 +49,8 @@ OUTPUT: reply with ONLY a JSON object, no other text:
 const TASKS = {
   greeting:
     "You have just been transferred this customer. Greet them in character. If the conversation shows what the previous Brad said, throw him under the bus about it.",
+  cancelFirst:
+    "The player wants to cancel. You are the first, lowest-level Brad: you cannot cancel and you know nothing about Cancel Plus (never mention it). Be cheerfully, maddeningly unhelpful: misunderstand on purpose, give useless troubleshooting, or claim the option doesn't exist. The goal is to frustrate them into asking for a manager, so now and then mention that only a manager could do that, while insisting they surely don't need one.",
   cancel:
     "The player wants to cancel. Refuse in character and pitch Cancel Plus ($9.99/mo) as the only way out. You MUST end by asking them a yes or no question about buying Cancel Plus.",
   insult: (surcharge) =>
@@ -68,6 +70,8 @@ export function buildPrompt({ phase, intent, surcharge, history, run, accepted }
   const task =
     intent === "insult"
       ? TASKS.insult(surcharge)
+      : intent === "cancel" && phase === 0
+        ? TASKS.cancelFirst
       : intent === "accepted"
         ? TASKS.accepted(accepted)
         : TASKS[intent];

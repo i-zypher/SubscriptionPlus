@@ -109,3 +109,21 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* The game's screens are designed light. Without this, phones in dark mode
+   paint form inputs with white text on our white backgrounds. */
+.intro,
+.aval,
+.home,
+.chatw,
+.desp,
+.set,
+.cap,
+.brad {
+  color-scheme: light;
+  /* Keep the starter template's dark-mode colors out of our screens */
+  --text: #0b0f14;
+  --text-h: #0b0f14;
+  --bg: #fff;
+  --border: #e5e4e7;
+}

@@ -69,22 +69,18 @@ export const chargedReplies: string[] = [
 ];
 
 export const bradReplies: Record<Intent, string[]> = {
+  // The first Brad can't sell Cancel Plus. He just makes you want a manager.
   cancel: [
-    "Cancel? Great news! That word qualifies you for Cancel Plus, just $9.99/mo. Want me to set that up?",
-    "I hear 'cancel' and I think 'opportunity.' Cancel Plus makes cancelling effortless for only $9.99/mo. Shall I add it?",
-    "Totally understand! Cancelling is hard. That's why we invented Cancel Plus. $9.99/mo and Brad does the hard part. Yes?",
-    "Oh no, cancelling sounds stressful. 😟 Have you considered Cancel Plus? It's like cancelling, but with a subscription. Interested?",
-    "Before you cancel, let me tell you about our most popular cancellation product: Cancel Plus! Only $9.99/mo. Want it?",
-    "I've located your account and the cancel button! Unfortunately it's a Cancel Plus feature. $9.99/mo. Should I upgrade you?",
-    "Cancelling requires Cancel Plus. Think of it as a key to the exit, rented monthly. $9.99. Yes?",
-    "I can absolutely help you cancel, as soon as you're a Cancel Plus member! $9.99/mo. Ready to start?",
-    "Our records show you want to cancel. Our records also show Cancel Plus is on sale for $9.99/mo. Coincidence? Want it?",
-    "You've chosen the cancel journey! 🎉 Step one: subscribe to Cancel Plus. $9.99/mo. Shall we begin?",
-    "Brad here, cancellation specialist! My favorite way to cancel is Cancel Plus. $9.99/mo. Want me to add it?",
-    "I'd love to cancel your subscription. I just need you to subscribe to something first. Cancel Plus, $9.99/mo?",
-    "Cancelling the old-fashioned way takes 6 to 8 business years. Cancel Plus does it for $9.99/mo. Interested?",
-    "I've escalated your cancel request to Cancel Plus, our premium cancellation tier. It's $9.99/mo. Shall I confirm?",
-    "Every journey ends with a single subscription. Cancel Plus, $9.99/mo. Do you accept?",
+    "Cancel? Hmm, I'm not seeing that option on my screen. Have you tried turning your subscription off and on again? 😊",
+    "Great question! Cancelling isn't something I'm authorized to do. Or know about. Or believe in.",
+    "I'd love to help you cancel! Unfortunately I only have access to the 'stay' button. 😊",
+    "Let me check… 🔍 Nope! Our system says you're happy. Is there anything else I can help with?",
+    "Cancel? I think you meant 'renew'! Autocorrect does that to everyone. Done! 😊",
+    "I've passed your request to the cancellations team. The cancellations team is a fax machine. It's unplugged.",
+    "Cancelling is above my access level. Way above. Only a manager can even see it from up there.",
+    "Sure! To cancel, please hold the power button on your heart until you feel loved again. 😊",
+    "I'm just a regular Brad, so I can't do cancellations. Only a manager could, but I'm sure you don't need one! 😊",
+    "Oh, I wish I could! My hands are tied. Not literally. I have hands. Human hands.",
   ],
   insult: [
     "I hear you saying I'm useless! That's valid. 💛 I've forwarded your feedback to our Delight Team.",
