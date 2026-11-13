@@ -1,16 +1,21 @@
 import { useState, useEffect, useRef } from "react";
-import type { FormEvent } from "react";
+import type { ComponentType, FormEvent } from "react";
 import { useGameStore } from "../../state/gameStore";
 import { useSettingsStore } from "../../state/settingsStore";
 import { captchaSrc } from "../../audio/jingleVersions";
 import {
   playSuccessTone,
   playFailureTone,
-  playMoneyAddedTone,
 } from "../../audio/sounds";
 import { spotScenes, spotImageSrc } from "./spotScenes";
+import { VerifiedHumanUpsell } from "./VerifiedHumanUpsell";
+import type { CaptchaProps } from "./VerifiedHumanUpsell";
+import type { CaptchaId } from "./captchaPool";
+import TrafficLightCaptcha from "./TrafficLightCaptcha";
+import WobblyTextCaptcha from "./WobblyTextCaptcha";
+import CookieCaptcha from "./CookieCaptcha";
+import SpotTheBotCaptcha from "./SpotTheBotCaptcha";
 
-const VERIFIED_HUMAN_PRICE = 4.99;
 const CHECKBOX_TAUNTS = [
   "Hmm. A human would have been faster.",
   "I thought you were human. Gonna have to try harder than that.",
@@ -33,37 +38,6 @@ function randomTaunt(previous: string | null) {
 const AUDIO_QUESTION = "Subscription Plus! What's it do?";
 const AUDIO_ANSWERS = ["it renews"];
 
-type CaptchaProps = { onPass: () => void };
-
-// --- Shared: what you see after failing a CAPTCHA ---
-
-function VerifiedHumanUpsell({
-  onRetry,
-  onPass,
-}: {
-  onRetry: () => void;
-  onPass: () => void;
-}) {
-  const addToTotal = useGameStore((state) => state.addToTotal);
-
-  function handleSkip() {
-    addToTotal(VERIFIED_HUMAN_PRICE);
-    playMoneyAddedTone();
-    onPass();
-  }
-
-  return (
-    <div>
-      <p>Verification failed. That's okay, nobody's perfect!</p>
-      <p>
-        Skip verification forever with <strong>Verified Human+</strong>, just $
-        {VERIFIED_HUMAN_PRICE}/mo.
-      </p>
-      <button onClick={handleSkip}>Yes! Verify me with money</button>
-      <button onClick={onRetry}>No thanks, I'll prove myself</button>
-    </div>
-  );
-}
 
 // --- Step 1: the checkbox that runs away ---
 
@@ -320,18 +294,31 @@ function AudioCaptcha({ onPass }: CaptchaProps) {
 
 // --- The gauntlet ---
 
-const steps = [CheckboxCaptcha, SpotDifferenceCaptcha, AudioCaptcha];
+const captchas: Record<CaptchaId, ComponentType<CaptchaProps>> = {
+  checkbox: CheckboxCaptcha,
+  spotDifference: SpotDifferenceCaptcha,
+  audio: AudioCaptcha,
+  trafficLights: TrafficLightCaptcha,
+  wobblyText: WobblyTextCaptcha,
+  cookies: CookieCaptcha,
+  spotTheBot: SpotTheBotCaptcha,
+};
+
+// Only used if a run somehow reaches the CAPTCHAs without a picked order
+const FALLBACK_ORDER: CaptchaId[] = ["checkbox", "spotDifference", "audio"];
 
 function CaptchaScreen() {
   const goToStage = useGameStore((state) => state.goToStage);
   const captchaLevel = useGameStore((state) => state.captchaLevel);
   const nextCaptcha = useGameStore((state) => state.nextCaptcha);
+  const pickedOrder = useGameStore((state) => state.captchaOrder);
+  const order = pickedOrder.length > 0 ? pickedOrder : FALLBACK_ORDER;
 
-  const step = Math.min(captchaLevel, steps.length - 1);
-  const Step = steps[step];
+  const step = Math.min(captchaLevel, order.length - 1);
+  const Step = captchas[order[step]];
 
   function handlePass() {
-    if (step === steps.length - 1) {
+    if (step === order.length - 1) {
       goToStage("brad");
     } else {
       nextCaptcha();
@@ -342,7 +329,7 @@ function CaptchaScreen() {
     <div>
       <h2>Please verify you are human to continue cancelling.</h2>
       <p>
-        Verification {step + 1} of {steps.length}
+        Verification {step + 1} of {order.length}
       </p>
 
       {/* key resets each step's local state when moving on */}

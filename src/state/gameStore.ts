@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { pickJingle } from "../audio/jingleVersions";
 import { pickSpotScene } from "../stages/captcha/spotScenes";
+import { pickCaptchas } from "../stages/captcha/captchaPool";
+import type { CaptchaId } from "../stages/captcha/captchaPool";
 
 export const TRIAL_LENGTH_MS = 10 * 60 * 1000;
 export const CANCEL_PLUS_PRICE = 9.99;
@@ -32,6 +34,7 @@ interface GameState {
   tierLevel: number;
   desperation: number;
   captchaLevel: number;
+  captchaOrder: CaptchaId[];
   transferCount: number;
   bradMode: "ai" | "lite";
   messages: Message[];
@@ -49,6 +52,7 @@ const initialState: GameState = {
   tierLevel: 0,
   desperation: 0,
   captchaLevel: 0,
+  captchaOrder: [],
   transferCount: 0,
   bradMode: "lite",
   messages: [],
@@ -104,6 +108,7 @@ export const useGameStore = create<GameState & GameActions>()((set) => ({
       trialEndsAt: Date.now() + TRIAL_LENGTH_MS,
       jingleVersion: pickJingle(state.jingleVersion),
       spotSceneId: pickSpotScene(state.spotSceneId),
+      captchaOrder: pickCaptchas(),
     })),
   resetGame: () =>
     set((state) => ({
