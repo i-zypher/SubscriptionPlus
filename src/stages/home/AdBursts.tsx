@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import type { CSSProperties } from "react";
+import confetti from "canvas-confetti";
+import "./home.css";
 import { ads, exitAds } from "./adPopups";
 import type { Ad, CloseTrick } from "./adPopups";
 import { useGameStore } from "../../state/gameStore";
 import { playJingleOnce, pauseJingle } from "../../audio/jinglePlayer";
 import { playFailureTone, playMoneyAddedTone } from "../../audio/sounds";
 
-const IDLE_STEP_MS = 30 * 1000; // 30s, then 60s, then 90s...
+const FIRST_IDLE_MS = 15 * 1000; // first burst after 15s of nothing
+const IDLE_STEP_MS = 30 * 1000; // then 30s, 60s, 90s...
 const MIN_ADS = 3;
 const MAX_ADS = 7;
 const COUNTDOWN_SECONDS = 5;
@@ -48,17 +51,21 @@ function pickAds(count: number) {
 
 // --- One popup ---
 
+// Ads are dark and warm so they clash with the app on purpose, without
+// burning anyone's eyes
 const cardStyle: CSSProperties = {
   position: "fixed",
   boxSizing: "border-box",
   width: "min(340px, calc(100vw - 16px))",
-  background: "#fff",
-  color: "#111",
-  border: "3px solid #F00AD1",
-  borderRadius: "12px",
-  padding: "16px",
-  boxShadow: "0 8px 30px rgba(0,0,0,0.5)",
+  background: "linear-gradient(160deg, #1d2140, #121528)",
+  color: "#f4f5fb",
+  border: "1px solid rgba(255, 138, 92, 0.45)",
+  borderRadius: "22px",
+  padding: "18px 18px 16px",
+  boxShadow: "0 24px 60px -16px rgba(0,0,0,0.6)",
   textAlign: "left",
+  fontFamily: '"Outfit", system-ui, sans-serif',
+  animation: "ad-pop 380ms cubic-bezier(0.2, 1.5, 0.4, 1) both",
 };
 
 const ctaStyle: CSSProperties = {
@@ -67,19 +74,22 @@ const ctaStyle: CSSProperties = {
   padding: "12px",
   fontWeight: "bold",
   fontSize: "1.1em",
-  background: "#FBE602",
-  color: "#111",
+  background: "linear-gradient(120deg, #ff9a5c, #f2596b)",
+  color: "#fff",
   border: "none",
-  borderRadius: "8px",
+  borderRadius: "999px",
   cursor: "pointer",
+  fontFamily: "inherit",
+  boxShadow: "0 10px 22px -10px rgba(242, 89, 107, 0.9)",
 };
 
 const linkStyle: CSSProperties = {
   background: "none",
   border: "none",
   padding: 0,
-  color: "#888",
+  color: "#8b93a7",
   fontSize: "0.7em",
+  fontFamily: "inherit",
   textDecoration: "underline",
   cursor: "pointer",
 };
@@ -147,7 +157,7 @@ function AdPopup({
         <button
           aria-label="Close ad"
           onClick={onClose}
-          style={{ ...linkStyle, position: "absolute", top: 4, right: 6, fontSize: "10px", textDecoration: "none", color: "#ccc" }}
+          style={{ ...linkStyle, position: "absolute", top: 4, right: 6, fontSize: "10px", textDecoration: "none", color: "#4a5070" }}
         >
           ×
         </button>
@@ -156,7 +166,7 @@ function AdPopup({
       {trick === "fakeX" && (
         <span
           aria-hidden="true"
-          style={{ position: "absolute", top: 6, right: 10, fontSize: "28px", fontWeight: "bold" }}
+          style={{ position: "absolute", top: 6, right: 12, fontSize: "26px", fontWeight: "bold", color: "#f4f5fb" }}
         >
           ✕
         </span>
@@ -164,11 +174,11 @@ function AdPopup({
 
       {trick === "countdown" && (
         secondsLeft > 0 ? (
-          <span style={{ position: "absolute", top: 6, right: 10, fontSize: "0.75em", color: "#888" }}>
+          <span style={{ position: "absolute", top: 10, right: 14, fontSize: "0.75em", color: "#8b93a7" }}>
             You can close this ad in {secondsLeft}…
           </span>
         ) : (
-          <button aria-label="Close ad" onClick={onClose} style={{ ...linkStyle, position: "absolute", top: 6, right: 10, fontSize: "18px", textDecoration: "none", color: "#111" }}>
+          <button aria-label="Close ad" onClick={onClose} style={{ ...linkStyle, position: "absolute", top: 6, right: 10, fontSize: "18px", textDecoration: "none", color: "#f4f5fb" }}>
             ✕
           </button>
         )
@@ -178,25 +188,41 @@ function AdPopup({
         <button
           aria-label="Close ad"
           onClick={handleDodge}
-          style={{ ...linkStyle, position: "absolute", top: `${dodgePos.top}%`, right: `${dodgePos.right}%`, fontSize: "18px", textDecoration: "none", color: "#111" }}
+          style={{ ...linkStyle, position: "absolute", top: `${dodgePos.top}%`, right: `${dodgePos.right}%`, fontSize: "18px", textDecoration: "none", color: "#f4f5fb" }}
         >
           ✕
         </button>
       )}
 
       {trick === "spawner" && (
-        <button aria-label="Close ad" onClick={onClose} style={{ ...linkStyle, position: "absolute", top: 6, right: 10, fontSize: "18px", textDecoration: "none", color: "#111" }}>
+        <button aria-label="Close ad" onClick={onClose} style={{ ...linkStyle, position: "absolute", top: 6, right: 10, fontSize: "18px", textDecoration: "none", color: "#f4f5fb" }}>
           ✕
         </button>
       )}
 
-      <h3 style={{ marginTop: "8px", paddingRight: "40px" }}>{ad.headline}</h3>
+      <span
+        style={{
+          display: "inline-block",
+          padding: "2px 8px",
+          borderRadius: "6px",
+          background: "rgba(255, 154, 92, 0.18)",
+          color: "#ffb38a",
+          fontSize: "10px",
+          fontWeight: 800,
+          letterSpacing: "0.12em",
+        }}
+      >
+        SPONSORED
+      </span>
+      <h3 style={{ margin: "8px 0", paddingRight: "40px", fontSize: "20px", lineHeight: 1.15, fontWeight: 800, color: "#fff" }}>
+        {ad.headline}
+      </h3>
 
       {trick === "bottom" ? (
         <div style={{ maxHeight: "200px", overflowY: "auto" }}>
-          <p>{ad.body}</p>
+          <p style={{ color: "#c3c8d9", fontSize: "15px", lineHeight: 1.4 }}>{ad.body}</p>
           {cta}
-          <p style={{ fontSize: "0.7em", color: "#888", marginTop: "200px" }}>
+          <p style={{ fontSize: "0.7em", color: "#8b93a7", marginTop: "200px" }}>
             Terms and conditions apply. Offer valid while subscribed. Subscribed
             while valid. See terms for terms.
           </p>
@@ -206,7 +232,7 @@ function AdPopup({
         </div>
       ) : (
         <>
-          <p>{ad.body}</p>
+          <p style={{ color: "#c3c8d9", fontSize: "15px", lineHeight: 1.4 }}>{ad.body}</p>
           {trick === "twoButtons" ? (
             <div style={{ display: "flex", gap: "8px" }}>
               {[0, 1].map((i) => (
@@ -233,6 +259,26 @@ function AdPopup({
       )}
     </div>
   );
+}
+
+// Every burst arrives with a party, on top of the ads
+function celebrateBurst() {
+  const end = Date.now() + 600;
+  const frame = () => {
+    for (const x of [0.1, 0.5, 0.9]) {
+      confetti({
+        particleCount: 18,
+        spread: 100,
+        startVelocity: 50,
+        origin: { x, y: 0.75 },
+        colors: ["#1cd1ee", "#33d4a8", "#ff9a5c", "#f2596b", "#ffffff"],
+        zIndex: 5000,
+        disableForReducedMotion: true,
+      });
+    }
+    if (Date.now() < end) requestAnimationFrame(frame);
+  };
+  frame();
 }
 
 // --- Idle timer, bursts, and the jingle ---
@@ -278,7 +324,11 @@ function AdBursts({ paused }: { paused: boolean }) {
   useEffect(() => {
     if (paused) return;
     const interval = setInterval(() => {
-      const needed = adsShowing ? STACK_EVERY_MS : IDLE_STEP_MS * (burstCount.current + 1);
+      const needed = adsShowing
+        ? STACK_EVERY_MS
+        : burstCount.current === 0
+          ? FIRST_IDLE_MS
+          : IDLE_STEP_MS * burstCount.current;
       if (Date.now() - lastActivity.current < needed) return;
 
       if (!adsShowing) burstCount.current += 1;
@@ -287,6 +337,7 @@ function AdBursts({ paused }: { paused: boolean }) {
       const burst = pickAds(count).map((ad) => makeOpenAd(ad, randomItem(tricks)));
       setOpenAds((current) => [...current, ...burst].slice(-MAX_ON_SCREEN));
       setBurstId((n) => n + 1);
+      celebrateBurst();
     }, 1000);
     return () => clearInterval(interval);
   }, [paused, adsShowing]);

@@ -201,6 +201,20 @@
   letter-spacing: -0.01em;
   animation: home-fade 600ms ease both;
 }
+.home-affirm::after {
+  content: "”";
+  display: block;
+  height: 26px;
+  margin-top: 10px;
+  text-align: right;
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 800;
+  background: var(--brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 .home-affirm::before {
   content: "“";
   display: block;
@@ -248,29 +262,51 @@
   font-weight: 800;
 }
 
-/* Library */
-.home-row + .home-row {
-  margin-top: 16px;
+/* Library: one swipeable page per category */
+.home-pages {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
 }
-.home-row h4 {
-  margin: 0 0 8px;
+.home-pages::-webkit-scrollbar {
+  display: none;
+}
+.home-page {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+}
+.home-page h4 {
+  margin: 0 0 10px;
   font-size: 15px;
   font-weight: 700;
 }
 .home-tiles {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  margin: 0 -18px;
-  padding: 2px 18px 6px;
-  scrollbar-width: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
 }
-.home-tiles::-webkit-scrollbar {
-  display: none;
+.home-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+.home-dots button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: #d5dde3;
+  cursor: pointer;
+  transition: width 200ms ease, background 200ms ease;
+}
+.home-dots button.is-active {
+  width: 22px;
+  background: var(--brand);
 }
 .home-tile {
-  flex: none;
-  width: 118px;
   aspect-ratio: 2 / 3;
   display: flex;
   align-items: flex-end;
@@ -482,5 +518,17 @@
   .chatw-panel,
   .desp {
     animation: none;
+  }
+}
+
+@keyframes ad-pop {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.9) rotate(-2deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [role="dialog"][aria-label] {
+    animation: none !important;
   }
 }

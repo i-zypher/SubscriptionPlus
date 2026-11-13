@@ -70,18 +70,19 @@ export type LibraryRow = {
   tiles: string[]
 }
 
+// Swipeable pages, in this order
 export const libraryRows: LibraryRow[] = [
   {
     title: "Trending Now",
     tiles: ["Coming Soon", "Coming Soon", "Coming Sooner"],
   },
   {
-    title: "Because You Subscribed",
-    tiles: ["Loading…", "Loading…", "Still Loading…"],
-  },
-  {
     title: "Continue Watching",
     tiles: ["Content Not Included", "Content Also Not Included"],
+  },
+  {
+    title: "Because You Subscribed",
+    tiles: ["Loading…", "Loading…", "Still Loading…"],
   },
   {
     title: "Exclusive to Plus Members",

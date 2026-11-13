@@ -36,25 +36,51 @@ function Affirmations() {
 }
 
 function ContentLibrary() {
+  const [page, setPage] = useState(0);
+  const pagesRef = useRef<HTMLDivElement | null>(null);
+
+  function handleScroll() {
+    const el = pagesRef.current;
+    if (!el) return;
+    setPage(Math.round(el.scrollLeft / el.clientWidth));
+  }
+
+  function goTo(index: number) {
+    const el = pagesRef.current;
+    el?.scrollTo({ left: index * el.clientWidth, behavior: "smooth" });
+  }
+
   return (
     <section className="home-card">
       <p className="home-label">Your Subscription Library</p>
       <h3>Explore your subscription content</h3>
-      {libraryRows.map((row) => (
-        <div key={row.title} className="home-row">
-          <h4>{row.title}</h4>
-          <div className="home-tiles">
-            {row.tiles.map((tile, i) => (
-              <div
-                key={i}
-                className={`home-tile${tile.includes("Loading") ? " is-loading" : ""}`}
-              >
-                {tile}
-              </div>
-            ))}
+      <div className="home-pages" ref={pagesRef} onScroll={handleScroll}>
+        {libraryRows.map((row) => (
+          <div key={row.title} className="home-page">
+            <h4>{row.title}</h4>
+            <div className="home-tiles">
+              {row.tiles.map((tile, i) => (
+                <div
+                  key={i}
+                  className={`home-tile${tile.includes("Loading") ? " is-loading" : ""}`}
+                >
+                  {tile}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
+      <div className="home-dots">
+        {libraryRows.map((row, i) => (
+          <button
+            key={row.title}
+            aria-label={`Show ${row.title}`}
+            className={i === page ? "is-active" : ""}
+            onClick={() => goTo(i)}
+          />
+        ))}
+      </div>
     </section>
   );
 }
