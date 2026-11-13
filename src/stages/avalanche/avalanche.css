@@ -1,0 +1,338 @@
+/* Avalanche: the intro's polish, getting gaudier with every tier */
+
+.aval {
+  --cyan: #1cd1ee;
+  --green: #33d4a8;
+  --brand: linear-gradient(120deg, var(--cyan), var(--green));
+  --ink: #0b0f14;
+  --muted: #5d6874;
+
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px 48px;
+  font-family: "Outfit", system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(60% 45% at 15% 0%, rgba(28, 209, 238, 0.28), transparent 70%),
+    radial-gradient(55% 40% at 100% 100%, rgba(51, 212, 168, 0.26), transparent 70%),
+    #f5f9fa;
+}
+
+/* Running total pill */
+.aval-total {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 18px;
+  margin-bottom: 44px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  box-shadow: 0 10px 24px -12px rgba(11, 15, 20, 0.6);
+}
+.aval-total span {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.aval-total strong {
+  font-size: 22px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  background: var(--brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: aval-bump 420ms cubic-bezier(0.2, 1.8, 0.4, 1);
+  display: inline-block;
+}
+
+/* Card stack */
+.aval-stack {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+}
+.aval-ghost {
+  position: absolute;
+  inset: 0;
+  border-radius: 32px;
+  background: #fff;
+  box-shadow: 0 10px 30px -14px rgba(11, 15, 20, 0.25);
+  transform-origin: top center;
+}
+
+.aval-card {
+  position: relative;
+  z-index: 20;
+  padding: 30px 24px 20px;
+  border-radius: 32px;
+  background: #fff;
+  text-align: center;
+  box-shadow:
+    0 2px 6px rgba(11, 15, 20, 0.05),
+    0 24px 60px -18px rgba(11, 15, 20, 0.3);
+  animation: aval-slide 560ms cubic-bezier(0.2, 1.3, 0.35, 1) both;
+}
+
+/* Getting gaudier */
+.aval-level-2,
+.aval-level-3,
+.aval-level-4 {
+  border: 3px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    var(--brand) border-box;
+}
+.aval-level-4 {
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(90deg, var(--cyan), var(--green), #ffd166, var(--cyan)) border-box;
+  background-size: 100% 100%, 300% 100%;
+  animation:
+    aval-slide 560ms cubic-bezier(0.2, 1.3, 0.35, 1) both,
+    aval-border 2.4s linear infinite;
+}
+
+/* Ribbons fighting for the top of the card */
+.aval-badges {
+  position: absolute;
+  top: -16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 6px;
+  padding: 0 12px;
+}
+.aval-badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  box-shadow: 0 6px 14px -6px rgba(11, 15, 20, 0.5);
+}
+.aval-badge:nth-child(2n) {
+  background: var(--brand);
+  color: #04221f;
+}
+.aval-badge:nth-child(3) {
+  background: #ffd166;
+  color: #3a2a00;
+}
+
+.aval-sparkles span {
+  position: absolute;
+  font-size: 22px;
+  color: #ffd166;
+  text-shadow: 0 0 8px rgba(255, 209, 102, 0.8);
+  animation: aval-twinkle 1.4s ease-in-out infinite;
+}
+.aval-sparkles span:nth-child(1) {
+  top: 34px;
+  left: 16px;
+}
+.aval-sparkles span:nth-child(2) {
+  top: 120px;
+  right: 14px;
+  animation-delay: 0.5s;
+}
+.aval-sparkles span:nth-child(3) {
+  bottom: 110px;
+  left: 22px;
+  animation-delay: 0.9s;
+}
+
+.aval-step {
+  margin: 10px 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #149aa8;
+}
+.aval h2 {
+  margin: 0 0 18px;
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+/* Price block */
+.aval-price {
+  margin: 0 0 20px;
+  padding: 16px;
+  border-radius: 22px;
+  background: linear-gradient(140deg, rgba(28, 209, 238, 0.12), rgba(51, 212, 168, 0.12));
+}
+.aval-price s {
+  font-size: 15px;
+  color: #98a2ad;
+}
+.aval-price div {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 2px;
+}
+.aval-price strong {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.aval-price div span {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.aval-price em {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #e7f9f2;
+  color: #138561;
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Buttons */
+.aval-cta {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding: 18px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #04221f;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 14px 28px -10px rgba(28, 209, 238, 0.7);
+  transition: transform 120ms ease;
+}
+.aval-cta:hover {
+  transform: translateY(-1px);
+}
+.aval-cta:active {
+  transform: translateY(1px) scale(0.99);
+}
+.aval-cta:focus-visible,
+.aval-decline:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+.aval-cta::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: skewX(-20deg);
+  animation: aval-shine 2.6s ease-in-out 0.8s infinite;
+}
+
+.aval-decline {
+  display: block;
+  margin: 12px auto 0;
+  padding: 4px;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 12px;
+  color: #a3acb5;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.aval-fine {
+  margin: 14px 0 0;
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: #a3acb5;
+}
+
+@keyframes aval-slide {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes aval-bump {
+  from {
+    transform: scale(1.35);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes aval-border {
+  to {
+    background-position: 0 0, 300% 0;
+  }
+}
+@keyframes aval-twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+@keyframes aval-shine {
+  0%,
+  55% {
+    left: -60%;
+  }
+  100% {
+    left: 130%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aval-card,
+  .aval-level-4,
+  .aval-total strong,
+  .aval-sparkles span,
+  .aval-cta::after {
+    animation: none;
+  }
+}
+
+/* Room for the ribbon pile-up on the gaudiest tiers */
+.aval-level-3 .aval-step {
+  margin-top: 26px;
+}
+.aval-level-4 .aval-step {
+  margin-top: 40px;
+}
