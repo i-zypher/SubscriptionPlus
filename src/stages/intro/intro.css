@@ -1,0 +1,252 @@
+/* Intro: "Peak Subscription". Glossy, cheerful, over-designed. */
+
+.intro {
+  --cyan: #1cd1ee;
+  --green: #33d4a8;
+  --brand: linear-gradient(120deg, var(--cyan), var(--green));
+  --ink: #0b0f14;
+  --muted: #5d6874;
+
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 32px 16px 48px;
+  font-family: "Outfit", system-ui, sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(60% 45% at 15% 0%, rgba(28, 209, 238, 0.28), transparent 70%),
+    radial-gradient(55% 40% at 100% 100%, rgba(51, 212, 168, 0.26), transparent 70%),
+    #f5f9fa;
+}
+
+.intro-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  margin: auto 0;
+  padding: 28px 24px 22px;
+  border-radius: 32px;
+  background: #fff;
+  text-align: center;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 2px 6px rgba(11, 15, 20, 0.05),
+    0 24px 60px -18px rgba(11, 15, 20, 0.28);
+  animation: intro-pop 520ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+/* Brand */
+.intro-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.intro-brand img {
+  width: 40px;
+  height: 40px;
+  animation: intro-spin 2.4s cubic-bezier(0.6, 0, 0.2, 1) 400ms both;
+}
+.intro-wordmark {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.intro-wordmark span {
+  background: var(--brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Success badge */
+.intro-check {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--brand);
+  color: #fff;
+  font-size: 30px;
+  font-weight: 800;
+  box-shadow: 0 10px 24px -6px rgba(51, 212, 168, 0.6);
+  animation: intro-pop 600ms cubic-bezier(0.2, 1.6, 0.4, 1) 180ms both;
+}
+
+.intro h2 {
+  margin: 0 0 6px;
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.intro-sub {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+/* Trial timer panel */
+.intro-trial {
+  margin: 0 0 14px;
+  padding: 16px;
+  border-radius: 22px;
+  background: linear-gradient(140deg, rgba(28, 209, 238, 0.12), rgba(51, 212, 168, 0.12));
+  border: 1px solid rgba(28, 209, 238, 0.25);
+}
+.intro-trial-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #149aa8;
+}
+.intro-trial-time {
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  margin: 6px 0 4px;
+}
+.intro-trial-note {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* Card on file */
+.intro-card-on-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 22px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: #f3f6f8;
+  text-align: left;
+}
+.intro-cc {
+  flex: none;
+  width: 46px;
+  height: 32px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, #20262e, #3a4450);
+  position: relative;
+}
+.intro-cc::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 9px;
+  width: 11px;
+  height: 9px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #f3d77a, #c9a643);
+}
+.intro-cc-text {
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--muted);
+}
+.intro-cc-text strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* The big shiny button */
+.intro-cta {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding: 18px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--brand);
+  color: #04221f;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 14px 28px -10px rgba(28, 209, 238, 0.7);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.intro-cta:hover {
+  transform: translateY(-1px);
+}
+.intro-cta:active {
+  transform: translateY(1px) scale(0.99);
+  box-shadow: 0 6px 14px -8px rgba(28, 209, 238, 0.7);
+}
+.intro-cta:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+/* Shine that sweeps across every few seconds */
+.intro-cta::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: skewX(-20deg);
+  animation: intro-shine 3.2s ease-in-out 1.2s infinite;
+}
+
+.intro-disclosure {
+  margin: 18px 0 0;
+  padding-top: 14px;
+  border-top: 1px dashed #dfe5ea;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+@keyframes intro-pop {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes intro-spin {
+  from {
+    transform: rotate(-360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+@keyframes intro-shine {
+  0%,
+  60% {
+    left: -60%;
+  }
+  100% {
+    left: 130%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-card,
+  .intro-check,
+  .intro-brand img,
+  .intro-cta::after {
+    animation: none;
+  }
+}
