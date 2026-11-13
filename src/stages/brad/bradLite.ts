@@ -1,7 +1,7 @@
 import { useGameStore } from "../../state/gameStore";
 import { jingleVersions } from "../../audio/jingleVersions";
 import { bradPhases } from "./bradPhases";
-import { pickOtherReply } from "./bradLogic";
+import { chargedReplies, FEATURE_FEE } from "./bradScript";
 import { smallTalk, lifeUpsells } from "./bradSmallTalk";
 import type { Offer } from "./bradAI";
 
@@ -127,9 +127,13 @@ export function liteReply(phaseIndex: number, message: string): LiteReply {
     return reply(pickFresh(`question-${phaseIndex}`, generalQuestion.lines[phaseIndex]));
   }
 
-  // 5. Brad's general filler (sometimes a $4.99 "feature")
-  const filler = pickOtherReply(bradPhases[phaseIndex]);
-  return { text: fill(filler.text, phaseIndex), charge: filler.charge, offer: null };
+  // 5. Brad's general filler, sometimes a $4.99 "feature" (no repeats either)
+  const plain = bradPhases[phaseIndex].replies.other;
+  const fee = `$${FEATURE_FEE.toFixed(2)}`;
+  const fillers = [...plain, ...chargedReplies.map((line) => line.replaceAll("{fee}", fee))];
+  const line = pickFresh(`filler-${phaseIndex}`, fillers);
+  const charged = !plain.includes(line);
+  return { text: fill(line, phaseIndex), charge: charged ? FEATURE_FEE : 0, offer: null };
 }
 
 // Real distress gets a real answer, in any Brad mode
