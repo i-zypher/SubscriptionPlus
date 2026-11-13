@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import confetti from "canvas-confetti"
+import confetti from "../../fx/confetti"
 import { useGameStore } from "../../state/gameStore"
 import { tiers } from "./tiers"
 import { playMoneyAddedTone } from "../../audio/sounds"

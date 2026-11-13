@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import confetti from "canvas-confetti";
+import confetti from "../../fx/confetti";
 import { useGameStore, CANCEL_PLUS_PRICE } from "../../state/gameStore";
 import { playSuccessTone } from "../../audio/sounds";
 import "./endings.css";

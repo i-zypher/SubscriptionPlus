@@ -1,4 +1,5 @@
 import { useSettingsStore } from "../state/settingsStore"
+import { captionEffect } from "./captions"
 
 let audioCtx: AudioContext | null = null
 
@@ -48,6 +49,7 @@ function playNotes(notes: Note[], type: OscillatorType, peak: number, slide = 1,
 }
 
 export function playSuccessTone() {
+  captionEffect("[cheerful ding]")
   const now = getAudioContext().currentTime
   playNotes(
     [
@@ -60,6 +62,7 @@ export function playSuccessTone() {
 }
 
 export function playFailureTone() {
+  captionEffect("[sad buzzer]")
   const now = getAudioContext().currentTime
   playNotes(
     [
@@ -73,6 +76,7 @@ export function playFailureTone() {
 }
 
 export function playMoneyAddedTone() {
+  captionEffect("[cash register: ka-ching!]")
   const now = getAudioContext().currentTime
 
   playNotes(

@@ -8,6 +8,7 @@ import {
 } from "../../audio/jingleVersions";
 import { useSettingsStore } from "../../state/settingsStore";
 import "./game-over.css";
+import { captionClip, CLIP_LYRIC } from "../../audio/captions";
 import { isApp } from "../../platform";
 
 function GameOverScreen() {
@@ -22,6 +23,7 @@ function GameOverScreen() {
     const audio = new Audio(captchaSrc(jingleVersion));
     audio.volume = (masterVolume / 100) * (music / 100);
     audio.play().catch((err) => console.error("Jingle failed:", err));
+    captionClip(CLIP_LYRIC, 9000);
     return () => audio.pause();
   }, [jingleVersion]);
 

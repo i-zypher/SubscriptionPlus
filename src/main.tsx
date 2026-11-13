@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { isApp } from './platform'
+import { startSettings } from './settings/applySettings'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -12,6 +13,9 @@ createRoot(document.getElementById('root')!).render(
 
 // Inside the iOS/Android apps: lets CSS keep the game clear of the notch
 if (isApp) document.documentElement.classList.add('is-app')
+
+// Theme, text size, reduce motion, high contrast (and the app's bar colours)
+startSettings()
 
 // Lets the website install as an app. Production only, so local dev never
 // gets a stale worker, and never inside the real apps (they don't need it).

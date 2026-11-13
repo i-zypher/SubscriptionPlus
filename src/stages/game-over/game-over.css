@@ -10,11 +10,11 @@
   padding: 32px 16px 48px;
   color-scheme: light;
   font-family: "Outfit", system-ui, sans-serif;
-  color: #0b0f14;
+  color: var(--sp-ink);
   background:
     radial-gradient(60% 45% at 85% 0%, rgba(51, 212, 168, 0.3), transparent 70%),
     radial-gradient(55% 40% at 0% 100%, rgba(28, 209, 238, 0.25), transparent 70%),
-    #f5f9fa;
+    var(--sp-page);
 }
 .over-card {
   width: 100%;
@@ -22,7 +22,7 @@
   margin: auto 0;
   padding: 32px 24px 24px;
   border-radius: 32px;
-  background: #fff;
+  background: var(--sp-card);
   text-align: center;
   box-shadow: 0 24px 60px -18px rgba(11, 15, 20, 0.3);
   animation: over-in 500ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
@@ -36,26 +36,26 @@
   border-radius: 50%;
   background: linear-gradient(140deg, #1cd1ee, #33d4a8);
   color: #fff;
-  font-size: 40px;
+  font-size: calc(40px * var(--ts, 1));
   font-weight: 800;
   box-shadow: 0 12px 26px -10px rgba(51, 212, 168, 0.9);
   animation: over-pop 500ms cubic-bezier(0.2, 1.8, 0.4, 1) 250ms both;
 }
 .over-kicker {
   margin: 16px 0 6px;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts, 1));
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #138561;
+  color: var(--sp-green-ink);
 }
 .over h1 {
   margin: 0 0 20px;
-  font-size: 30px;
+  font-size: calc(30px * var(--ts, 1));
   line-height: 1.1;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #0b0f14;
+  color: var(--sp-ink);
 }
 .over-charge {
   padding: 18px 16px;
@@ -65,46 +65,46 @@
 }
 .over-charge small {
   display: block;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts, 1));
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #149aa8;
+  color: var(--sp-teal-ink);
 }
 .over-charge strong {
   display: block;
   margin: 6px 0;
-  font-size: 54px;
+  font-size: calc(54px * var(--ts, 1));
   line-height: 1;
   font-weight: 800;
   letter-spacing: -0.04em;
 }
 .over-charge span {
-  font-size: 15px;
+  font-size: calc(15px * var(--ts, 1));
   font-weight: 600;
-  color: #3d4752;
+  color: var(--sp-ink-2);
 }
 .over-jingle {
   margin: 0 0 20px;
   padding: 12px 14px;
   border-radius: 18px;
-  background: #f1f4f6;
-  color: #3d4752;
+  background: var(--sp-soft);
+  color: var(--sp-ink-2);
 }
 .over-jingle p {
   margin: 0 0 6px;
-  font-size: 14px;
+  font-size: calc(14px * var(--ts, 1));
   font-weight: 700;
 }
 .over-jingle p span {
-  color: #149aa8;
+  color: var(--sp-teal-ink);
 }
 .over-jingle a {
   display: block;
-  font-size: 12.5px;
+  font-size: calc(12.5px * var(--ts, 1));
   line-height: 1.4;
   font-weight: 600;
-  color: #149aa8;
+  color: var(--sp-teal-ink);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -116,7 +116,7 @@
   background: linear-gradient(120deg, #1cd1ee, #33d4a8);
   color: #04221f;
   font-family: inherit;
-  font-size: 18px;
+  font-size: calc(18px * var(--ts, 1));
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 14px 28px -10px rgba(28, 209, 238, 0.8);

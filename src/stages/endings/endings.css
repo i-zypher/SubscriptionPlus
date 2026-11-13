@@ -12,7 +12,7 @@
   padding: 32px 16px 48px;
   color-scheme: light;
   font-family: "Outfit", system-ui, sans-serif;
-  color: #0b0f14;
+  color: var(--sp-ink);
   background:
     radial-gradient(70% 50% at 50% 0%, rgba(255, 209, 102, 0.45), transparent 70%),
     linear-gradient(160deg, var(--cyan), var(--green));
@@ -23,19 +23,19 @@
   margin: auto 0;
   padding: 30px 24px 24px;
   border-radius: 32px;
-  background: #fff;
+  background: var(--sp-card);
   text-align: center;
   box-shadow: 0 30px 80px -24px rgba(4, 34, 31, 0.55);
   animation: win-pop 700ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
 }
 .win-trophy {
-  font-size: 72px;
+  font-size: calc(72px * var(--ts, 1));
   line-height: 1;
   animation: win-bounce 1.6s ease-in-out 700ms infinite;
 }
 .win-kicker {
   margin: 12px 0 4px;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts, 1));
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -43,16 +43,16 @@
 }
 .win h2 {
   margin: 0;
-  font-size: 34px;
+  font-size: calc(34px * var(--ts, 1));
   line-height: 1.05;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #0b0f14;
+  color: var(--sp-ink);
 }
 .win-sub {
   margin: 6px 0 20px;
-  font-size: 17px;
-  color: #5d6874;
+  font-size: calc(17px * var(--ts, 1));
+  color: var(--sp-muted);
 }
 .win-total {
   padding: 18px;
@@ -62,24 +62,24 @@
 }
 .win-total small {
   display: block;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts, 1));
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #149aa8;
+  color: var(--sp-teal-ink);
 }
 .win-total strong {
   display: block;
   margin: 4px 0;
-  font-size: 60px;
+  font-size: calc(60px * var(--ts, 1));
   line-height: 1;
   font-weight: 800;
   letter-spacing: -0.04em;
 }
 .win-total span {
-  font-size: 13px;
+  font-size: calc(13px * var(--ts, 1));
   font-weight: 600;
-  color: #138561;
+  color: var(--sp-green-ink);
 }
 .win-list {
   display: flex;
@@ -93,9 +93,9 @@
 .win-list li {
   padding: 6px 12px;
   border-radius: 999px;
-  background: #0b0f14;
+  background: var(--sp-pill);
   color: #fff;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts, 1));
   font-weight: 700;
 }
 .win-list li::before {
@@ -104,9 +104,9 @@
 }
 .win-note {
   margin: 0 0 20px;
-  font-size: 15px;
+  font-size: calc(15px * var(--ts, 1));
   line-height: 1.45;
-  color: #5d6874;
+  color: var(--sp-muted);
 }
 .win-cta {
   width: 100%;
@@ -116,7 +116,7 @@
   background: linear-gradient(120deg, var(--cyan), var(--green));
   color: #04221f;
   font-family: inherit;
-  font-size: 18px;
+  font-size: calc(18px * var(--ts, 1));
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 14px 28px -10px rgba(28, 209, 238, 0.8);
@@ -164,7 +164,7 @@
   background: #fff0f0;
   color: #c00;
   font-family: "Courier New", monospace;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts, 1));
   line-height: 1.4;
 }
 .crash-title {
@@ -185,7 +185,7 @@
   background: #c0c0c0;
   border: 2px outset #fff;
   font-family: Tahoma, Verdana, sans-serif;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts, 1));
   box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.35);
   animation: crash-shake 420ms ease 200ms both;
 }
@@ -203,7 +203,7 @@
   padding: 14px 14px 6px;
 }
 .crash-icon {
-  font-size: 30px;
+  font-size: calc(30px * var(--ts, 1));
 }
 .crash-body p {
   margin: 0 0 8px;
@@ -222,7 +222,7 @@
   border: 2px outset #fff;
   background: #c0c0c0;
   font-family: inherit;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts, 1));
   cursor: pointer;
 }
 .crash-buttons button:active {
@@ -231,7 +231,7 @@
 .crash-dump {
   margin: 0;
   font-family: "Courier New", monospace;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts, 1));
   color: #808080;
   word-break: break-all;
 }
@@ -257,7 +257,7 @@
 }
 .term p {
   margin: 0 0 6px;
-  font-size: 15px;
+  font-size: calc(15px * var(--ts, 1));
 }
 .term-out {
   color: #b8ffd9;
@@ -266,7 +266,7 @@
 .term-big {
   margin: 18px 0 14px;
   font-family: inherit;
-  font-size: 34px;
+  font-size: calc(34px * var(--ts, 1));
   line-height: 1.1;
   font-weight: 700;
   color: #eafff3;
@@ -283,7 +283,7 @@
   background: none;
   color: #33ff99;
   font-family: inherit;
-  font-size: 16px;
+  font-size: calc(16px * var(--ts, 1));
   cursor: pointer;
 }
 .term-caret {
@@ -301,11 +301,11 @@
   padding: 32px 16px 48px;
   color-scheme: light;
   font-family: "Outfit", system-ui, sans-serif;
-  color: #0b0f14;
+  color: var(--sp-ink);
   background:
     radial-gradient(60% 45% at 15% 0%, rgba(28, 209, 238, 0.3), transparent 70%),
     radial-gradient(55% 40% at 100% 100%, rgba(51, 212, 168, 0.28), transparent 70%),
-    #f5f9fa;
+    var(--sp-page);
 }
 .cplus-card {
   width: 100%;
@@ -313,30 +313,30 @@
   margin: auto 0;
   padding: 30px 24px 20px;
   border-radius: 32px;
-  background: #fff;
+  background: var(--sp-card);
   text-align: center;
   box-shadow: 0 24px 60px -18px rgba(11, 15, 20, 0.3);
   animation: win-pop 600ms cubic-bezier(0.2, 1.5, 0.4, 1) both;
 }
 .cplus-badge {
-  font-size: 56px;
+  font-size: calc(56px * var(--ts, 1));
   line-height: 1;
 }
 .cplus-kicker {
   margin: 12px 0 6px;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts, 1));
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #149aa8;
+  color: var(--sp-teal-ink);
 }
 .cplus h2 {
   margin: 0 0 18px;
-  font-size: 28px;
+  font-size: calc(28px * var(--ts, 1));
   line-height: 1.1;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #0b0f14;
+  color: var(--sp-ink);
 }
 .cplus-total {
   padding: 16px;
@@ -346,23 +346,23 @@
 }
 .cplus-total small {
   display: block;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts, 1));
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #149aa8;
+  color: var(--sp-teal-ink);
 }
 .cplus-total strong {
   display: block;
   margin: 4px 0;
-  font-size: 52px;
+  font-size: calc(52px * var(--ts, 1));
   line-height: 1;
   font-weight: 800;
   letter-spacing: -0.04em;
 }
 .cplus-total span {
-  font-size: 14px;
-  color: #138561;
+  font-size: calc(14px * var(--ts, 1));
+  color: var(--sp-green-ink);
   font-weight: 600;
 }
 .cplus-cta {
@@ -373,16 +373,16 @@
   background: linear-gradient(120deg, #1cd1ee, #33d4a8);
   color: #04221f;
   font-family: inherit;
-  font-size: 18px;
+  font-size: calc(18px * var(--ts, 1));
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 14px 28px -10px rgba(28, 209, 238, 0.8);
 }
 .cplus-fine {
   margin: 14px 0 0;
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--ts, 1));
   line-height: 1.4;
-  color: #a3acb5;
+  color: var(--sp-faint);
 }
 
 @keyframes crash-glitch {

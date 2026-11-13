@@ -1,0 +1,29 @@
+/* Classic caption look in every theme: white on translucent black */
+.captions {
+  position: fixed;
+  left: 50%;
+  bottom: calc(92px + var(--sa-bottom, 0px));
+  z-index: 9000;
+  transform: translateX(-50%);
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  pointer-events: none;
+  font-family: "Outfit", system-ui, sans-serif;
+  text-align: center;
+}
+.captions p {
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.82);
+  color: #fff;
+  font-size: calc(15px * var(--ts, 1));
+  font-weight: 600;
+  line-height: 1.35;
+}
+.captions .captions-effect {
+  font-style: italic;
+}

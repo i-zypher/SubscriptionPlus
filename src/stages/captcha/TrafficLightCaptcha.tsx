@@ -9,7 +9,12 @@ import type { CaptchaProps } from "./VerifiedHumanUpsell";
 
 // "either" = a photo you could argue both ways (something tiny in the
 // background), so selecting it or not are both fine
-type Tile = { label: string; emoji?: string; image?: string; match: boolean | "either" };
+type Tile = {
+  label: string;
+  emoji?: string;
+  image?: string;
+  match: boolean | "either";
+};
 type Photo = { file: string; label: string };
 type PhotoSet = {
   prompt: string;
@@ -42,7 +47,10 @@ const PHOTO_SETS: PhotoSet[] = [
       { file: "bicycles/mountain-bike", label: "Bicycle against a brick wall" },
       { file: "bicycles/old-bike", label: "Penny-farthing" },
       { file: "bicycles/recumbent-bike", label: "Recumbent bike" },
-      { file: "bicycles/tightrope-bike", label: "Bicycle on a tightrope over a canyon" },
+      {
+        file: "bicycles/tightrope-bike",
+        label: "Bicycle on a tightrope over a canyon",
+      },
       { file: "bicycles/street-bike", label: "Cyclist in a bike lane" },
       { file: "bicycles/tandem-bike", label: "Tandem bicycle in a park" },
     ],
@@ -59,7 +67,11 @@ const PHOTO_SETS: PhotoSet[] = [
       { file: "filler/city-skyline", label: "City skyline" },
       { file: "filler/eagle-capitol", label: "Eagle over Washington" },
       // Two bikes parked far in the background. Does that count? Either way.
-      { file: "bicycles/city-street-1", label: "Street with parked cars", either: true },
+      {
+        file: "bicycles/city-street-1",
+        label: "Street with parked cars",
+        either: true,
+      },
     ],
   },
   {
@@ -79,7 +91,10 @@ const PHOTO_SETS: PhotoSet[] = [
       { file: "bicycles/crosswalk", label: "Crosswalk full of people" },
       { file: "bicycles/recumbent-bike", label: "Recumbent bike" },
       { file: "bicycles/old-bike", label: "Penny-farthing" },
-      { file: "traffic-lights/too-many-lights", label: "Street full of traffic lights" },
+      {
+        file: "traffic-lights/too-many-lights",
+        label: "Street full of traffic lights",
+      },
       { file: "traffic-lights/stop-sign", label: "Stop sign" },
       { file: "traffic-lights/old-west", label: "Old West street" },
       ...FILLER,
@@ -87,7 +102,11 @@ const PHOTO_SETS: PhotoSet[] = [
       { file: "filler/old-map", label: "Old city map", either: true },
       { file: "filler/city-skyline", label: "City skyline", either: true },
       // Lawns and the National Mall below the eagle
-      { file: "filler/eagle-capitol", label: "Eagle over Washington", either: true },
+      {
+        file: "filler/eagle-capitol",
+        label: "Eagle over Washington",
+        either: true,
+      },
     ],
   },
   {
@@ -95,8 +114,14 @@ const PHOTO_SETS: PhotoSet[] = [
     hits: [
       { file: "traffic-lights/signal-pole", label: "Overloaded signal pole" },
       { file: "traffic-lights/old-west", label: "Old West street" },
-      { file: "traffic-lights/too-many-lights", label: "Street full of traffic lights" },
-      { file: "traffic-lights/avenue-lights", label: "Avenue with traffic lights" },
+      {
+        file: "traffic-lights/too-many-lights",
+        label: "Street full of traffic lights",
+      },
+      {
+        file: "traffic-lights/avenue-lights",
+        label: "Avenue with traffic lights",
+      },
       { file: "traffic-lights/green-light", label: "Green traffic light" },
     ],
     misses: [
@@ -168,7 +193,8 @@ function buildRounds(): Round[] {
     { prompt: set.prompt, build: () => photoGrid(set) },
     {
       prompt: "Select all squares with hidden fees",
-      build: () => shuffle(FEES).map((label) => ({ label, emoji: "💸", match: true })),
+      build: () =>
+        shuffle(FEES).map((label) => ({ label, emoji: "💸", match: true })),
     },
   ];
 }
@@ -199,7 +225,7 @@ function TrafficLightCaptcha({ onPass }: CaptchaProps) {
 
   function handleVerify() {
     const correct = tiles.every(
-      (tile, i) => tile.match === "either" || tile.match === picked.has(i),
+      (tile, i) => tile.match === "either" || tile.match === picked.has(i)
     );
 
     if (correct && round === rounds.length - 1) {
@@ -276,13 +302,27 @@ function TrafficLightCaptcha({ onPass }: CaptchaProps) {
                 src={tile.image}
                 alt=""
                 draggable={false}
-                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                }}
               />
             ) : (
-              <span style={{ fontSize: "32px" }}>{tile.emoji}</span>
+              <span style={{ fontSize: "calc(32px * var(--ts, 1))" }}>
+                {tile.emoji}
+              </span>
             )}
             {round === rounds.length - 1 && (
-              <span style={{ fontSize: "11px", lineHeight: 1.2 }}>{tile.label}</span>
+              <span
+                style={{
+                  fontSize: "calc(11px * var(--ts, 1))",
+                  lineHeight: 1.2,
+                }}
+              >
+                {tile.label}
+              </span>
             )}
           </button>
         ))}

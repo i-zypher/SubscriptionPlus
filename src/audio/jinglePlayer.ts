@@ -1,6 +1,7 @@
 import { jingleSrc } from "./jingleVersions"
 import { useSettingsStore } from "../state/settingsStore"
 import { showJingleNowPlaying } from "./mediaSession"
+import { captionJingle } from "./captions"
 
 // One jingle player for the whole run, shared by the home-screen intro, the ad
 // bursts, and Brad's holds, so the song always picks up where it left off.
@@ -33,6 +34,7 @@ function getAudio(version: string) {
 // Loops for as long as it's playing (ad bursts, Brad's holds)
 export function playJingle(version: string) {
   showJingleNowPlaying(version)
+  captionJingle(version)
   getAudio(version).play().catch(() => {})
 }
 
@@ -44,6 +46,7 @@ export function playJingleOnce(version: string, onDone: () => void) {
 
   const handleEnded = () => {
     stopWatchingEnd?.()
+    captionJingle(null)
     onDone()
   }
   // "pause" here means the phone stopped it (media controls, switching apps),
@@ -57,11 +60,13 @@ export function playJingleOnce(version: string, onDone: () => void) {
   }
 
   showJingleNowPlaying(version)
+  captionJingle(version)
   // If the browser blocks playback, skip the intro instead of waiting forever
   player.play().catch(handleEnded)
 }
 
 export function pauseJingle() {
   stopWatchingEnd?.()
+  captionJingle(null)
   audio?.pause()
 }

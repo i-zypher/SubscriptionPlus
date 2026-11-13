@@ -2,11 +2,11 @@
    middle looks like the real verification boxes everyone hates. */
 
 .cap {
-  --ink: #0b0f14;
-  --muted: #5d6874;
+  --ink: var(--sp-ink);
+  --muted: var(--sp-muted);
   --blue: #1a73e8;
   --blue-dark: #1558b0;
-  --line: #d6dbe0;
+  --line: var(--sp-line);
 
   position: fixed;
   inset: 0;
@@ -17,7 +17,7 @@
   text-align: left;
   background:
     radial-gradient(60% 35% at 0% 0%, rgba(28, 209, 238, 0.16), transparent 70%),
-    #eef2f5;
+    var(--sp-page);
 }
 .cap-inner {
   max-width: 560px;
@@ -30,7 +30,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: 14px;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts, 1));
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -42,7 +42,7 @@
 }
 .cap h2 {
   margin: 0 0 12px;
-  font-size: 24px;
+  font-size: calc(24px * var(--ts, 1));
   line-height: 1.15;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -60,7 +60,7 @@
   width: 28px;
   height: 6px;
   border-radius: 999px;
-  background: #d5dde3;
+  background: var(--sp-line);
 }
 .cap-progress span.is-done {
   background: linear-gradient(120deg, #1cd1ee, #33d4a8);
@@ -70,7 +70,7 @@
 }
 .cap-progress small {
   margin-left: 6px;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts, 1));
   color: var(--muted);
 }
 
@@ -78,22 +78,22 @@
 .cap-widget {
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #fff;
+  background: var(--sp-card);
   box-shadow: 0 2px 10px rgba(11, 15, 20, 0.08);
   overflow: hidden;
 }
 .cap-body {
   padding: 18px 16px 16px;
   font-family: Roboto, "Segoe UI", system-ui, sans-serif;
-  font-size: 16px;
+  font-size: calc(16px * var(--ts, 1));
   line-height: 1.45;
-  color: #202124;
+  color: var(--sp-ink);
 }
 .cap-body p {
   margin: 0 0 12px;
 }
 .cap-body p strong {
-  font-size: 18px;
+  font-size: calc(18px * var(--ts, 1));
 }
 
 /* Everything clickable inside looks like a real verification button */
@@ -109,12 +109,12 @@
   flex: 1;
   min-width: 0;
   padding: 11px 12px;
-  border: 1px solid #b9c0c7;
+  border: 1px solid var(--sp-line-strong);
   border-radius: 4px;
   font-family: inherit;
-  font-size: 16px;
-  color: #202124;
-  background: #fff;
+  font-size: calc(16px * var(--ts, 1));
+  color: var(--sp-ink);
+  background: var(--sp-card);
 }
 .cap-body input[type="text"]:focus {
   outline: 2px solid var(--blue);
@@ -128,7 +128,7 @@
   border-radius: 4px;
   background: var(--blue);
   color: #fff;
-  font-size: 14px;
+  font-size: calc(14px * var(--ts, 1));
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -146,13 +146,13 @@
   align-items: center;
   padding: 8px 14px;
   border-top: 1px solid var(--line);
-  background: #f8f9fa;
+  background: var(--sp-soft);
 }
 .cap-icons {
   display: flex;
   gap: 14px;
-  font-size: 18px;
-  color: #6b7178;
+  font-size: calc(18px * var(--ts, 1));
+  color: var(--sp-muted);
 }
 .cap-brand {
   display: flex;
@@ -166,12 +166,12 @@
 }
 .cap-brand strong {
   display: block;
-  font-size: 11px;
+  font-size: calc(11px * var(--ts, 1));
   color: #555;
 }
 .cap-brand small {
   display: block;
-  font-size: 9px;
+  font-size: calc(9px * var(--ts, 1));
   color: #999;
 }
 
@@ -181,10 +181,10 @@
   padding: 12px 20px;
   border: 0;
   border-radius: 999px;
-  background: #fff;
+  background: var(--sp-card);
   color: var(--ink);
   font-family: inherit;
-  font-size: 15px;
+  font-size: calc(15px * var(--ts, 1));
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 14px -8px rgba(11, 15, 20, 0.4);
@@ -197,7 +197,7 @@
   margin-bottom: 12px;
   border-radius: 4px;
   background:
-    repeating-linear-gradient(45deg, #f6f7f8, #f6f7f8 10px, #f1f3f4 10px, #f1f3f4 20px);
+    repeating-linear-gradient(45deg, var(--sp-stripe-a), var(--sp-stripe-a) 10px, var(--sp-stripe-b) 10px, var(--sp-stripe-b) 20px);
   overflow: hidden;
 }
 .cap-check {
@@ -208,10 +208,10 @@
   padding: 14px 18px 14px 14px;
   border: 1px solid var(--line);
   border-radius: 4px;
-  background: #f9f9f9;
+  background: var(--sp-soft);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
   white-space: nowrap;
-  font-size: 15px;
+  font-size: calc(15px * var(--ts, 1));
   cursor: pointer;
   transition:
     left 160ms ease,
@@ -225,7 +225,7 @@
   margin: 0;
   border: 2px solid #c1c1c1;
   border-radius: 3px;
-  background: #fff;
+  background: var(--sp-card);
   cursor: pointer;
 }
 .cap-check input:hover {
@@ -241,7 +241,7 @@
   position: absolute;
   inset: -6px 0 0;
   color: #0f9d58;
-  font-size: 30px;
+  font-size: calc(30px * var(--ts, 1));
   font-weight: 700;
   line-height: 1;
   text-align: center;
@@ -251,7 +251,7 @@
   border-radius: 4px;
   background: #fef7e0;
   color: #7a5b00;
-  font-size: 14px;
+  font-size: calc(14px * var(--ts, 1));
 }
 .cap-taunt.is-good {
   background: #e6f4ea;
@@ -265,11 +265,11 @@
   gap: 8px;
   margin-bottom: 14px;
   padding: 10px 18px;
-  border: 1px solid #b9c0c7;
+  border: 1px solid var(--sp-line-strong);
   border-radius: 999px;
-  background: #fff;
-  color: #202124;
-  font-size: 15px;
+  background: var(--sp-card);
+  color: var(--sp-ink);
+  font-size: calc(15px * var(--ts, 1));
   font-weight: 600;
   cursor: pointer;
 }
@@ -281,7 +281,7 @@
   border-radius: 50%;
   background: var(--blue);
   color: #fff;
-  font-size: 11px;
+  font-size: calc(11px * var(--ts, 1));
 }
 
 .cap-loading {
@@ -302,7 +302,7 @@
   place-items: center;
   background: #fce8e6;
   color: #c5221f;
-  font-size: 22px;
+  font-size: calc(22px * var(--ts, 1));
   font-weight: 800;
 }
 .cap-upsell p {
@@ -310,7 +310,7 @@
   color: var(--muted);
 }
 .cap-upsell .cap-upsell-title {
-  font-size: 20px;
+  font-size: calc(20px * var(--ts, 1));
   font-weight: 800;
   color: var(--ink);
 }
@@ -319,12 +319,12 @@
   padding: 14px;
   border-radius: 16px;
   background: linear-gradient(140deg, rgba(28, 209, 238, 0.12), rgba(51, 212, 168, 0.12));
-  font-size: 15px;
+  font-size: calc(15px * var(--ts, 1));
 }
 .cap-upsell-offer span {
   display: block;
   margin-top: 4px;
-  font-size: 30px;
+  font-size: calc(30px * var(--ts, 1));
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--ink);
@@ -337,7 +337,7 @@
   background: linear-gradient(120deg, #1cd1ee, #33d4a8);
   color: #04221f;
   font-family: inherit;
-  font-size: 17px;
+  font-size: calc(17px * var(--ts, 1));
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 12px 24px -12px rgba(28, 209, 238, 0.9);
@@ -349,8 +349,8 @@
   border: 0;
   background: none;
   font-family: inherit;
-  font-size: 13px;
-  color: #8a949e;
+  font-size: calc(13px * var(--ts, 1));
+  color: var(--sp-faint);
   text-decoration: underline;
   cursor: pointer;
 }
@@ -362,11 +362,11 @@
 .cap-zoom {
   width: 44px;
   height: 40px;
-  border: 1px solid #b9c0c7;
+  border: 1px solid var(--sp-line-strong);
   border-radius: 4px;
-  background: #fff;
-  color: #202124;
-  font-size: 20px;
+  background: var(--sp-card);
+  color: var(--sp-ink);
+  font-size: calc(20px * var(--ts, 1));
   font-weight: 700;
   cursor: pointer;
 }

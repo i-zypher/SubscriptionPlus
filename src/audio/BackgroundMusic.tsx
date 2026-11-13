@@ -3,6 +3,13 @@ import { useGameStore } from "../state/gameStore";
 import type { Stage } from "../state/gameStore";
 import { useSettingsStore } from "../state/settingsStore";
 import { showMusicNowPlaying } from "./mediaSession";
+import { captionMusic } from "./captions";
+
+function captionFor(track: string) {
+  return track.endsWith("glitchy.mp3")
+    ? "♪ Hold music, glitching and falling apart ♪"
+    : "♪ Smooth, endless hold music ♪";
+}
 
 function trackFor(stage: Stage): string | null {
   switch (stage) {
@@ -40,12 +47,14 @@ function BackgroundMusic() {
     audio.volume = musicVolume(masterVolume, music);
     if (!useGameStore.getState().musicPaused) {
       showMusicNowPlaying(track);
+      captionMusic(captionFor(track));
       audio.play().catch(() => {});
     }
     audioRef.current = audio;
 
     return () => {
       audio.pause();
+      captionMusic(null);
       audioRef.current = null;
     };
   }, [track]);
@@ -62,8 +71,10 @@ function BackgroundMusic() {
     if (!audio) return;
     if (musicPaused) {
       audio.pause();
+      captionMusic(null);
     } else {
       showMusicNowPlaying(audio.src);
+      captionMusic(captionFor(audio.src));
       audio.play().catch(() => {});
     }
   }, [musicPaused]);

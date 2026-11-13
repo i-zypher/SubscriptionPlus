@@ -12,6 +12,7 @@ import ChatBubble from "./ui/ChatBubble";
 import BradScreen from "./stages/brad/BradScreen";
 import EndingsScreen from "./stages/endings/EndingsScreen";
 import EndScreen from "./stages/end-screen/EndScreen";
+import Captions from "./ui/Captions";
 
 function App() {
   const currentStage = useGameStore((state) => state.currentStage);
@@ -36,6 +37,7 @@ function App() {
       {currentStage === "brad" && <BradScreen />}
       {currentStage === "endings" && <EndingsScreen />}
       {currentStage === "end-screen" && <EndScreen />}
+      <Captions />
     </div>
   );
 }

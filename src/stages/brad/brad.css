@@ -72,7 +72,7 @@
   flex: 1;
   min-width: 0;
   /* 16px or larger stops iOS Safari from zooming in on focus */
-  font-size: 16px;
+  font-size: calc(16px * var(--ts, 1));
 }
 
 /* ---------- 0: Brad. Our app, at its friendliest ---------- */
@@ -80,10 +80,10 @@
   --cyan: #1cd1ee;
   --green: #33d4a8;
   font-family: "Outfit", system-ui, sans-serif;
-  color: #0b0f14;
+  color: var(--sp-ink);
   background:
     radial-gradient(60% 35% at 0% 0%, rgba(28, 209, 238, 0.2), transparent 70%),
-    #f5f9fa;
+    var(--sp-page);
 }
 .brad-p0 .brad-window {
   padding: 12px 16px 16px;
@@ -92,7 +92,7 @@
   padding: 12px 14px;
   margin-bottom: 12px;
   border-radius: 22px;
-  background: #fff;
+  background: var(--sp-card);
   box-shadow: 0 10px 30px -18px rgba(11, 15, 20, 0.4);
 }
 .brad-p0 .brad-avatar {
@@ -119,22 +119,22 @@
   border: 2px solid #fff;
 }
 .brad-p0 .brad-head h2 {
-  color: #0b0f14;
-  font-size: 16px;
+  color: var(--sp-ink);
+  font-size: calc(16px * var(--ts, 1));
   font-weight: 800;
 }
 .brad-p0 .brad-head small {
-  font-size: 12px;
-  color: #5d6874;
+  font-size: calc(12px * var(--ts, 1));
+  color: var(--sp-muted);
 }
 .brad-p0 .brad-meters {
-  font-size: 12px;
+  font-size: calc(12px * var(--ts, 1));
   font-weight: 700;
-  color: #5d6874;
+  color: var(--sp-muted);
 }
 .brad-p0 .brad-meters span:first-child {
-  font-size: 15px;
-  color: #0b0f14;
+  font-size: calc(15px * var(--ts, 1));
+  color: var(--sp-ink);
 }
 .brad-p0 .brad-log {
   padding: 4px 2px 12px;
@@ -142,12 +142,12 @@
 .brad-p0 .bmsg {
   padding: 10px 14px;
   border-radius: 20px;
-  font-size: 16px;
+  font-size: calc(16px * var(--ts, 1));
   line-height: 1.4;
   animation: brad-in 240ms cubic-bezier(0.2, 1.3, 0.4, 1) both;
 }
 .brad-p0 .bmsg.is-brad {
-  background: #fff;
+  background: var(--sp-card);
   border-bottom-left-radius: 6px;
   box-shadow: 0 6px 16px -12px rgba(11, 15, 20, 0.5);
 }
@@ -159,13 +159,13 @@
 .brad-p0 .bmsg.is-system {
   padding: 4px 10px;
   background: none;
-  color: #7c8792;
-  font-size: 13px;
+  color: var(--sp-faint);
+  font-size: calc(13px * var(--ts, 1));
 }
 .brad-p0 .bmsg-name {
   margin-bottom: 2px;
-  font-size: 12px;
-  color: #149aa8;
+  font-size: calc(12px * var(--ts, 1));
+  color: var(--sp-teal-ink);
 }
 .brad-p0 .is-typing span {
   display: inline-flex;
@@ -188,11 +188,11 @@
 .brad-p0 .brad-form {
   padding: 6px;
   border-radius: 999px;
-  background: #fff;
+  background: var(--sp-card);
   box-shadow: 0 10px 30px -16px rgba(11, 15, 20, 0.45);
 }
 .brad-p0 .brad-form input {
-  color: #0b0f14;
+  color: var(--sp-ink);
   padding: 10px 14px;
   border: 0;
   outline: 0;
@@ -206,7 +206,7 @@
   background: linear-gradient(120deg, var(--cyan), var(--green));
   color: #04221f;
   font-family: inherit;
-  font-size: 15px;
+  font-size: calc(15px * var(--ts, 1));
   font-weight: 800;
   cursor: pointer;
 }
@@ -240,16 +240,16 @@
   border-radius: 3px;
 }
 .brad-p1 .brad-head h2 {
-  font-size: 15px;
+  font-size: calc(15px * var(--ts, 1));
   font-weight: 700;
   color: #fff;
 }
 .brad-p1 .brad-head small {
-  font-size: 11px;
+  font-size: calc(11px * var(--ts, 1));
   color: #cfe0ef;
 }
 .brad-p1 .brad-meters {
-  font-size: 12px;
+  font-size: calc(12px * var(--ts, 1));
   color: #cfe0ef;
 }
 .brad-p1 .brad-log {
@@ -261,7 +261,7 @@
 .brad-p1 .bmsg {
   padding: 8px 10px;
   border-radius: 3px;
-  font-size: 15px;
+  font-size: calc(15px * var(--ts, 1));
   line-height: 1.4;
 }
 .brad-p1 .bmsg.is-brad {
@@ -273,11 +273,11 @@
   border: 1px solid #b8cde0;
 }
 .brad-p1 .bmsg.is-system {
-  font-size: 12px;
+  font-size: calc(12px * var(--ts, 1));
   color: #8b8170;
 }
 .brad-p1 .bmsg-name {
-  font-size: 11px;
+  font-size: calc(11px * var(--ts, 1));
   font-weight: 700;
   color: #2d6ca2;
 }
@@ -304,7 +304,7 @@
   background: linear-gradient(#3b80bb, #2d6ca2);
   color: #fff;
   font-family: inherit;
-  font-size: 14px;
+  font-size: calc(14px * var(--ts, 1));
   font-weight: 700;
   cursor: pointer;
 }
@@ -312,7 +312,7 @@
 /* ---------- 2: Senior Specialist. A 2003 corporate portal ---------- */
 .brad-p2 {
   font-family: Tahoma, Verdana, Geneva, sans-serif;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts, 1));
   color: #000;
   background: #8d9db6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='2' height='2' fill='%23818fa6'/%3E%3C/svg%3E");
 }
@@ -329,19 +329,19 @@
   color: #fff;
 }
 .brad-p2 .brad-avatar {
-  font-size: 20px;
+  font-size: calc(20px * var(--ts, 1));
 }
 .brad-p2 .brad-head h2 {
-  font-size: 13px;
+  font-size: calc(13px * var(--ts, 1));
   font-weight: bold;
   color: #fff;
 }
 .brad-p2 .brad-head small {
-  font-size: 11px;
+  font-size: calc(11px * var(--ts, 1));
   color: #d4dcf0;
 }
 .brad-p2 .brad-meters {
-  font-size: 11px;
+  font-size: calc(11px * var(--ts, 1));
 }
 .brad-p2 .brad-log {
   margin: 8px;
@@ -353,7 +353,7 @@
 .brad-p2 .bmsg {
   max-width: 100%;
   align-self: stretch;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts, 1));
   line-height: 1.35;
 }
 .brad-p2 .bmsg-name {
@@ -388,7 +388,7 @@
   border: 2px outset #e0e0e0;
   background: #ece9d8;
   font-family: inherit;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts, 1));
   cursor: pointer;
 }
 .brad-p2 .brad-form button:active {
@@ -398,7 +398,7 @@
 /* ---------- 3: BRAD. No CSS survived. Scripts are dead. ---------- */
 .brad-p3 {
   font-family: "Times New Roman", Times, serif;
-  font-size: 16px;
+  font-size: calc(16px * var(--ts, 1));
   color: #000;
   background: #fff;
 }
@@ -419,7 +419,7 @@
   background: #fff0f0;
   color: #c00;
   font-family: "Courier New", monospace;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts, 1));
   line-height: 1.4;
 }
 .brad-applet {
@@ -433,11 +433,11 @@
   border: 1px solid #999;
   background: #e0e0e0;
   font-family: Arial, sans-serif;
-  font-size: 11px;
+  font-size: calc(11px * var(--ts, 1));
   color: #444;
 }
 .brad-applet span {
-  font-size: 26px;
+  font-size: calc(26px * var(--ts, 1));
   filter: grayscale(1);
 }
 .brad-p3 .brad-head {
@@ -452,13 +452,13 @@
 }
 .brad-p3 .brad-head small {
   font-family: "Courier New", monospace;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts, 1));
 }
 .brad-p3 .brad-meters {
   display: block;
   margin: 4px 0 8px;
   font-family: "Courier New", monospace;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts, 1));
 }
 .brad-p3 .brad-meters span {
   display: block;
@@ -499,7 +499,7 @@
 }
 .brad-p3 .bmsg.is-system {
   font-family: "Courier New", monospace;
-  font-size: 13px;
+  font-size: calc(13px * var(--ts, 1));
   color: #808080;
 }
 .brad-p3 .brad-form {
@@ -511,7 +511,7 @@
 }
 .brad-footer {
   margin-top: 2em;
-  font-size: 12px;
+  font-size: calc(12px * var(--ts, 1));
 }
 .brad-footer a {
   color: #00e;
@@ -564,7 +564,7 @@
   background: none;
   color: inherit;
   font: inherit;
-  font-size: 11px;
+  font-size: calc(11px * var(--ts, 1));
   opacity: 0.5;
   cursor: pointer;
   text-align: left;

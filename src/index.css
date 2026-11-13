@@ -110,8 +110,57 @@ code {
   background: var(--code-bg);
 }
 
-/* The game's screens are designed light. Without this, phones in dark mode
-   paint form inputs with white text on our white backgrounds. */
+/* ---------- Light and dark themes (Settings → Display → Theme) ----------
+   applySettings.ts sets data-theme on <html>. Every screen's colours are these
+   tokens. Things that are deliberately one look (the receipt paper, the
+   pop-up ads, the crash and terminal endings, Brad's retro pages) don't use them. */
+:root,
+:root[data-theme="light"],
+/* One look in both themes: Brad's retro pages, the crash and terminal
+   endings, and the receipt paper */
+:root[data-theme="dark"] :is(.brad-p1, .brad-p2, .brad-p3, .crash, .term, .rcpt) {
+  --sp-page: #f5f9fa;
+  --sp-card: #fff;
+  --sp-soft: #f1f4f6;
+  --sp-ink: #0b0f14;
+  --sp-ink-2: #3d4752;
+  --sp-muted: #5d6874;
+  --sp-faint: #98a2ad;
+  --sp-line: #e3e8ec;
+  --sp-line-strong: #b9c0c7;
+  --sp-teal-ink: #149aa8;
+  --sp-green-ink: #138561;
+  /* Dark badges and pills with white text, in both themes */
+  --sp-pill: #0b0f14;
+  /* CAPTCHA checkbox area stripes */
+  --sp-stripe-a: #f6f7f8;
+  --sp-stripe-b: #f1f3f4;
+}
+:root[data-theme="dark"] {
+  --sp-page: #0b1016;
+  --sp-card: #151c24;
+  --sp-soft: #1d2630;
+  --sp-ink: #eef3f6;
+  --sp-ink-2: #c6cfd8;
+  --sp-muted: #9aa6b2;
+  --sp-faint: #6f7b88;
+  --sp-line: #2a3542;
+  --sp-line-strong: #45525f;
+  --sp-teal-ink: #4fdcef;
+  --sp-green-ink: #4fe0b4;
+  --sp-pill: #2a3644;
+  --sp-stripe-a: #1a222b;
+  --sp-stripe-b: #161d25;
+}
+
+/* The true-cancel win keeps its celebration, dimmed for dark mode */
+:root[data-theme="dark"] .win {
+  background:
+    radial-gradient(70% 50% at 50% 0%, rgba(255, 209, 102, 0.22), transparent 70%),
+    linear-gradient(160deg, #0b4a55, #0b4a3b);
+}
+
+/* Our screens. color-scheme makes form fields match the theme. */
 .intro,
 .aval,
 .home,
@@ -119,13 +168,21 @@ code {
 .desp,
 .set,
 .cap,
-.brad {
+.brad,
+.rcpt-page,
+.over,
+.cplus,
+.win {
   color-scheme: light;
-  /* Keep the starter template's dark-mode colors out of our screens */
-  --text: #0b0f14;
-  --text-h: #0b0f14;
-  --bg: #fff;
-  --border: #e5e4e7;
+  /* Keep the starter template's colours out of our screens */
+  --text: var(--sp-ink);
+  --text-h: var(--sp-ink);
+  --bg: var(--sp-card);
+  --border: var(--sp-line);
+  color: var(--sp-ink);
+}
+:root[data-theme="dark"] :is(.intro, .aval, .home, .chatw, .desp, .set, .cap, .brad-p0, .rcpt-page, .over, .cplus, .win) {
+  color-scheme: dark;
 }
 
 /* iOS/Android apps: every screen is a full-screen layer, so pull each one in
@@ -136,7 +193,7 @@ code {
   --sa-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom));
 }
 .is-app body {
-  background: #f5f9fa;
+  background: var(--sp-page);
 }
 .is-app .intro,
 .is-app .aval,
@@ -166,7 +223,8 @@ code {
   left: 0;
   right: 0;
   z-index: 9999;
-  background: #f5f9fa;
+  /* Copies the background of whatever screen is showing (applySettings.ts) */
+  background: var(--bar-bg, #f5f9fa);
   pointer-events: none;
 }
 .is-app body::before {
@@ -176,4 +234,69 @@ code {
 .is-app body::after {
   bottom: 0;
   height: var(--sa-bottom);
+}
+
+/* ---------- Text Size (Settings → Accessibility) ----------
+   Every font size in the game is "N px × --ts", so this scales all text. */
+:root {
+  --ts: 1;
+}
+:root[data-text="small"] {
+  --ts: 0.9;
+}
+:root[data-text="large"] {
+  --ts: 1.2;
+}
+
+/* ---------- Reduce Motion (the game's setting or the phone's) ----------
+   Animations jump straight to their last frame, nothing loops or slides.
+   Confetti is skipped in fx/confetti.ts. */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 1ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+  transition-delay: 0ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ---------- High Contrast (Settings → Accessibility) ----------
+   Secondary text, borders and accent text get much stronger, faded labels
+   go solid, and keyboard focus gets a thick outline. Works with both themes. */
+:root.high-contrast[data-theme="light"],
+:root.high-contrast:not([data-theme]),
+:root.high-contrast[data-theme="dark"] :is(.brad-p1, .brad-p2, .brad-p3, .crash, .term, .rcpt) {
+  --sp-ink-2: #12181f;
+  --sp-muted: #262e37;
+  --sp-faint: #3b444e;
+  --sp-line: #7a848e;
+  --sp-line-strong: #3b444e;
+  --sp-teal-ink: #05616b;
+  --sp-green-ink: #055c40;
+}
+:root.high-contrast[data-theme="dark"] {
+  --sp-page: #000;
+  --sp-card: #0d1218;
+  --sp-ink: #fff;
+  --sp-ink-2: #f0f4f7;
+  --sp-muted: #dde3e9;
+  --sp-faint: #bcc6cf;
+  --sp-line: #7d8a96;
+  --sp-line-strong: #bcc6cf;
+  --sp-teal-ink: #8aeefa;
+  --sp-green-ink: #8af0d2;
+}
+.high-contrast .home-chip small,
+.high-contrast .bmsg-report {
+  opacity: 1;
+}
+/* Receipt paper greys */
+.high-contrast .rcpt :is(.rcpt-meta dt, .rcpt-album, .rcpt-fine, .rcpt-head p) {
+  color: #1f1f1f;
+}
+.high-contrast :focus-visible {
+  outline: 3px solid #1cd1ee !important;
+  outline-offset: 2px !important;
 }

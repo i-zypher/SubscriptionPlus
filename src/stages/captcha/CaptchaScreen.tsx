@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import type { ComponentType, FormEvent } from "react";
 import { useGameStore } from "../../state/gameStore";
 import { useSettingsStore } from "../../state/settingsStore";
+import { captionClip, CLIP_LYRIC } from "../../audio/captions";
 import { captchaSrc } from "../../audio/jingleVersions";
 import {
   playSuccessTone,
@@ -229,6 +230,7 @@ function AudioCaptcha({ onPass }: CaptchaProps) {
     const audio = new Audio(captchaSrc(jingleVersion));
     audio.volume = (masterVolume / 100) * (music / 100);
     audio.play().catch((err) => console.error("CAPTCHA audio failed:", err));
+    captionClip(CLIP_LYRIC, 6500);
     audioRef.current = audio;
   }
 
