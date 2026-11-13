@@ -493,9 +493,11 @@ function BradScreen() {
             type="text"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            // readOnly, not disabled: iOS Safari leaves a focused input that gets
-            // disabled unresponsive. handleSubmit already ignores sends while busy.
-            readOnly={busy}
+            // Always typable: on iPhones a disabled or read-only input that you
+            // tap never opens the keyboard, even after it's editable again.
+            // You can type ahead while Brad types; only sending waits
+            // (the Send button and handleSubmit both check busy).
+            enterKeyHint="send"
             aria-label="Message Brad"
             placeholder={
               onHold
