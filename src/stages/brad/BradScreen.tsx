@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import { useGameStore } from "../../state/gameStore";
 import type { Ending } from "../../state/gameStore";
 import { bradPhases } from "./bradPhases";
-import { detectIntent, pickLine, pickReply } from "./bradLogic";
+import { detectIntent, mentionsIntent, pickLine, pickReply } from "./bradLogic";
 import { playJingle, pauseJingle } from "../../audio/jinglePlayer";
 import { playMoneyAddedTone } from "../../audio/sounds";
 import { FEATURE_FEE } from "./bradScript";
@@ -178,32 +178,35 @@ function BradScreen() {
     });
     startHoldMusic();
 
-    later(async () => {
-      stopHoldMusic();
-      const nextIndex = Math.min(phaseIndex + 1, LAST_PHASE);
-      const next = bradPhases[nextIndex];
-      nextTransfer();
-      setBotAsks(0);
-      setInsults(0);
-      setCancels(0);
-      setPitchOpen(false);
-      setOffer(null);
-      addMessage({
-        from: "system",
-        text: `🔄 You've been transferred to ${next.name}.`,
-      });
-      setTyping(true);
-      const ai = await aiLine(nextIndex, "greeting", next.typingMs);
-      if (!alive.current) return;
-      setTyping(false);
-      addMessage({
-        from: "brad",
-        name: next.name,
-        text: ai?.reply ?? pickLine(next.greetings),
-      });
-      setOffer(ai?.offer ?? null);
-      setOnHold(false);
-    }, HOLD_MS[Math.min(phaseIndex, HOLD_MS.length - 1)]);
+    later(
+      async () => {
+        stopHoldMusic();
+        const nextIndex = Math.min(phaseIndex + 1, LAST_PHASE);
+        const next = bradPhases[nextIndex];
+        nextTransfer();
+        setBotAsks(0);
+        setInsults(0);
+        setCancels(0);
+        setPitchOpen(false);
+        setOffer(null);
+        addMessage({
+          from: "system",
+          text: `🔄 You've been transferred to ${next.name}.`,
+        });
+        setTyping(true);
+        const ai = await aiLine(nextIndex, "greeting", next.typingMs);
+        if (!alive.current) return;
+        setTyping(false);
+        addMessage({
+          from: "brad",
+          name: next.name,
+          text: ai?.reply ?? pickLine(next.greetings),
+        });
+        setOffer(ai?.offer ?? null);
+        setOnHold(false);
+      },
+      HOLD_MS[Math.min(phaseIndex, HOLD_MS.length - 1)],
+    );
   }
 
   async function respond(message: string) {
@@ -215,7 +218,15 @@ function BradScreen() {
       return;
     }
 
-    const intent = detectIntent(message);
+    const detected = detectIntent(message);
+    // A cursed cancel ("cancel this shit") is both: the surcharge still hits,
+    // but from the second Brad up it also counts as a cancel. The first Brad
+    // can't cancel anything, so for him it's just an insult.
+    const cursedCancel =
+      detected === "insult" &&
+      phaseIndex > 0 &&
+      mentionsIntent(message, "cancel");
+    const intent = cursedCancel ? "cancel" : detected;
     const pitchWasOpen = pitchOpen;
     const offerWasOpen = offer;
     setPitchOpen(false);
@@ -223,9 +234,17 @@ function BradScreen() {
 
     // Saying yes to one of Brad's made-up plans really buys it
     if (intent === "yes" && !pitchWasOpen && offerWasOpen) {
-      charge(offerWasOpen.price, `${offerWasOpen.name} (upsold by ${phase.name})`);
+      charge(
+        offerWasOpen.price,
+        `${offerWasOpen.name} (upsold by ${phase.name})`,
+      );
       setTyping(true);
-      const ai = await aiLine(phaseIndex, "accepted", phase.typingMs, offerWasOpen);
+      const ai = await aiLine(
+        phaseIndex,
+        "accepted",
+        phase.typingMs,
+        offerWasOpen,
+      );
       if (!alive.current) return;
       setTyping(false);
       const price = `$${offerWasOpen.price.toFixed(2)}/mo`;
@@ -240,7 +259,7 @@ function BradScreen() {
 
     // The surcharge hits instantly; Brad's reply takes its time
     let insultsNow = insults;
-    if (intent === "insult") {
+    if (intent === "insult" || cursedCancel) {
       charge(phase.surcharge, `Insult surcharge from ${phase.name}`);
       insultsNow = insults + 1;
       setInsults(insultsNow);
@@ -262,8 +281,11 @@ function BradScreen() {
       (intent === "transfer" && phaseIndex === LAST_PHASE) ||
       (intent === "cancel" && atBrad && cancelCount >= CANCELS_TO_WIN - 1);
 
-    const aiIntent: AiIntent = intent === "yes" || intent === "iAmBot" ? "other" : intent;
-    const ai = scripted ? (await wait(phase.typingMs), null) : await aiLine(phaseIndex, aiIntent, phase.typingMs);
+    const aiIntent: AiIntent =
+      intent === "yes" || intent === "iAmBot" ? "other" : intent;
+    const ai = scripted
+      ? (await wait(phase.typingMs), null)
+      : await aiLine(phaseIndex, aiIntent, phase.typingMs);
     if (!alive.current) return;
     setTyping(false);
 
@@ -330,12 +352,14 @@ function BradScreen() {
     if (ai) {
       bradSays(ai.reply);
       setOffer(ai.offer);
-      if (ai.charge) charge(FEATURE_FEE, `Plus+ feature fee from ${phase.name}`);
+      if (ai.charge)
+        charge(FEATURE_FEE, `Plus+ feature fee from ${phase.name}`);
     } else {
       const lite = liteReply(phaseIndex, message);
       bradSays(lite.text);
       setOffer(lite.offer);
-      if (lite.charge > 0) charge(lite.charge, `Plus+ feature fee from ${phase.name}`);
+      if (lite.charge > 0)
+        charge(lite.charge, `Plus+ feature fee from ${phase.name}`);
     }
   }
 
@@ -381,7 +405,9 @@ function BradScreen() {
           )}
           <div className="brad-who">
             <h2>
-              {brokenPage ? "Live Support - [object Object]" : `Live Support · ${phase.name}`}
+              {brokenPage
+                ? "Live Support - [object Object]"
+                : `Live Support · ${phase.name}`}
             </h2>
             <small>
               {brokenPage
@@ -394,15 +420,23 @@ function BradScreen() {
             </small>
           </div>
           <div className="brad-meters">
-            <span>{brokenPage ? `TOTAL=${meters.total}` : `${meters.total}/mo`}</span>
-            <span>{brokenPage ? `trial.remaining=${meters.time}` : `Trial ${meters.time}`}</span>
+            <span>
+              {brokenPage ? `TOTAL=${meters.total}` : `${meters.total}/mo`}
+            </span>
+            <span>
+              {brokenPage
+                ? `trial.remaining=${meters.time}`
+                : `Trial ${meters.time}`}
+            </span>
           </div>
         </header>
 
         <div ref={chatRef} className="brad-log">
           {messages.map((m, i) => (
             <div key={i} className={`bmsg is-${m.from}`}>
-              {m.from === "brad" && <strong className="bmsg-name">{m.name ?? "Brad"}</strong>}
+              {m.from === "brad" && (
+                <strong className="bmsg-name">{m.name ?? "Brad"}</strong>
+              )}
               <span>{m.text}</span>
             </div>
           ))}
@@ -410,7 +444,15 @@ function BradScreen() {
             <div className="bmsg is-brad is-typing">
               <strong className="bmsg-name">{phase.name}</strong>
               <span>
-                {brokenPage ? "BRAD is typing... NaN%" : <><i /><i /><i /></>}
+                {brokenPage ? (
+                  "BRAD is typing... NaN%"
+                ) : (
+                  <>
+                    <i />
+                    <i />
+                    <i />
+                  </>
+                )}
               </span>
             </div>
           )}
@@ -426,7 +468,13 @@ function BradScreen() {
             // disabled unresponsive. handleSubmit already ignores sends while busy.
             readOnly={busy}
             aria-label="Message Brad"
-            placeholder={onHold ? "You're on hold…" : brokenPage ? "undefined" : "Type a message…"}
+            placeholder={
+              onHold
+                ? "You're on hold…"
+                : brokenPage
+                  ? "undefined"
+                  : "Type a message…"
+            }
           />
           <button type="submit" disabled={busy}>
             {brokenPage ? "Submit Query" : "Send"}
@@ -435,11 +483,16 @@ function BradScreen() {
 
         {brokenPage && (
           <p className="brad-footer">
-            Best viewed in Netscape Navigator 4.0 at 800x600. © 1998 Subscription Plus.
+            Best viewed in Netscape Navigator 4.0 at 800x600. © 1998
+            Subscription Plus.
             <br />
-            <a href="#top" onClick={(e) => e.preventDefault()}>Return to homepage</a>
+            <a href="#top" onClick={(e) => e.preventDefault()}>
+              Return to homepage
+            </a>
             {" | "}
-            <a href="#top" onClick={(e) => e.preventDefault()}>Sign our guestbook</a>
+            <a href="#top" onClick={(e) => e.preventDefault()}>
+              Sign our guestbook
+            </a>
           </p>
         )}
       </div>

@@ -22,6 +22,13 @@ function mentions(text: string, keyword: string) {
   return new RegExp(`\\b${escapeRegex(keyword)}\\b`).test(text)
 }
 
+// Does the message contain any of this intent's words? (Used when a message
+// is two things at once, like "cancel this shit".)
+export function mentionsIntent(message: string, intent: Exclude<Intent, "other">) {
+  const text = message.toLowerCase().replace(/’/g, "'")
+  return intentKeywords[intent].some((keyword) => mentions(text, keyword))
+}
+
 export function detectIntent(message: string): Intent {
   const text = message.toLowerCase().replace(/’/g, "'")
   for (const intent of intentOrder) {
