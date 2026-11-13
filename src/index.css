@@ -157,3 +157,23 @@ code {
 .is-app .desp {
   bottom: calc(16px + var(--sa-bottom));
 }
+/* Solid strips behind the status bar and home bar, so the game's hidden
+   layers underneath never show through the gaps */
+.is-app body::before,
+.is-app body::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: #f5f9fa;
+  pointer-events: none;
+}
+.is-app body::before {
+  top: 0;
+  height: var(--sa-top);
+}
+.is-app body::after {
+  bottom: 0;
+  height: var(--sa-bottom);
+}
