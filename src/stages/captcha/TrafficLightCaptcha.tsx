@@ -25,6 +25,12 @@ const FILLER: Photo[] = [
   { file: "filler/marble-bust", label: "Marble bust" },
   { file: "filler/leaf-pile", label: "Jumping into a leaf pile" },
   { file: "filler/purple-bird", label: "Purple bird" },
+  { file: "filler/library", label: "Library" },
+  { file: "filler/grandma-reading", label: "Grandma reading a storybook" },
+  { file: "filler/spaghetti", label: "Plate of spaghetti" },
+  { file: "filler/cereal", label: "Breakfast cereal" },
+  { file: "filler/pirate-flag", label: "Pirate flag" },
+  { file: "filler/teapot", label: "Teapot" },
 ];
 
 // Files live in public/captcha-tiles/<folder>/<name>.jpg. Each set mixes the
@@ -51,6 +57,7 @@ const PHOTO_SETS: PhotoSet[] = [
       ...FILLER,
       { file: "filler/old-map", label: "Old city map" },
       { file: "filler/city-skyline", label: "City skyline" },
+      { file: "filler/eagle-capitol", label: "Eagle over Washington" },
       // Two bikes parked far in the background. Does that count? Either way.
       { file: "bicycles/city-street-1", label: "Street with parked cars", either: true },
     ],
@@ -79,6 +86,8 @@ const PHOTO_SETS: PhotoSet[] = [
       // Parks drawn on a map, and a little green park in the skyline: either way
       { file: "filler/old-map", label: "Old city map", either: true },
       { file: "filler/city-skyline", label: "City skyline", either: true },
+      // Lawns and the National Mall below the eagle
+      { file: "filler/eagle-capitol", label: "Eagle over Washington", either: true },
     ],
   },
   {
@@ -101,6 +110,7 @@ const PHOTO_SETS: PhotoSet[] = [
       { file: "bicycles/tandem-bike", label: "Tandem bicycle in a park" },
       ...FILLER,
       { file: "filler/old-map", label: "Old city map" },
+      { file: "filler/eagle-capitol", label: "Eagle over Washington" },
       // Too far away to tell if there are traffic lights down there
       { file: "filler/city-skyline", label: "City skyline", either: true },
       // Traffic lights far down the street behind the stop sign
