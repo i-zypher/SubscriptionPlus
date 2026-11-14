@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useGameStore } from "../state/gameStore";
 import "../stages/home/home.css";
 
-const QUEUE_WAIT_MS = 3 * 60 * 1000;
+const QUEUE_WAIT_MS = 90 * 1000;
 const QUEUE_TICK_MS = 35 * 1000;
 
 function randomQueuePosition() {
@@ -16,7 +16,7 @@ function ChatBubble() {
   const [queuePosition, setQueuePosition] = useState(randomQueuePosition);
 
   // While the panel is open: shuffle the queue number every few seconds,
-  // and send them to the CAPTCHAs after 3 minutes. Closing the panel
+  // and send them to the CAPTCHAs after 90 seconds. Closing the panel
   // (or leaving Home) cancels this, so they lose their spot.
   useEffect(() => {
     if (!open) return;
