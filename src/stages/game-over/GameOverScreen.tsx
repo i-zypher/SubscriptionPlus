@@ -10,6 +10,7 @@ import { useSettingsStore } from "../../state/settingsStore";
 import "./game-over.css";
 import { captionClip, CLIP_LYRIC } from "../../audio/captions";
 import { isApp } from "../../platform";
+import { TIP_STRIPE_URL, TIP_CASHAPP_URL } from "../../links";
 
 function GameOverScreen() {
   const monthlyTotal = useGameStore((state) => state.monthlyTotal);
@@ -65,6 +66,25 @@ function GameOverScreen() {
         <button className="over-cta" onClick={resetGame}>
           Play Again
         </button>
+
+        {/* The one real charge in the game, so it says so. Web only: the
+            app stores don't allow outside payment links. */}
+        {!isApp && (
+          <div className="over-tip">
+            <p>
+              <strong>This one's real:</strong> enjoyed it? Tip the developer.
+            </p>
+            <div className="over-tip-links">
+              <a href={TIP_STRIPE_URL} target="_blank" rel="noopener noreferrer">
+                Card, Apple Pay or Google Pay
+              </a>
+              <a href={TIP_CASHAPP_URL} target="_blank" rel="noopener noreferrer">
+                Cash App $CeymerStudios
+              </a>
+            </div>
+            <small>Optional, one time, no auto-renew. Seriously.</small>
+          </div>
+        )}
       </main>
     </div>
   );

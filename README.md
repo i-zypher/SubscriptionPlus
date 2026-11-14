@@ -8,7 +8,7 @@ A parody game about the subscription you can't cancel. You get a 10-minute free 
 
 ![Seven screens from the game: the free trial, the upgrade avalanche, pop-up ads, a CAPTCHA, Brad's chat, the broken 1998 BRAD page, and the receipt](docs/images/screens.png)
 
-> No real money is ever charged. Every price, plan and card number in the game is fake.
+> No real money is ever charged in the game. Every price, plan and card number is fake. The only real payment is an optional, clearly labeled tip link on the website's end screen (Stripe or Cash App), left out of the apps per store rules.
 
 ## What's in the game
 

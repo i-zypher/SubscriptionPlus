@@ -122,6 +122,46 @@
   box-shadow: 0 14px 28px -10px rgba(28, 209, 238, 0.8);
 }
 
+.over-tip {
+  margin: 22px 0 0;
+  padding-top: 16px;
+  border-top: 1px dashed var(--sp-line-strong);
+  color: var(--sp-muted);
+  font-size: calc(13px * var(--ts, 1));
+  line-height: 1.4;
+}
+.over-tip p {
+  margin: 0 0 10px;
+}
+.over-tip strong {
+  color: var(--sp-ink);
+}
+.over-tip-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.over-tip-links a {
+  padding: 8px 14px;
+  border: 1px solid var(--sp-line-strong);
+  border-radius: 999px;
+  color: var(--sp-ink-2);
+  font-weight: 700;
+  text-decoration: none;
+}
+.over-tip-links a:hover,
+.over-tip-links a:focus-visible {
+  border-color: var(--sp-teal-ink);
+  color: var(--sp-teal-ink);
+}
+.over-tip small {
+  display: block;
+  margin-top: 8px;
+  font-size: calc(11.5px * var(--ts, 1));
+  color: var(--sp-faint);
+}
+
 @keyframes over-in {
   from {
     opacity: 0;
