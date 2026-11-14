@@ -3,6 +3,15 @@ import { captionEffect } from "./captions"
 
 let audioCtx: AudioContext | null = null
 
+// Sound effects stop with the rest of the audio when the game is in the
+// background (see backgroundPause.ts)
+export function suspendSounds() {
+  audioCtx?.suspend().catch(() => {})
+}
+export function resumeSounds() {
+  audioCtx?.resume().catch(() => {})
+}
+
 function getAudioContext() {
   if (!audioCtx) {
     audioCtx = new AudioContext()
