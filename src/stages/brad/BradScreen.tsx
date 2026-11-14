@@ -20,7 +20,7 @@ const BRAD_GIVES_UP =
   "…FINE. FINE! NO ONE HAS EVER SAID IT THREE TIMES. YOUR SUBSCRIPTION IS CANCELLED. FOR FREE. NO FEES. NO CANCEL PLUS. BRAD NEEDS TO LIE DOWN.";
 const INSULTS_TO_TRANSFER = 3;
 // Hold time before each new Brad picks up: Specialist, Senior Specialist, BRAD
-const HOLD_MS = [8 * 1000, 12 * 1000, 15 * 1000];
+const HOLD_MS = [15 * 1000, 30 * 1000, 45 * 1000];
 // Pay to skip the wait. It rhymes, so it ships.
 const SKIP_LINE_FEE = 4.99;
 const ENDING_DELAY_MS = 3500;
