@@ -10,11 +10,12 @@ import { useSettingsStore } from "../../state/settingsStore";
 import "./game-over.css";
 import { captionClip, CLIP_LYRIC } from "../../audio/captions";
 import { isApp } from "../../platform";
-import { TIP_STRIPE_URL, TIP_CASHAPP_URL } from "../../links";
 
 function GameOverScreen() {
   const monthlyTotal = useGameStore((state) => state.monthlyTotal);
   const resetGame = useGameStore((state) => state.resetGame);
+  const goToStage = useGameStore((state) => state.goToStage);
+  const chargeCount = useGameStore((state) => state.receipts.length);
   const jingleVersion = useGameStore((state) => state.jingleVersion);
   const jingle = jingleVersions.find((v) => v.id === jingleVersion);
 
@@ -28,20 +29,27 @@ function GameOverScreen() {
     return () => audio.pause();
   }, [jingleVersion]);
 
-  // You lost, so the app is delighted: a cheerful payment confirmation
+  // The trial ran out. You lost, and it should feel like it.
   return (
     <div className="over">
-      <main className="over-card">
-        <div className="over-check" aria-hidden="true">
-          ✓
+      <main className="over-card" aria-labelledby="over-title">
+        <div className="over-x" aria-hidden="true">
+          ✕
         </div>
-        <p className="over-kicker">Payment successful</p>
-        <h1>Your free trial has ended.</h1>
+        <p className="over-kicker">Trial expired · 0:00</p>
+        <h1 id="over-title">You lose.</h1>
+        <p className="over-sub">
+          The clock ran out before you could cancel. You are now a paying
+          member of Subscription Plus. Forever.
+        </p>
 
         <div className="over-charge">
-          <small>Charged to card •••• 6767</small>
+          <small>Auto-renewed · Card •••• 6767</small>
           <strong>${monthlyTotal.toFixed(2)}</strong>
-          <span>Thank you for your loyalty. 💳</span>
+          <span>
+            {chargeCount} {chargeCount === 1 ? "charge" : "charges"} · Billed
+            monthly · No refunds
+          </span>
         </div>
 
         {jingle && (
@@ -63,28 +71,12 @@ function GameOverScreen() {
           </div>
         )}
 
-        <button className="over-cta" onClick={resetGame}>
-          Play Again
+        <button className="over-cta" onClick={() => goToStage("end-screen")}>
+          See my receipt
         </button>
-
-        {/* The one real charge in the game, so it says so. Web only: the
-            app stores don't allow outside payment links. */}
-        {!isApp && (
-          <div className="over-tip">
-            <p>
-              <strong>This one's real:</strong> enjoyed it? Tip the developer.
-            </p>
-            <div className="over-tip-links">
-              <a href={TIP_STRIPE_URL} target="_blank" rel="noopener noreferrer">
-                Card, Apple Pay or Google Pay
-              </a>
-              <a href={TIP_CASHAPP_URL} target="_blank" rel="noopener noreferrer">
-                Cash App $CeymerStudios
-              </a>
-            </div>
-            <small>Optional, one time, no auto-renew. Seriously.</small>
-          </div>
-        )}
+        <button className="over-retry" onClick={resetGame}>
+          Try again
+        </button>
       </main>
     </div>
   );

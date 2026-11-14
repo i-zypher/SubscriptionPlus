@@ -1,6 +1,7 @@
-/* Trial ran out: you lost, and the app has never been happier */
+/* Trial ran out: you lost, and it should feel like it */
 
 .over {
+  --over-red: #c5221f;
   position: fixed;
   inset: 0;
   z-index: 10;
@@ -12,9 +13,12 @@
   font-family: "Outfit", system-ui, sans-serif;
   color: var(--sp-ink);
   background:
-    radial-gradient(60% 45% at 85% 0%, rgba(51, 212, 168, 0.3), transparent 70%),
-    radial-gradient(55% 40% at 0% 100%, rgba(28, 209, 238, 0.25), transparent 70%),
+    radial-gradient(70% 50% at 50% 0%, rgba(217, 48, 37, 0.22), transparent 70%),
+    radial-gradient(60% 40% at 50% 100%, rgba(11, 15, 20, 0.18), transparent 70%),
     var(--sp-page);
+}
+:root[data-theme="dark"] .over {
+  --over-red: #ff8a80;
 }
 .over-card {
   width: 100%;
@@ -25,21 +29,23 @@
   background: var(--sp-card);
   text-align: center;
   box-shadow: 0 24px 60px -18px rgba(11, 15, 20, 0.3);
-  animation: over-in 500ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  animation:
+    over-in 450ms ease-out both,
+    over-shake 420ms ease-in-out 700ms both;
 }
-.over-check {
+.over-x {
   display: grid;
   place-items: center;
   width: 76px;
   height: 76px;
   margin: 0 auto;
   border-radius: 50%;
-  background: linear-gradient(140deg, #1cd1ee, #33d4a8);
+  background: #d93025;
   color: #fff;
-  font-size: calc(40px * var(--ts, 1));
+  font-size: calc(38px * var(--ts, 1));
   font-weight: 800;
-  box-shadow: 0 12px 26px -10px rgba(51, 212, 168, 0.9);
-  animation: over-pop 500ms cubic-bezier(0.2, 1.8, 0.4, 1) 250ms both;
+  box-shadow: 0 12px 26px -10px rgba(217, 48, 37, 0.8);
+  animation: over-drop 520ms cubic-bezier(0.3, 1.5, 0.5, 1) 200ms both;
 }
 .over-kicker {
   margin: 16px 0 6px;
@@ -47,21 +53,29 @@
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--sp-green-ink);
+  color: var(--over-red);
 }
 .over h1 {
-  margin: 0 0 20px;
-  font-size: calc(30px * var(--ts, 1));
+  margin: 0 0 8px;
+  font-size: calc(42px * var(--ts, 1));
   line-height: 1.1;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: var(--sp-ink);
 }
+.over-sub {
+  margin: 0 0 20px;
+  font-size: calc(15px * var(--ts, 1));
+  line-height: 1.45;
+  color: var(--sp-muted);
+}
 .over-charge {
+  position: relative;
+  overflow: hidden;
   padding: 18px 16px;
   margin-bottom: 16px;
   border-radius: 22px;
-  background: linear-gradient(140deg, rgba(28, 209, 238, 0.14), rgba(51, 212, 168, 0.14));
+  background: rgba(217, 48, 37, 0.1);
 }
 .over-charge small {
   display: block;
@@ -69,7 +83,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--sp-teal-ink);
+  color: var(--over-red);
 }
 .over-charge strong {
   display: block;
@@ -122,44 +136,19 @@
   box-shadow: 0 14px 28px -10px rgba(28, 209, 238, 0.8);
 }
 
-.over-tip {
-  margin: 22px 0 0;
-  padding-top: 16px;
-  border-top: 1px dashed var(--sp-line-strong);
+.over-retry {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  border: 0;
+  background: none;
   color: var(--sp-muted);
-  font-size: calc(13px * var(--ts, 1));
-  line-height: 1.4;
-}
-.over-tip p {
-  margin: 0 0 10px;
-}
-.over-tip strong {
-  color: var(--sp-ink);
-}
-.over-tip-links {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-}
-.over-tip-links a {
-  padding: 8px 14px;
-  border: 1px solid var(--sp-line-strong);
-  border-radius: 999px;
-  color: var(--sp-ink-2);
+  font-family: inherit;
+  font-size: calc(15px * var(--ts, 1));
   font-weight: 700;
-  text-decoration: none;
-}
-.over-tip-links a:hover,
-.over-tip-links a:focus-visible {
-  border-color: var(--sp-teal-ink);
-  color: var(--sp-teal-ink);
-}
-.over-tip small {
-  display: block;
-  margin-top: 8px;
-  font-size: calc(11.5px * var(--ts, 1));
-  color: var(--sp-faint);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 
 @keyframes over-in {
@@ -168,14 +157,25 @@
     transform: translateY(24px) scale(0.96);
   }
 }
-@keyframes over-pop {
+@keyframes over-drop {
   from {
-    transform: scale(0);
+    opacity: 0;
+    transform: translateY(-40px) scale(0.6);
+  }
+}
+@keyframes over-shake {
+  20%,
+  60% {
+    transform: translateX(-8px);
+  }
+  40%,
+  80% {
+    transform: translateX(8px);
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .over-card,
-  .over-check {
+  .over-x {
     animation: none;
   }
 }

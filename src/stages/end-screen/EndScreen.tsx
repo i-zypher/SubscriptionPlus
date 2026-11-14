@@ -6,6 +6,7 @@ import { toBlob } from "html-to-image";
 import { Share } from "@capacitor/share";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { isApp } from "../../platform";
+import { TIP_STRIPE_URL, TIP_CASHAPP_URL } from "../../links";
 import "./receipt.css";
 
 // Receipt lines are saved as "Name (details) ($4.99)"
@@ -40,6 +41,7 @@ const endingLabels: Record<Ending, string> = {
   "player-is-bot": "Accepted I'm a Bot 🤖",
   "cancel-plus": "Subscribed to Cancel Plus 💳",
   "true-cancel": "Actually Cancelled 🏆",
+  "timed-out": "Ran Out the Clock ⏰",
 };
 // Replace with the real link once the game is hosted
 const GAME_URL = "https://subscriptionplusgame.com";
@@ -59,7 +61,9 @@ function EndScreen() {
   const [copied, setCopied] = useState(false);
 
   const shareText = [
-    "I escaped Subscription Plus 💳",
+    ending === "timed-out"
+      ? "I lost to Subscription Plus 💳"
+      : "I escaped Subscription Plus 💳",
     `Final monthly total: $${monthlyTotal.toFixed(2)} (${
       receipts.length
     } charges)`,
@@ -198,6 +202,7 @@ function EndScreen() {
   const subtotal = items.reduce((sum, item) => sum + (item.amount ?? 0), 0);
   const adjustment = monthlyTotal - subtotal;
   const cancelled = ending === "true-cancel";
+  const timedOut = ending === "timed-out";
   const orderNumber = (runId || "000000")
     .replace(/[^a-z0-9]/gi, "")
     .slice(0, 8)
@@ -275,6 +280,9 @@ function EndScreen() {
             </p>
 
             {cancelled && <div className="rcpt-stamp">CANCELLED</div>}
+            {timedOut && (
+              <div className="rcpt-stamp is-renewed">AUTO-RENEWED</div>
+            )}
 
             <div className="rcpt-rule" />
 
@@ -336,6 +344,25 @@ function EndScreen() {
             Start a New Free Trial
           </button>
         </div>
+
+        {/* The one real charge in the game, so it says so. Web only: the
+            app stores don't allow outside payment links. */}
+        {!isApp && (
+          <div className="rcpt-tip">
+            <p>
+              <strong>This one's real:</strong> enjoyed it? Tip the developer.
+            </p>
+            <div className="rcpt-tip-links">
+              <a href={TIP_STRIPE_URL} target="_blank" rel="noopener noreferrer">
+                Card, Apple Pay or Google Pay
+              </a>
+              <a href={TIP_CASHAPP_URL} target="_blank" rel="noopener noreferrer">
+                Cash App $CeymerStudios
+              </a>
+            </div>
+            <small>Optional, one time, no auto-renew. Seriously.</small>
+          </div>
+        )}
       </div>
     </div>
   );

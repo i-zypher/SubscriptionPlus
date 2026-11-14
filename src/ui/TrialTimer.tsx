@@ -4,6 +4,7 @@ import { useGameStore } from "../state/gameStore"
 function TrialTimer() {
   const trialEndsAt = useGameStore((state) => state.trialEndsAt)
   const goToStage = useGameStore((state) => state.goToStage)
+  const setEnding = useGameStore((state) => state.setEnding)
   const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
@@ -16,9 +17,11 @@ function TrialTimer() {
 
   useEffect(() => {
     if (trialEndsAt !== null && now >= trialEndsAt) {
+      // Running out the clock is an ending too: it gets a receipt
+      setEnding("timed-out")
       goToStage("game-over")
     }
-  }, [now, trialEndsAt, goToStage])
+  }, [now, trialEndsAt, goToStage, setEnding])
 
   if (trialEndsAt === null) return null
 

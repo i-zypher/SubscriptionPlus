@@ -162,6 +162,10 @@
   transform: translate(-50%, -50%) rotate(-14deg);
   animation: rcpt-stamp 500ms cubic-bezier(0.2, 1.6, 0.4, 1) 1.3s both;
 }
+.rcpt-stamp.is-renewed {
+  font-size: calc(28px * var(--ts, 1));
+  white-space: nowrap;
+}
 
 .rcpt-actions {
   display: grid;
@@ -191,6 +195,49 @@
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 6px 16px -10px rgba(11, 15, 20, 0.5);
+}
+
+/* Real tips, below the game's own buttons (web only) */
+.rcpt-tip {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--sp-line-strong);
+  text-align: center;
+  color: var(--sp-muted);
+  font-size: calc(13px * var(--ts, 1));
+  line-height: 1.4;
+}
+.rcpt-tip p {
+  margin: 0 0 10px;
+}
+.rcpt-tip strong {
+  color: var(--sp-ink);
+}
+.rcpt-tip-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.rcpt-tip-links a {
+  padding: 8px 14px;
+  border: 1px solid var(--sp-line-strong);
+  border-radius: 999px;
+  background: var(--sp-card);
+  color: var(--sp-ink-2);
+  font-weight: 700;
+  text-decoration: none;
+}
+.rcpt-tip-links a:hover,
+.rcpt-tip-links a:focus-visible {
+  border-color: var(--sp-teal-ink);
+  color: var(--sp-teal-ink);
+}
+.rcpt-tip small {
+  display: block;
+  margin-top: 8px;
+  font-size: calc(11.5px * var(--ts, 1));
+  color: var(--sp-faint);
 }
 
 @keyframes rcpt-print {

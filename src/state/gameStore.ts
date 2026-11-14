@@ -25,7 +25,12 @@ export type Stage =
   | "end-screen"
   | "game-over";
 
-export type Ending = "brad-admits-bot" | "player-is-bot" | "cancel-plus" | "true-cancel";
+export type Ending =
+  | "brad-admits-bot"
+  | "player-is-bot"
+  | "cancel-plus"
+  | "true-cancel"
+  | "timed-out";
 
 export type Message = {
   from: "brad" | "player" | "system";
