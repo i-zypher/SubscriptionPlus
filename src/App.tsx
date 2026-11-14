@@ -14,9 +14,16 @@ import EndingsScreen from "./stages/endings/EndingsScreen";
 import EndScreen from "./stages/end-screen/EndScreen";
 import Captions from "./ui/Captions";
 import NotifyPrompt from "./ui/NotifyPrompt";
+import StartGate from "./stages/start/StartGate";
+import { useState } from "react";
 
 function App() {
   const currentStage = useGameStore((state) => state.currentStage);
+  // Plain-words disclaimer first, once per visit (replays skip it). Nothing
+  // else mounts until then, so no music starts behind it either.
+  const [readyToPlay, setReadyToPlay] = useState(false);
+
+  if (!readyToPlay) return <StartGate onPlay={() => setReadyToPlay(true)} />;
 
   return (
     <div>

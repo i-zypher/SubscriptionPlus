@@ -1,0 +1,100 @@
+/* The disclaimer before the game: calm and plain on purpose, so it reads
+   as the real thing and not part of the parody */
+
+.start {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: calc(32px + var(--sa-top, 0px)) 16px calc(40px + var(--sa-bottom, 0px));
+  background: var(--sp-page);
+  color: var(--sp-ink);
+  font-family: "Outfit", system-ui, sans-serif;
+}
+
+.start-card {
+  width: 100%;
+  max-width: 420px;
+  margin: auto 0;
+  padding: 28px 24px 22px;
+  border: 1px solid var(--sp-line);
+  border-radius: 28px;
+  background: var(--sp-card);
+  text-align: center;
+}
+
+.start-logo {
+  width: 44px;
+  height: 44px;
+}
+
+.start h1 {
+  margin: 12px 0 10px;
+  font-size: calc(28px * var(--ts, 1));
+  letter-spacing: -0.02em;
+}
+
+.start-lede {
+  margin: 0 0 18px;
+  color: var(--sp-muted);
+  font-size: calc(15.5px * var(--ts, 1));
+  line-height: 1.5;
+}
+.start-lede strong {
+  color: var(--sp-ink);
+}
+
+.start-list {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+.start-list li {
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--sp-soft);
+  color: var(--sp-muted);
+  font-size: calc(14px * var(--ts, 1));
+  line-height: 1.45;
+}
+.start-list li > span {
+  font-size: calc(20px * var(--ts, 1));
+  line-height: 1.2;
+}
+.start-list strong {
+  color: var(--sp-ink);
+}
+
+.start-cta {
+  width: 100%;
+  padding: 16px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(120deg, #1cd1ee, #33d4a8);
+  color: #062a2f;
+  font-family: inherit;
+  font-size: calc(18px * var(--ts, 1));
+  font-weight: 800;
+  cursor: pointer;
+}
+.start-cta:focus-visible {
+  outline: 3px solid var(--sp-teal-ink);
+  outline-offset: 3px;
+}
+
+.start-links {
+  margin: 14px 0 0;
+  color: var(--sp-faint);
+  font-size: calc(12.5px * var(--ts, 1));
+}
+.start-links a {
+  color: var(--sp-muted);
+}
