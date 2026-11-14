@@ -17,13 +17,37 @@ import NotifyPrompt from "./ui/NotifyPrompt";
 import StartGate from "./stages/start/StartGate";
 import { useState } from "react";
 
+// The disclaimer is shown once per device; after that, straight to the game
+const DISCLAIMER_KEY = "sp-disclaimer-seen";
+function hasSeenDisclaimer() {
+  try {
+    return localStorage.getItem(DISCLAIMER_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+function rememberDisclaimer() {
+  try {
+    localStorage.setItem(DISCLAIMER_KEY, "1");
+  } catch {
+    // private mode: they'll just see it next visit
+  }
+}
+
 function App() {
   const currentStage = useGameStore((state) => state.currentStage);
-  // Plain-words disclaimer first, once per visit (replays skip it). Nothing
+  // Plain-words disclaimer first, once per device (replays skip it). Nothing
   // else mounts until then, so no music starts behind it either.
-  const [readyToPlay, setReadyToPlay] = useState(false);
+  const [readyToPlay, setReadyToPlay] = useState(hasSeenDisclaimer);
 
-  if (!readyToPlay) return <StartGate onPlay={() => setReadyToPlay(true)} />;
+  if (!readyToPlay) return (
+      <StartGate
+        onPlay={() => {
+          rememberDisclaimer();
+          setReadyToPlay(true);
+        }}
+      />
+    );
 
   return (
     <div>

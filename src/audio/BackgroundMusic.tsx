@@ -66,7 +66,18 @@ function BackgroundMusic() {
     if (!musicPaused && !jinglePlaying) {
       showMusicNowPlaying(track);
       captionMusic(captionFor(track));
-      audio.play().catch(() => {});
+      // Browsers block sound before the first tap (returning players skip the
+      // disclaimer), so retry once on their first touch or key press
+      audio.play().catch(() => {
+        const retry = () => {
+          const { musicPaused, jinglePlaying } = useGameStore.getState();
+          if (audioRef.current === audio && !musicPaused && !jinglePlaying) {
+            audio.play().catch(() => {});
+          }
+        };
+        window.addEventListener("pointerdown", retry, { once: true });
+        window.addEventListener("keydown", retry, { once: true });
+      });
     }
     audioRef.current = audio;
 
