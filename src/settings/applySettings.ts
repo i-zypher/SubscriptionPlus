@@ -12,6 +12,11 @@ const root = document.documentElement;
 const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
+// The phone's own setting (Android: Remove animations, iOS: Reduce Motion)
+export function phoneReducesMotion() {
+  return motionQuery.matches;
+}
+
 // The phone's own "reduce motion" setting counts too
 export function prefersLessMotion() {
   return useSettingsStore.getState().reduceMotion || motionQuery.matches;

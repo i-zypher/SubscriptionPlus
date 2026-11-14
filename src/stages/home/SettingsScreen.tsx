@@ -6,6 +6,7 @@ import type { SettingOption } from "./settingsContent";
 import { useSettingsStore } from "../../state/settingsStore";
 import { useNotificationNote } from "../../notifications";
 import { isApp } from "../../platform";
+import { phoneReducesMotion } from "../../settings/applySettings";
 import type {
   ToggleSettingKey,
   ChoiceSettingKey,
@@ -99,14 +100,17 @@ function RealToggle({
   const notificationNote = useNotificationNote((state) => state.note);
 
   // Push Notifications only does something in the apps; say so honestly
-  const note =
-    setting !== "push"
-      ? null
-      : !isApp
-      ? isOn
-        ? "Reminders come with the iOS and Android apps."
-        : null
-      : notificationNote;
+  const pushNote = !isApp
+    ? isOn
+      ? "Reminders come with the iOS and Android apps."
+      : null
+    : notificationNote;
+  // When the phone itself asks for less motion, this switch can't turn it back on
+  const motionNote =
+    !isOn && phoneReducesMotion()
+      ? "Your phone's own reduce-motion setting is on (Android: Remove animations), so animations and confetti stay off."
+      : null;
+  const note = setting === "push" ? pushNote : setting === "reduceMotion" ? motionNote : null;
 
   return (
     <div className="set-item">
