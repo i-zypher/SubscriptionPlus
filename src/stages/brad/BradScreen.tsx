@@ -8,6 +8,7 @@ import { playJingle, pauseJingle } from "../../audio/jinglePlayer";
 import { playMoneyAddedTone } from "../../audio/sounds";
 import { FEATURE_FEE, BRAD_HANDS_OFF } from "./bradScript";
 import { aiBradAvailable, askBrad, reportBradReply } from "./bradAI";
+import { pickIdleLine } from "./bradIdle";
 import { liteReply, soundsLikeDistress, DISTRESS_REPLY } from "./bradLite";
 import type { AiIntent, Offer } from "./bradAI";
 import "./brad.css";
@@ -27,6 +28,10 @@ const HOLD_MS = [15 * 1000, 30 * 1000, 45 * 1000];
 // Pay to skip the wait. It rhymes, so it ships.
 const SKIP_LINE_FEE = 4.99;
 const ENDING_DELAY_MS = 3500;
+// Go quiet and Brad checks on you: first after 15s, then every 20s, up to 3
+const IDLE_FIRST_MS = 15 * 1000;
+const IDLE_REPEAT_MS = 20 * 1000;
+const MAX_NUDGES = 3;
 
 const LAST_PHASE = bradPhases.length - 1;
 
@@ -83,12 +88,18 @@ function BradScreen() {
   const lastWasDistress = useRef(false);
   const endedRef = useRef(false);
   const holdDone = useRef<(() => Promise<void>) | null>(null);
+  const nudges = useRef(0);
+  const nudgeRef = useRef<() => void>(() => {});
+  const busyRef = useRef(false);
   const alive = useRef(true);
   const chatRef = useRef<HTMLDivElement | null>(null);
 
   const phaseIndex = Math.min(transferCount, LAST_PHASE);
   const phase = bradPhases[phaseIndex];
   const busy = typing || onHold || ended;
+  busyRef.current = busy;
+  const waitingOnPlayer =
+    !busy && messages[messages.length - 1]?.from === "brad";
 
   // The first Brad says hi once per run
   useEffect(() => {
@@ -125,6 +136,41 @@ function BradScreen() {
       page.scrollTo({ top: page.scrollHeight, behavior: "smooth" });
     }
   }, [messages, typing, onHold]);
+
+  // Brad checks on a quiet player. The first nudge is scripted; later ones
+  // are written by AI when it's available. Never charges, never pitches.
+  async function nudge() {
+    const last = () => {
+      const all = useGameStore.getState().messages;
+      return all[all.length - 1];
+    };
+    if (!alive.current || busyRef.current || last()?.from !== "brad") return;
+    if (document.hidden) {
+      later(() => nudgeRef.current(), 2000);
+      return;
+    }
+    const count = nudges.current;
+    nudges.current += 1;
+    const scripted = () => pickIdleLine(phaseIndex, offer?.name);
+    let text: string | null = null;
+    if (count > 0 && useGameStore.getState().bradMode === "ai") {
+      const ai = await askBrad(phaseIndex, "idle");
+      text = ai?.reply ?? null;
+    }
+    // The player may have answered, or the screen moved on, while we waited
+    if (!alive.current || busyRef.current || last()?.from !== "brad") return;
+    bradSays(text ?? scripted());
+  }
+  nudgeRef.current = () => void nudge();
+
+  useEffect(() => {
+    if (!waitingOnPlayer || nudges.current >= MAX_NUDGES) return;
+    const id = window.setTimeout(
+      () => nudgeRef.current(),
+      nudges.current === 0 ? IDLE_FIRST_MS : IDLE_REPEAT_MS
+    );
+    return () => clearTimeout(id);
+  }, [waitingOnPlayer, messages.length]);
 
   function later(fn: () => void, ms: number) {
     timers.current.push(window.setTimeout(fn, ms));
@@ -224,6 +270,7 @@ function BradScreen() {
       setCancels(0);
       setPitchOpen(false);
       setOffer(null);
+      nudges.current = 0;
       addMessage({
         from: "system",
         text: `🔄 You've been transferred to ${next.name}.`,
@@ -424,6 +471,7 @@ function BradScreen() {
     const text = draft.trim();
     if (!text || busy) return;
     addMessage({ from: "player", text });
+    nudges.current = 0;
     setDraft("");
     void (async () => {
       await respond(text);

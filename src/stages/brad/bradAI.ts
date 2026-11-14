@@ -16,7 +16,8 @@ export type AiIntent =
   | "transfer"
   | "askBot"
   | "other"
-  | "accepted";
+  | "accepted"
+  | "idle";
 // A made-up plan Brad pitched; saying yes really adds it to the bill
 export type Offer = { name: string; price: number };
 export type AiReply = { reply: string; charge: boolean; offer: Offer | null };

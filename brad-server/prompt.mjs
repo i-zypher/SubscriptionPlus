@@ -61,6 +61,8 @@ const TASKS = {
     "The player is asking whether you're a bot. Deny it in character, badly: the denial itself should sound robotic or glitch, and you can accuse them of being the bot. Do not admit it.",
   accepted: (offer) =>
     `The customer just said yes to ${offer.name}, and the game has added it to their bill at $${offer.price.toFixed(2)}/mo. Celebrate the purchase in character. Don't pitch anything new in this reply ("offer" must be null).`,
+  idle:
+    "The customer has gone quiet for a while and hasn't answered you. Nudge them in character with ONE short, funny line, like a needy, nervous, or impatient support agent checking if they're still there. Use something from the conversation if it helps. Never pitch a new plan (\"offer\" must be null) and \"charge\" must be false. Do not repeat any earlier nudge.",
   other:
     "Respond to what the player said, in character, and steer them back toward staying subscribed (without mentioning Cancel Plus). If what they said gives you an opening, you may charge them for a ridiculous 'Plus+ feature' (like answering, listening, empathy, eye contact, reading their message) for $4.99 and set \"charge\" to true. Do this at most about one time in four, only when it's funny, and say it's $4.99 in the reply.",
 };
