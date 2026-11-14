@@ -3,6 +3,7 @@ import { useSettingsStore } from "../state/settingsStore"
 import { showJingleNowPlaying } from "./mediaSession"
 import { captionJingle } from "./captions"
 import { useGameStore } from "../state/gameStore"
+import { inBackground } from "./backgroundPause"
 
 // One jingle player for the whole run, shared by the home-screen intro, the ad
 // bursts, and Brad's holds, so the song always picks up where it left off.
@@ -59,12 +60,21 @@ export function playJingleOnce(version: string, onDone: () => void) {
     setPlaying(false)
     onDone()
   }
-  // "pause" here means the phone stopped it (media controls, switching apps),
-  // since pauseJingle() stops watching before it pauses. Either way, move on.
-  const endEvents = ["ended", "pause", "error"]
-  endEvents.forEach((e) => player.addEventListener(e, handleEnded))
+  // "pause" here means the phone's media controls stopped it, since
+  // pauseJingle() stops watching before it pauses. Leaving the app also
+  // pauses it, but that's backgroundPause holding it to resume later, so the
+  // song isn't over (counting it as over let the hold music play on top).
+  const handlePause = () => {
+    if (!inBackground()) handleEnded()
+  }
+  const endEvents: [string, () => void][] = [
+    ["ended", handleEnded],
+    ["pause", handlePause],
+    ["error", handleEnded],
+  ]
+  endEvents.forEach(([e, fn]) => player.addEventListener(e, fn))
   stopWatchingEnd = () => {
-    endEvents.forEach((e) => player.removeEventListener(e, handleEnded))
+    endEvents.forEach(([e, fn]) => player.removeEventListener(e, fn))
     player.loop = true
     stopWatchingEnd = null
     finishOnce = null

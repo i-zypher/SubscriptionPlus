@@ -23,6 +23,12 @@ HTMLMediaElement.prototype.play = function (this: HTMLMediaElement) {
   return realPlay.call(this);
 };
 
+// True while the game is in the background and we paused its audio. Players
+// use it to tell our pause apart from the song really stopping.
+export function inBackground() {
+  return hidden;
+}
+
 function goBackground() {
   if (hidden) return;
   hidden = true;
