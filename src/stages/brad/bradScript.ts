@@ -233,6 +233,15 @@ export const bradReplies: Record<Intent, string[]> = {
   ],
 };
 
+// The first Brad can't do anything, so after a while he hands you off himself,
+// to the Specialist, who speaks very slowly
+export const BRAD_HANDS_OFF: string[] = [
+  "Okay, I'll be honest: I've been trying to help for a while now and I can't actually do anything. 😅 Let me transfer you to a Specialist. He speaks very, very slowly, which I'm told helps.",
+  "You know what? I think we've reached the limit of what I can do, which is chat. Let me get you to Brad, the Specialist. He talks slowly. Like, slowly slowly. 😊",
+  "I'm so sorry, I just realized I can't help with anything you've asked. That's on me! Handing you to a Specialist. Fair warning: he speaks. Very. Slowly.",
+  "Plot twist: I'm just the first Brad! Time to meet the Specialist. He goes at a gentle pace. You'll love it. Probably. 🙂",
+]
+
 export const BRAD_GREETING =
   "Hi, I'm Brad! 😊 I'm a real person. How can I help you today?";
 export const BRAD_CRACK =

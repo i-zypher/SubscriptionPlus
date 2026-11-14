@@ -6,7 +6,7 @@ import { bradPhases } from "./bradPhases";
 import { detectIntent, mentionsIntent, pickLine, pickReply } from "./bradLogic";
 import { playJingle, pauseJingle } from "../../audio/jinglePlayer";
 import { playMoneyAddedTone } from "../../audio/sounds";
-import { FEATURE_FEE } from "./bradScript";
+import { FEATURE_FEE, BRAD_HANDS_OFF } from "./bradScript";
 import { aiBradAvailable, askBrad, reportBradReply } from "./bradAI";
 import { liteReply, soundsLikeDistress, DISTRESS_REPLY } from "./bradLite";
 import type { AiIntent, Offer } from "./bradAI";
@@ -19,6 +19,9 @@ const BRAD_WAVERS =
 const BRAD_GIVES_UP =
   "…FINE. FINE! NO ONE HAS EVER SAID IT THREE TIMES. YOUR SUBSCRIPTION IS CANCELLED. FOR FREE. NO FEES. NO CANCEL PLUS. BRAD NEEDS TO LIE DOWN.";
 const INSULTS_TO_TRANSFER = 3;
+// The first Brad can't help with anything: after this many of your messages
+// he passes you on to the Specialist himself
+const MESSAGES_BEFORE_HANDOFF = 8;
 // Hold time before each new Brad picks up: Specialist, Senior Specialist, BRAD
 const HOLD_MS = [15 * 1000, 30 * 1000, 45 * 1000];
 // Pay to skip the wait. It rhymes, so it ships.
@@ -74,6 +77,11 @@ function BradScreen() {
   // The hold in progress: its timer, and what happens when it ends (so
   // "Skip the line" can end it early)
   const holdTimer = useRef<number | null>(null);
+  // Messages sent to the first Brad, and whether the last one was real
+  // distress (no joke handoff after that) or an ending has started
+  const turnsWithFirstBrad = useRef(0);
+  const lastWasDistress = useRef(false);
+  const endedRef = useRef(false);
   const holdDone = useRef<(() => Promise<void>) | null>(null);
   const alive = useRef(true);
   const chatRef = useRef<HTMLDivElement | null>(null);
@@ -177,6 +185,7 @@ function BradScreen() {
   }
 
   function finish(ending: Ending) {
+    endedRef.current = true;
     setEnded(true);
     later(() => {
       setEnding(ending);
@@ -255,8 +264,10 @@ function BradScreen() {
   }
 
   async function respond(message: string) {
+    lastWasDistress.current = false;
     // Real distress skips the bit entirely: no charges, no jokes
     if (soundsLikeDistress(message)) {
+      lastWasDistress.current = true;
       setPitchOpen(false);
       setOffer(null);
       addMessage({ from: "system", text: DISTRESS_REPLY });
@@ -414,7 +425,24 @@ function BradScreen() {
     if (!text || busy) return;
     addMessage({ from: "player", text });
     setDraft("");
-    void respond(text);
+    void (async () => {
+      await respond(text);
+      // Eight messages in and he still can't help: Brad passes you on
+      if (phaseIndex !== 0 || !alive.current) return;
+      turnsWithFirstBrad.current += 1;
+      const startedSomethingElse =
+        holdDone.current !== null || endedRef.current;
+      if (
+        turnsWithFirstBrad.current >= MESSAGES_BEFORE_HANDOFF &&
+        !startedSomethingElse &&
+        !lastWasDistress.current
+      ) {
+        setPitchOpen(false);
+        setOffer(null);
+        bradSays(pickLine(BRAD_HANDS_OFF));
+        putOnHold();
+      }
+    })();
   }
 
   const brokenPage = phaseIndex === LAST_PHASE;

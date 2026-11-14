@@ -12,13 +12,18 @@ function captionFor(track: string) {
     : "♪ Smooth, endless hold music ♪";
 }
 
-function trackFor(stage: Stage): string | null {
+// The first Brad is still a normal chat, so the smooth music carries on from
+// the CAPTCHAs. The glitching starts when the second Brad picks up.
+function trackFor(stage: Stage, transferCount: number): string | null {
   switch (stage) {
     case "avalanche":
     case "home":
     case "captcha":
       return `${import.meta.env.BASE_URL}audio/background.mp3`;
     case "brad":
+      return `${import.meta.env.BASE_URL}audio/${
+        transferCount === 0 ? "background" : "glitchy"
+      }.mp3`;
     case "endings":
       return `${import.meta.env.BASE_URL}audio/glitchy.mp3`;
     default:
@@ -41,7 +46,8 @@ function BackgroundMusic() {
   );
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const track = trackFor(stage);
+  const transferCount = useGameStore((state) => state.transferCount);
+  const track = trackFor(stage, transferCount);
 
   // A jingle from home keeps playing through Settings and the CAPTCHAs, and
   // ends when the game moves on (Brad, an ending, a new trial)
