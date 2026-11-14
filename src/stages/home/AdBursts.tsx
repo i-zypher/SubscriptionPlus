@@ -495,10 +495,12 @@ function AdBursts({ paused }: { paused: boolean }) {
     setMusicPaused(false);
   }, [adsShowing, setMusicPaused]);
 
-  // Leaving the home screen mid-jingle
+  // Leaving the home screen mid-jingle. Off to the CAPTCHAs, the song keeps
+  // going (BackgroundMusic ends it if the game moves on past them).
   useEffect(
     () => () => {
       if (!adJinglePlaying.current) return;
+      if (useGameStore.getState().currentStage === "captcha") return;
       adJinglePlaying.current = false;
       pauseJingle();
       setMusicPaused(false);

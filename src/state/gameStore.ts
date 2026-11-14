@@ -57,6 +57,8 @@ interface GameState {
   jingleIntro: "pending" | "playing" | "done";
   spotSceneId: string | null;
   musicPaused: boolean;
+  // The jingle is playing (set by jinglePlayer); the hold music waits for it
+  jinglePlaying: boolean;
 }
 
 const initialState: GameState = {
@@ -77,6 +79,7 @@ const initialState: GameState = {
   jingleIntro: "pending",
   spotSceneId: null,
   musicPaused: false,
+  jinglePlaying: false,
 };
 
 interface GameActions {

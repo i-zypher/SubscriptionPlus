@@ -4,6 +4,7 @@ import type { Stage } from "../state/gameStore";
 import { useSettingsStore } from "../state/settingsStore";
 import { showMusicNowPlaying } from "./mediaSession";
 import { captionMusic } from "./captions";
+import { finishJingle } from "./jinglePlayer";
 
 function captionFor(track: string) {
   return track.endsWith("glitchy.mp3")
@@ -33,10 +34,20 @@ function BackgroundMusic() {
   const stage = useGameStore((state) => state.currentStage);
   const masterVolume = useSettingsStore((state) => state.masterVolume);
   const music = useSettingsStore((state) => state.music);
-  const musicPaused = useGameStore((state) => state.musicPaused);
+  // Quiet while something needs it (the audio CAPTCHA, Brad's holds) or the
+  // jingle is playing
+  const musicPaused = useGameStore(
+    (state) => state.musicPaused || state.jinglePlaying
+  );
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const track = trackFor(stage);
+
+  // A jingle from home keeps playing through Settings and the CAPTCHAs, and
+  // ends when the game moves on (Brad, an ending, a new trial)
+  useEffect(() => {
+    if (stage !== "home" && stage !== "captcha") finishJingle();
+  }, [stage]);
 
   useEffect(() => {
     if (!track) return;
@@ -45,7 +56,8 @@ function BackgroundMusic() {
     const audio = new Audio(track);
     audio.loop = true;
     audio.volume = musicVolume(masterVolume, music);
-    if (!useGameStore.getState().musicPaused) {
+    const { musicPaused, jinglePlaying } = useGameStore.getState();
+    if (!musicPaused && !jinglePlaying) {
       showMusicNowPlaying(track);
       captionMusic(captionFor(track));
       audio.play().catch(() => {});

@@ -20,9 +20,12 @@ function JingleIntro() {
       setMusicPaused(false);
     });
 
-    // Leaving Home mid-song: stop it, and finish the song next time they're back
+    // Off to the CAPTCHAs mid-song: the song keeps going (BackgroundMusic ends
+    // it if the game moves on past them). Anywhere else: stop it, and finish
+    // the song next time they're back.
     return () => {
-      if (useGameStore.getState().jingleIntro === "playing") {
+      const { jingleIntro, currentStage } = useGameStore.getState();
+      if (jingleIntro === "playing" && currentStage !== "captcha") {
         pauseJingle();
         setMusicPaused(false);
         setJingleIntro("pending");

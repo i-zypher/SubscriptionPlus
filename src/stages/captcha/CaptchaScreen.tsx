@@ -4,6 +4,7 @@ import { useGameStore } from "../../state/gameStore";
 import { useSettingsStore } from "../../state/settingsStore";
 import { captionClip, CLIP_LYRIC } from "../../audio/captions";
 import { captchaSrc } from "../../audio/jingleVersions";
+import { finishJingle } from "../../audio/jinglePlayer";
 import {
   playSuccessTone,
   playFailureTone,
@@ -213,9 +214,11 @@ function AudioCaptcha({ onPass }: CaptchaProps) {
   const [failed, setFailed] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Background music stays off for this whole step; stop the clip and
-  // bring the music back when the player leaves it
+  // Background music stays off for this whole step (and a jingle still
+  // playing from home ends here, so the clip can be heard); stop the clip
+  // and bring the music back when the player leaves it
   useEffect(() => {
+    finishJingle();
     setMusicPaused(true);
     return () => {
       audioRef.current?.pause();

@@ -2,12 +2,20 @@ import { jingleSrc } from "./jingleVersions"
 import { useSettingsStore } from "../state/settingsStore"
 import { showJingleNowPlaying } from "./mediaSession"
 import { captionJingle } from "./captions"
+import { useGameStore } from "../state/gameStore"
 
 // One jingle player for the whole run, shared by the home-screen intro, the ad
 // bursts, and Brad's holds, so the song always picks up where it left off.
 let audio: HTMLAudioElement | null = null
 let loadedVersion: string | null = null
 let stopWatchingEnd: (() => void) | null = null
+let finishOnce: (() => void) | null = null
+
+// Tell the hold music to wait while the jingle plays
+function setPlaying(playing: boolean) {
+  if (useGameStore.getState().jinglePlaying !== playing)
+    useGameStore.setState({ jinglePlaying: playing })
+}
 
 function jingleVolume() {
   const { masterVolume, music } = useSettingsStore.getState()
@@ -35,7 +43,8 @@ function getAudio(version: string) {
 export function playJingle(version: string) {
   showJingleNowPlaying(version)
   captionJingle(version)
-  getAudio(version).play().catch(() => {})
+  setPlaying(true)
+  getAudio(version).play().catch(() => setPlaying(false))
 }
 
 // Plays through to the end of the song once, then calls onDone (home-screen intro)
@@ -47,6 +56,7 @@ export function playJingleOnce(version: string, onDone: () => void) {
   const handleEnded = () => {
     stopWatchingEnd?.()
     captionJingle(null)
+    setPlaying(false)
     onDone()
   }
   // "pause" here means the phone stopped it (media controls, switching apps),
@@ -57,10 +67,16 @@ export function playJingleOnce(version: string, onDone: () => void) {
     endEvents.forEach((e) => player.removeEventListener(e, handleEnded))
     player.loop = true
     stopWatchingEnd = null
+    finishOnce = null
+  }
+  finishOnce = () => {
+    handleEnded() // stops watching first, so this pause isn't counted twice
+    player.pause()
   }
 
   showJingleNowPlaying(version)
   captionJingle(version)
+  setPlaying(true)
   // If the browser blocks playback, skip the intro instead of waiting forever
   player.play().catch(handleEnded)
 }
@@ -68,5 +84,14 @@ export function playJingleOnce(version: string, onDone: () => void) {
 export function pauseJingle() {
   stopWatchingEnd?.()
   captionJingle(null)
+  setPlaying(false)
   audio?.pause()
 }
+
+// The jingle is playing through once (home intro or an ad burst): end it now,
+// as if the song had finished, so whoever started it moves on. Used when the
+// game leaves home and the CAPTCHAs, and by the audio CAPTCHA, which needs quiet.
+export function finishJingle() {
+  finishOnce?.()
+}
+
