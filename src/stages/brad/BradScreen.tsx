@@ -20,7 +20,9 @@ const BRAD_GIVES_UP =
   "…FINE. FINE! NO ONE HAS EVER SAID IT THREE TIMES. YOUR SUBSCRIPTION IS CANCELLED. FOR FREE. NO FEES. NO CANCEL PLUS. BRAD NEEDS TO LIE DOWN.";
 const INSULTS_TO_TRANSFER = 3;
 // Hold time before each new Brad picks up: Specialist, Senior Specialist, BRAD
-const HOLD_MS = [15 * 1000, 30 * 1000, 45 * 1000];
+const HOLD_MS = [8 * 1000, 12 * 1000, 15 * 1000];
+// Pay to skip the wait. It rhymes, so it ships.
+const SKIP_LINE_FEE = 4.99;
 const ENDING_DELAY_MS = 3500;
 
 const LAST_PHASE = bradPhases.length - 1;
@@ -35,7 +37,9 @@ function useMeters() {
     return () => clearInterval(interval);
   }, []);
   const remaining = Math.max(0, (trialEndsAt ?? now) - now);
-  const time = `${Math.floor(remaining / 60000)}:${String(Math.floor(remaining / 1000) % 60).padStart(2, "0")}`;
+  const time = `${Math.floor(remaining / 60000)}:${String(
+    Math.floor(remaining / 1000) % 60
+  ).padStart(2, "0")}`;
   return { total: `$${monthlyTotal.toFixed(2)}`, time };
 }
 
@@ -54,6 +58,8 @@ function BradScreen() {
   const [draft, setDraft] = useState("");
   const [typing, setTyping] = useState(false);
   const [onHold, setOnHold] = useState(false);
+  // Paid to skip this hold: hide the button while the next Brad picks up
+  const [skipped, setSkipped] = useState(false);
   const [ended, setEnded] = useState(false);
   const [pitchOpen, setPitchOpen] = useState(false);
   // The last made-up plan AI Brad pitched, waiting for a yes
@@ -65,6 +71,10 @@ function BradScreen() {
   const [cancels, setCancels] = useState(0);
 
   const timers = useRef<number[]>([]);
+  // The hold in progress: its timer, and what happens when it ends (so
+  // "Skip the line" can end it early)
+  const holdTimer = useRef<number | null>(null);
+  const holdDone = useRef<(() => Promise<void>) | null>(null);
   const alive = useRef(true);
   const chatRef = useRef<HTMLDivElement | null>(null);
 
@@ -114,7 +124,7 @@ function BradScreen() {
 
   // Reporting a reply (required for AI chat in the app stores)
   const [reported, setReported] = useState<Record<number, "sending" | "sent">>(
-    {},
+    {}
   );
   async function report(index: number, text: string, name: string) {
     setReported((r) => ({ ...r, [index]: "sending" }));
@@ -142,7 +152,7 @@ function BradScreen() {
     phaseIndexForLine: number,
     intent: AiIntent,
     minMs: number,
-    accepted?: Offer,
+    accepted?: Offer
   ) {
     if (useGameStore.getState().bradMode !== "ai") {
       await wait(minMs);
@@ -187,41 +197,61 @@ function BradScreen() {
   }
   function putOnHold() {
     setOnHold(true);
+    setSkipped(false);
     addMessage({
       from: "system",
       text: "🎵 You've been placed on hold. Your call is important to us.",
     });
     startHoldMusic();
 
-    later(
-      async () => {
-        stopHoldMusic();
-        const nextIndex = Math.min(phaseIndex + 1, LAST_PHASE);
-        const next = bradPhases[nextIndex];
-        nextTransfer();
-        setBotAsks(0);
-        setInsults(0);
-        setCancels(0);
-        setPitchOpen(false);
-        setOffer(null);
-        addMessage({
-          from: "system",
-          text: `🔄 You've been transferred to ${next.name}.`,
-        });
-        setTyping(true);
-        const ai = await aiLine(nextIndex, "greeting", next.typingMs);
-        if (!alive.current) return;
-        setTyping(false);
-        addMessage({
-          from: "brad",
-          name: next.name,
-          text: ai?.reply ?? pickLine(next.greetings),
-        });
-        setOffer(ai?.offer ?? null);
-        setOnHold(false);
-      },
-      HOLD_MS[Math.min(phaseIndex, HOLD_MS.length - 1)],
+    const finishHold = async () => {
+      holdDone.current = null;
+      stopHoldMusic();
+      const nextIndex = Math.min(phaseIndex + 1, LAST_PHASE);
+      const next = bradPhases[nextIndex];
+      nextTransfer();
+      setBotAsks(0);
+      setInsults(0);
+      setCancels(0);
+      setPitchOpen(false);
+      setOffer(null);
+      addMessage({
+        from: "system",
+        text: `🔄 You've been transferred to ${next.name}.`,
+      });
+      setTyping(true);
+      const ai = await aiLine(nextIndex, "greeting", next.typingMs);
+      if (!alive.current) return;
+      setTyping(false);
+      addMessage({
+        from: "brad",
+        name: next.name,
+        text: ai?.reply ?? pickLine(next.greetings),
+      });
+      setOffer(ai?.offer ?? null);
+      setOnHold(false);
+    };
+    holdDone.current = finishHold;
+    const id = window.setTimeout(
+      finishHold,
+      HOLD_MS[Math.min(phaseIndex, HOLD_MS.length - 1)]
     );
+    holdTimer.current = id;
+    timers.current.push(id);
+  }
+
+  // $4.99 to end the hold right now
+  function skipTheLine() {
+    const done = holdDone.current;
+    if (!done) return;
+    if (holdTimer.current !== null) clearTimeout(holdTimer.current);
+    setSkipped(true);
+    charge(SKIP_LINE_FEE, `Skip the Line from ${phase.name}`);
+    addMessage({
+      from: "system",
+      text: "⏩ You skipped the line! Skip the Line is $4.99/mo. You'll be skipping lines monthly now.",
+    });
+    void done();
   }
 
   async function respond(message: string) {
@@ -251,14 +281,14 @@ function BradScreen() {
     if (intent === "yes" && !pitchWasOpen && offerWasOpen) {
       charge(
         offerWasOpen.price,
-        `${offerWasOpen.name} (upsold by ${phase.name})`,
+        `${offerWasOpen.name} (upsold by ${phase.name})`
       );
       setTyping(true);
       const ai = await aiLine(
         phaseIndex,
         "accepted",
         phase.typingMs,
-        offerWasOpen,
+        offerWasOpen
       );
       if (!alive.current) return;
       setTyping(false);
@@ -267,7 +297,7 @@ function BradScreen() {
         ai?.reply ??
           (phaseIndex === LAST_PHASE
             ? `${offerWasOpen.name.toUpperCase()} IS YOURS. ${price}. BRAD IS PLEASED.`
-            : `Done! ${offerWasOpen.name} is now on your account for ${price}. 😊`),
+            : `Done! ${offerWasOpen.name} is now on your account for ${price}. 😊`)
       );
       return;
     }
@@ -428,10 +458,10 @@ function BradScreen() {
               {brokenPage
                 ? "status: undefined"
                 : phaseIndex === 0
-                  ? "Online · usually replies instantly"
-                  : phaseIndex === 1
-                    ? "Specialist Desk · Ticket #A-0042"
-                    : "Senior Specialist · Office of Customer Success"}
+                ? "Online · usually replies instantly"
+                : phaseIndex === 1
+                ? "Specialist Desk · Ticket #A-0042"
+                : "Senior Specialist · Office of Customer Success"}
             </small>
           </div>
           <div className="brad-meters">
@@ -463,8 +493,8 @@ function BradScreen() {
                   {reported[i] === "sent"
                     ? "Reported. Thanks."
                     : reported[i] === "sending"
-                      ? "Reporting…"
-                      : "⚑ Report"}
+                    ? "Reporting…"
+                    : "⚑ Report"}
                 </button>
               )}
             </div>
@@ -485,7 +515,20 @@ function BradScreen() {
               </span>
             </div>
           )}
-          {onHold && <div className="bmsg is-system is-hold">🎵 On hold…</div>}
+          {onHold && (
+            <div className="bmsg is-system is-hold">
+              🎵 On hold…
+              {!skipped && (
+                <button
+                  type="button"
+                  className="brad-skip"
+                  onClick={skipTheLine}
+                >
+                  {brokenPage ? "SkipLine($4.99)" : "Skip the line for $4.99"}
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="brad-form">
@@ -503,8 +546,8 @@ function BradScreen() {
               onHold
                 ? "You're on hold…"
                 : brokenPage
-                  ? "undefined"
-                  : "Type a message…"
+                ? "undefined"
+                : "Type a message…"
             }
           />
           <button type="submit" disabled={busy}>

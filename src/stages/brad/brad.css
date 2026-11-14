@@ -576,3 +576,42 @@
 .bmsg-report:disabled {
   cursor: default;
 }
+
+/* Skip the line for $4.99: each Brad's own kind of button */
+.brad-skip {
+  display: block;
+  margin: 8px auto 0;
+  cursor: pointer;
+}
+.brad-p0 .brad-skip {
+  padding: 8px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(120deg, var(--cyan), var(--green));
+  color: #04221f;
+  font-family: inherit;
+  font-size: calc(14px * var(--ts, 1));
+  font-weight: 800;
+}
+.brad-p1 .brad-skip {
+  padding: 6px 12px;
+  border: 1px solid #245a88;
+  border-radius: 3px;
+  background: linear-gradient(#3b80bb, #2d6ca2);
+  color: #fff;
+  font-family: inherit;
+  font-size: calc(13px * var(--ts, 1));
+  font-weight: 700;
+}
+.brad-p2 .brad-skip {
+  padding: 3px 14px;
+  border: 2px outset #e0e0e0;
+  background: #ece9d8;
+  color: #000;
+  font-family: inherit;
+  font-size: calc(13px * var(--ts, 1));
+  font-style: normal;
+}
+.brad-p2 .brad-skip:active {
+  border-style: inset;
+}
